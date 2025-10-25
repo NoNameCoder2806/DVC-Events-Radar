@@ -18,3 +18,7 @@ Thumbs.db
 # Django migrations
 */migrations/*.py
 */migrations/*.pyc
+
+# Word temp files
+~$*
+*.tmp
