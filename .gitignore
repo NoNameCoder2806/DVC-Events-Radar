@@ -22,3 +22,7 @@ Thumbs.db
 # Word temp files
 ~$*
 *.tmp
+
+# Ignore Word docs and temporary files
+Documents/*.docx
+Documents/~*.tmp
