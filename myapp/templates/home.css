@@ -1,20 +1,21 @@
-*{
+* {
     padding: 0;
     margin: 0;
     font-family: "Avenir", "Mulish", "Helvetica", sans-serif;
 }
-body{
+
+body {
     --green: #017550;
 }
 
-header{
+header {
     height: 20vh;
     color: var(--green);
     background-color: white;
     position: relative;
 }
 
-header h1{
+header h1 {
     font-weight: bolder;
     position: absolute;
     left: 50%;
@@ -22,7 +23,7 @@ header h1{
     transform: translate(-50%, -50%);
 }
 
-header #button{
+header #button {
     position: absolute;
     cursor: pointer;
     top: 50%;
@@ -39,28 +40,34 @@ header #button{
     box-sizing: border-box;
 }
 
-.event-box{
+.page-description {
+    color: #2a954a;
+}
+
+.event-box {
     color: white;
-    height: 500px;
-    width: 400px;
     background-color: #202020;
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 10px;
+    padding: 20px;
+    height: 100%;
 }
-.event-box .event-title{
+
+.event-box .event-title {
     font-size: 1.6em;
     text-align: center;
     padding: 25px;
 }
 
-.event-box img{
+.event-box img {
     height: 250px;
     width: 100%;
     background-color: gray;
 }
 
-.event-box .info-summary{
+.event-box .info-summary {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -70,21 +77,74 @@ header #button{
     padding: 15px;
 }
 
-.add-fav, .see-details{
+.add-fav,
+.see-details {
     background-color: gray;
-    height: fit-content;
-    padding: 15px;
+    /* fallback color */
+    color: white;
+    /* make text visible */
+    border: none;
+    /* remove default button border */
+    padding: 15px 20px;
+    /* adjust spacing */
     border-radius: 50px;
     text-align: center;
     margin: 5px;
-}.add-fav{
-    background-color: goldenrod;
-}.see-details{
-    background-color: var(--green);
+    cursor: pointer;
+    /* shows pointer on hover */
+    font-size: 1em;
 }
 
-.event-box .additional-buttons{
+.add-fav {
+    background-color: goldenrod !important;
+    color: white !important;
+    border: none !important;
+}
+
+.see-details {
+    background-color: var(--green) !important;
+    color: white !important;
+    border: none !important;
+}
+
+.event-box .additional-buttons {
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.event-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.event-row .event-box {
+    flex: 1 1 calc(50% - 10px);
+    min-width: 350px;
+}
+
+/* For the buttons in the Events display*/
+.additional-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.additional-buttons button {
+    flex: 1;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.additional-buttons button:hover {
+    background-color: #555;
+    transform: scale(1.03);
 }

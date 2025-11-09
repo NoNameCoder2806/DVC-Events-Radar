@@ -131,52 +131,61 @@
 
             <!-- 🎟️ Middle Column -->
             <div class="col-md-8">
+                <!-- Short Description -->
+                <div>
+                    <p class="page-description">Add the Events page description here</p>
+                </div>
+
+                <!-- The Events Search Bar-->
                 <div class="p-3 bg-white border rounded">
                     <h3>Event Search</h3>
                     <input type="text" class="form-control mb-3" placeholder="Search for events...">
-                    <h4>Events</h4>
-                    <p>Events will be displayed here.</p>
-                    <div class="event-box">
-                        <p class="event-title">Event 1</p>
-                        <img alt="image">
-                        <div class="info-summary">
-                            <p class="date">December 18</p>
-                            <p class="time">3:30pm - 6:00pm</p>
-                            <p class="location">The Commons</p>
+
+                    <!-- ✅ New Bootstrap row for event grid -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="event-box">
+                                <p class="event-title">Event 1</p>
+                                <img alt="image">
+                                <div class="info-summary">
+                                    <p class="date">December 18</p>
+                                    <p class="time">3:30pm - 6:00pm</p>
+                                    <p class="location">The Commons</p>
+                                </div>
+                                <div class="additional-buttons">
+                                    <button class="add-fav">Add to Favorites</button>
+                                    <button class="see-details">See Details</button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="additional-buttons">
-                            <div class="add-fav">Add to Favorites</div>
-                            <div class="see-details">See Details</div>
+
+                        <div class="col-md-6">
+                            <div class="event-box">
+                                <p class="event-title">Event 2</p>
+                                <img alt="image">
+                                <div class="info-summary">
+                                    <p class="date">December 18</p>
+                                    <p class="time">3:30pm - 6:00pm</p>
+                                    <p class="location">The Commons</p>
+                                </div>
+
+                                <div class="additional-buttons">
+                                    <button class="add-fav">Add to Favorites</button>
+                                    <button class="see-details">See Details</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+
             <!-- 📅 Right Column -->
-
-            <!-- 
-            
-    Events Possible Format (CSS included in stylesheet):
-
-    <div class="event-box">
-        <p class="event-title">Event 1</p>
-        <img alt="image">
-        <div class="info-summary">
-            <p class="date">December 18</p>
-            <p class="time">3:30pm - 6:00pm</p>
-            <p class="location">The Commons</p>
-        </div>
-        <div class="additional-buttons">
-            <div class="add-fav">Add to Favorites</div>
-            <div class="see-details">See Details</div>
-        </div>
-    </div>
-    
--->
             <div class="col-md-2">
-                <div class="p-3 bg-light border rounded">
-                    <h5>Extra</h5>
-                    <p>Maybe announcements or info here.</p>
+                <div class="p-3 bg-light border rounded d-flex flex-column align-items-center">
+                    <h5>Quick Access</h5>
+                    <a href="{% url 'full_calendar' %}" class="btn btn-primary mb-2 w-100">Full Calendar</a>
+                    <a href="{% url 'event_map' %}" class="btn btn-success w-100">Event Map</a>
                 </div>
             </div>
         </div>
