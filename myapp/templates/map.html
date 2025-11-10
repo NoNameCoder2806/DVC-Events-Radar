@@ -1,0 +1,26 @@
+{% extends 'home.html' %}
+{% block title %}Event Map{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Event Map</h2>
+    <p>Scroll around to explore events.</p>
+    <div id="map" style="height: 500px; width: 100%;"></div>
+</div>
+
+<!-- ✅ Use Leaflet.js for the interactive static map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    const map = L.map('map').setView([37.9680, -122.0720], 13); // Default: DVC Pleasant Hill
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Example pin
+    L.marker([37.9680, -122.0720]).addTo(map)
+        .bindPopup('DVC Event Location')
+        .openPopup();
+</script>
+{% endblock %}
