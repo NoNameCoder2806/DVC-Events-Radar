@@ -1,0 +1,34 @@
+{% extends 'home.html' %}
+{% block title %}Calendar{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Event Calendar</h2>
+    <p>This is the full calendar page.</p>
+    <div id="calendar"></div>
+</div>
+
+<script>
+    // ✅ This script dynamically generates a simple static calendar based on current date
+    const calendarDiv = document.getElementById("calendar");
+    const today = new Date();
+    const month = today.toLocaleString('default', { month: 'long' });
+    const year = today.getFullYear();
+
+    let daysInMonth = new Date(year, today.getMonth() + 1, 0).getDate();
+    let firstDay = new Date(year, today.getMonth(), 1).getDay();
+
+    let html = `<h4>${month} ${year}</h4><table class="table table-bordered"><tr>`;
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    days.forEach(d => html += `<th>${d}</th>`);
+    html += "</tr><tr>";
+
+    for (let i = 0; i < firstDay; i++) html += "<td></td>";
+    for (let day = 1; day <= daysInMonth; day++) {
+        html += `<td>${day}</td>`;
+        if ((day + firstDay) % 7 === 0) html += "</tr><tr>";
+    }
+    html += "</tr></table>";
+
+    calendarDiv.innerHTML = html;
+</script>
+{% endblock %}
