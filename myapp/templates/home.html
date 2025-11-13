@@ -151,38 +151,11 @@
 
                     <!-- ✅ New Bootstrap row for event grid -->
                     <div class="row">
+                        {% for event in events_data %}
                         <div class="col-md-6">
-                            <div class="event-box">
-                                <p class="event-title">Event 1</p>
-                                <img alt="image">
-                                <div class="info-summary">
-                                    <p class="date">December 18</p>
-                                    <p class="time">3:30pm - 6:00pm</p>
-                                    <p class="location">The Commons</p>
-                                </div>
-                                <div class="additional-buttons">
-                                    <button class="add-fav">Add to Favorites</button>
-                                    <button class="see-details">See Details</button>
-                                </div>
-                            </div>
+                            {% include 'partials/events.html' with event=event %} 
                         </div>
-
-                        <div class="col-md-6">
-                            <div class="event-box">
-                                <p class="event-title">Event 2</p>
-                                <img alt="image">
-                                <div class="info-summary">
-                                    <p class="date">December 18</p>
-                                    <p class="time">3:30pm - 6:00pm</p>
-                                    <p class="location">The Commons</p>
-                                </div>
-
-                                <div class="additional-buttons">
-                                    <button class="add-fav">Add to Favorites</button>
-                                    <button class="see-details">See Details</button>
-                                </div>
-                            </div>
-                        </div>
+                        {% endfor %} 
                     </div>
                 </div>
             </div>
