@@ -122,41 +122,42 @@
         }
     </style>
 </head>
-<body>
-    <div class="container">
+<body>    
+    <form action="/register/" method="POST">
+        {% csrf_token %}
         <h1>Register</h1>
         
         <div class="form-group">
             <label>First Name</label>
-            <input type="text">
+            <input type="text"  id="first_name" name="first_name">
         </div>
 
         <div class="form-group">
             <label>Last Name</label>
-            <input type="text">
+            <input type="text" id="last_name" name="last_name">
         </div>
 
         <div class="form-group">
             <label>DVC ID</label>
-            <input type="text">
+            <input type="text" id="DVC_ID" name="DVC_ID">
         </div>
 
         <div class="form-group">
             <label>Email</label>
-            <input type="email">
+            <input type="email"  id="email" name="email">
         </div>
 
         <div class="form-group">
             <label>Password</label>
-            <input type="password">
+            <input type="password"  id="password" name="password">
         </div>
 
         <div class="form-group">
             <label>Confirm Password</label>
-            <input type="password">
+            <input type="password" id="password_validation" name="password_validation">
         </div>
 
         <button class="create-btn">CREATE ACCOUNT</button>
-    </div>
+    </form>
 </body>
 </html>
