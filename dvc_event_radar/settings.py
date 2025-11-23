@@ -20,7 +20,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+<<<<<<< HEAD
 SECRET_KEY = 'django-insecure-!l6r$bph*=wwxm-ettu1q8lzf$z-1$6h9e)qyir2lt=lwj%dp5'
+=======
+SECRET_KEY = 'django-insecure-j*sv)_j62su#tfg3@+z3gb9=^b*j)jl%!_u#8u@cjpn%*g1%ay'
+>>>>>>> origin/kayla-dev
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,7 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
     "myapp"
+=======
+>>>>>>> origin/kayla-dev
 ]
 
 MIDDLEWARE = [
@@ -115,8 +122,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+<<<<<<< HEAD
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "myapp" / "static"]
+=======
+STATIC_URL = 'static/'
+>>>>>>> origin/kayla-dev
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
