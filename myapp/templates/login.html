@@ -1,5 +1,6 @@
 {% extends 'home.html' %}
 {% block title %}Calendar{% endblock %}
+{% block show_header %}{% endblock %} 
 {% block content %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'login.css' %}">
@@ -16,10 +17,13 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
 </head>
 
-<body>
+
 <body>
     <div class="login-container">
         <h1 class="title">DVC Event Radar</h1>
+        {% if error_message %}
+            <div class="alert alert-danger" role="alert">{{error_message}}</div>
+        {% endif %}
         <form method="POST" action="{% url 'login' %}">
             {% csrf_token %}
             <label for="email"><i>Student Email</i></label>
@@ -34,6 +38,7 @@
             First-time user? <a href="{% url 'register' %}">Register</a> here
         </p>
     </div>
+    
 </body>
 </html>
 {% endblock %}
