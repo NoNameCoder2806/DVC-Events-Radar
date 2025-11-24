@@ -15,6 +15,10 @@
 </head>
 
 <body>
+    <p style="background: yellow; padding: 5px;">
+        DEBUG: {{ user_id }} — {{ user_name }}
+    </p>
+
     <!-- ✅ Header (outside of <head>) -->
     <header class="d-flex align-items-center p-3 bg-light border-bottom" style="position: relative;">
         <h1 class="mb-0">DVC Events</h1>
@@ -22,13 +26,13 @@
         <div class="button-container" 
             style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 5px;">
             {% if user_id %}
-                <!-- Logged-in user -->
-                <span>Welcome, {{ user_name }}!</span>
-                <a href="{% url 'logout' %}" class="btn btn-danger mt-2 w-100">Logout</a>
+                <!-- USER IS LOGGED IN -->
+                <p>Welcome, {{ user_name }}!</p>
+                <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
             {% else %}
-                <!-- Guest -->
-                <a href="{% url 'login' %}" class="btn btn-primary mb-2 w-100">Login</a>
-                <a href="{% url 'register' %}" class="btn btn-success w-100">Register</a>
+                <!-- USER IS NOT LOGGED IN -->
+                <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+                <a href="{% url 'register' %}" class="btn btn-secondary">Register</a>
             {% endif %}
         </div>
     </header>
