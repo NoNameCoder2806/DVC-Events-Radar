@@ -198,6 +198,36 @@
     </script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelectorAll('.interested-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const eventId = button.dataset.eventId;
+                const csrfToken = '{{ csrf_token }}';
+
+                const response = await fetch(`/favorite/${eventId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'added') {
+                    button.textContent = 'Unmark';
+                    button.classList.remove('btn-warning'); // remove yellow
+                    button.classList.add('btn-success');    // add green
+                } else if (data.status === 'removed') {
+                    button.textContent = 'Interested';
+                    button.classList.remove('btn-success'); // remove green
+                    button.classList.add('btn-warning');    // add yellow
+                } else if (data.status === 'error') {
+                    alert(data.message);
+                }
+            });
+        });
+        </script>
 </body>
 
 </html>

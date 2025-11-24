@@ -1,34 +1,101 @@
 {% extends 'home.html' %}
 {% block title %}Calendar{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <h2>Event Calendar</h2>
     <p>This is the full calendar page.</p>
-    <div id="calendar"></div>
+
+    <!-- Calendar container -->
+    <div id="calendar" class="calendar"></div>
+
+    <!-- Embed favorite days as JSON safely -->
+    {{ user_favorites_days|json_script:"favorite-days" }}
 </div>
 
+<style>
+#calendar h4 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+#calendar table {
+    width: 100%;
+    border-collapse: collapse;
+}
+#calendar th, #calendar td {
+    width: 14.28%;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+}
+#calendar td.empty {
+    background-color: #f8f9fa;
+}
+
+/* Highlight today */
+#calendar td.today {
+    background-color: #d4edda;  /* light green */
+    color: #155724;
+    font-weight: bold;
+    border-radius: 0;
+}
+
+/* Highlight favorite days */
+#calendar td.favorite {
+    background-color: #fff3cd;  /* light yellow */
+    color: #856404;
+    font-weight: bold;
+    border-radius: 0;
+}
+</style>
+
 <script>
-    // ✅ This script dynamically generates a simple static calendar based on current date
-    const calendarDiv = document.getElementById("calendar");
-    const today = new Date();
-    const month = today.toLocaleString('default', { month: 'long' });
-    const year = today.getFullYear();
+const calendarDiv = document.getElementById("calendar");
+const today = new Date();
+const monthNames = [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+];
 
-    let daysInMonth = new Date(year, today.getMonth() + 1, 0).getDate();
-    let firstDay = new Date(year, today.getMonth(), 1).getDay();
+const year = today.getFullYear();
+const month = today.getMonth();
+const dateToday = today.getDate();
+const daysInMonth = new Date(year, month + 1, 0).getDate();
+const firstDay = new Date(year, month, 1).getDay();
+const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
-    let html = `<h4>${month} ${year}</h4><table class="table table-bordered"><tr>`;
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    days.forEach(d => html += `<th>${d}</th>`);
-    html += "</tr><tr>";
+// Get favorite days from JSON safely
+let favoriteDays = [];
+const favEl = document.getElementById("favorite-days");
+if (favEl) {
+    favoriteDays = JSON.parse(favEl.textContent);
+}
 
-    for (let i = 0; i < firstDay; i++) html += "<td></td>";
-    for (let day = 1; day <= daysInMonth; day++) {
-        html += `<td>${day}</td>`;
-        if ((day + firstDay) % 7 === 0) html += "</tr><tr>";
-    }
-    html += "</tr></table>";
+// Build calendar HTML
+let html = `<h4>${monthNames[month]} ${year}</h4>`;
+html += `<table class="table table-bordered"><tr>`;
 
-    calendarDiv.innerHTML = html;
+// Weekday headers
+days.forEach(d => html += `<th>${d}</th>`);
+html += `</tr><tr>`;
+
+// Empty cells before first day
+for (let i = 0; i < firstDay; i++) html += `<td class="empty"></td>`;
+
+// Fill days
+for (let day = 1; day <= daysInMonth; day++) {
+    let classes = "";
+    if (day === dateToday) classes += " today";
+    if (favoriteDays.includes(day)) classes += " favorite";
+    html += `<td class="${classes.trim()}">${day}</td>`;
+    if ((day + firstDay) % 7 === 0) html += `</tr><tr>`;
+}
+
+// Empty cells after last day
+const remainingCells = (7 - (daysInMonth + firstDay) % 7) % 7;
+for (let i = 0; i < remainingCells; i++) html += `<td class="empty"></td>`;
+
+html += `</tr></table>`;
+calendarDiv.innerHTML = html;
 </script>
 {% endblock %}
