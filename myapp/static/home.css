@@ -15,9 +15,17 @@ body {
 .col-md-2 button{
     background-color: var(--blue) !important;
     color: white;
+    transition: all 0.2s ease;
 }.col-md-2 button:hover{
     background-color: var(--purple) !important;
     color: white;
+    transform: scale(1.2);
+}.col-md-2 button:active{
+    background-color: var(--purple) !important;
+    color: white;
+    transform: scale(1.2);
+}.border-bottom{
+    border-bottom: var(--green) 2px solid;
 }
 
 header {
