@@ -123,7 +123,8 @@
     </style>
 </head>
 <body>    
-    <form action="/register" method="POST">
+    <form action="/register/" method="POST">
+        {% csrf_token %}
         <h1>Register</h1>
         
         <div class="form-group">

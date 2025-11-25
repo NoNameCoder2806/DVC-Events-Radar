@@ -1,0 +1,19 @@
+<div class="event-box">
+    <p class="event-title">{{event.name}}</p>
+    {% if event.image != None %}
+        <img src = {{event.image_url}} alt="Event thumbnail">
+    {% else %}
+        <img alt="Event thumbnail">
+    {% endif %}
+    <div class="info-summary">
+        <p class="date">{{event.date}}</p>
+        <p class="time">{{event.start_time}} - {{event.end_time}}</p>
+        <p class="location">{{event.location}}</p>
+    </div>
+    <div class="additional-buttons">
+        <button class="add-fav">Add to Favorites</button>
+        <a href="{% url 'event_detail' event.id %}" class="btn btn-info see-details">
+            See Details
+        </a>
+    </div>
+</div>
