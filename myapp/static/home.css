@@ -13,10 +13,10 @@ body {
 }
 
 .col-md-2 button{
-    background-color: var(--blue);
+    background-color: var(--blue) !important;
     color: white;
 }.col-md-2 button:hover{
-    background-color: var(--purple);
+    background-color: var(--purple) !important;
     color: white;
 }
 
