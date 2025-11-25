@@ -1,15 +1,16 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Users(models.Model):
-    first_name = models.CharField(max_length=50, default=None, blank=True, null=True)
-    last_name = models.CharField(max_length=50, default=None, blank=True, null=True)
-    password = models.CharField(max_length=50)
-    email = models.CharField(max_length=100)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     DVC_ID = models.CharField(max_length=10,default=None, blank=True, null=True)
     role = models.CharField(max_length=30)
+    
+    def __str__(self):
+        return self.user.username
 
 class Events(models.Model): 
-    author_ID = models.IntegerField()
+    author_ID = models.ForeignKey(Users, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=10000)
     date = models.CharField(max_length=100)
@@ -21,6 +22,9 @@ class Events(models.Model):
     event_type = models.CharField(max_length=100)
     image_url = models.URLField(default=None, blank=True, null=True)
     
+    def __str__(self):
+        return self.name     
+    
 class Favorites(models.Model):
-    event_ID = models.IntegerField()
-    user_ID = models.IntegerField()
+    event_ID = models.ForeignKey(Events, on_delete=models.CASCADE)
+    user_ID = models.ForeignKey(Users, on_delete=models.CASCADE)
