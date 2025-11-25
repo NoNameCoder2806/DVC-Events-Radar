@@ -3,7 +3,7 @@ from django.db import models
 class Users(models.Model):
     first_name = models.CharField(max_length=50, default=None, blank=True, null=True)
     last_name = models.CharField(max_length=50, default=None, blank=True, null=True)
-    password = models.CharField(max_length=50)
+    password = models.CharField(max_length=256)
     email = models.CharField(max_length=100)
     DVC_ID = models.CharField(max_length=10,default=None, blank=True, null=True)
     role = models.CharField(max_length=30)

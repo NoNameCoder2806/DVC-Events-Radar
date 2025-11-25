@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Users, Events, Favorites
+from django.contrib.auth.hashers import make_password, check_password
 
 def get_data():    
     users_data = Users.objects.all()
@@ -29,11 +30,17 @@ def login(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
         try:
-            user = Users.objects.get(email=email, password=password)
-            # Store session info
-            request.session['user_id'] = user.id
-            request.session['user_name'] = f"{user.first_name} {user.last_name}"
-            return redirect("home")  # successful login
+            user = Users.objects.get(email=email)
+            if check_password(password, user.password):
+                # if password is correct
+                # Store session info
+                request.session['user_id'] = user.id
+                request.session['user_name'] = f"{user.first_name} {user.last_name}"
+                return redirect("home")  # successful login
+            else:
+                # if password is wrong
+                # invalid login
+                return render(request, 'login.html', {'error': 'Invalid credentials'})
         except Users.DoesNotExist:
             # invalid login
             return render(request, 'login.html', {'error': 'Invalid credentials'})
@@ -53,7 +60,7 @@ def register(request):
             first_name = request.POST.get("first_name"),
             last_name = request.POST.get("last_name"),
             email = request.POST.get("email"),
-            password = request.POST.get("password"),
+            password = make_password(request.POST.get("password")),
             DVC_ID = request.POST.get("DVC_ID"),
             role = 'user'
         )
