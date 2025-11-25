@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Users, Events, Favorites
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
 
 def get_data():    
     users_data = Users.objects.all()
@@ -15,8 +16,6 @@ def get_data():
 
 def home(request):
     data = get_data()
-    data['user_id'] = request.session.get('user_id')
-    data['user_name'] = request.session.get('user_name')
     return render(request, 'home.html', data)
 
 def calendar(request):
@@ -25,30 +24,23 @@ def calendar(request):
 def map(request):
     return render(request, 'map.html')
 
-def login(request):
+def app_login(request):
     if request.method == "POST":
-        email = request.POST.get("email")
+        email = request.POST.get("email").lower()
         password = request.POST.get("password")
-        try:
-            user = Users.objects.get(email=email)
-            if check_password(password, user.password):
-                # if password is correct
-                # Store session info
-                request.session['user_id'] = user.id
-                request.session['user_name'] = f"{user.first_name} {user.last_name}"
-                return redirect("home")  # successful login
-            else:
-                # if password is wrong
-                # invalid login
-                return render(request, 'login.html', {'error': 'Invalid credentials'})
-        except Users.DoesNotExist:
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect("home")  # successful login
+        else:
+            # if password is wrong
             # invalid login
             return render(request, 'login.html', {'error': 'Invalid credentials'})
     else:
         return render(request, 'login.html')
     
-def logout(request):
-    request.session.flush()  # clears all session data
+def app_logout(request):
+    logout(request) # clears all session data
     return redirect("home")
 
 def register(request):
@@ -56,13 +48,17 @@ def register(request):
         return render(request, 'register.html')
 
     elif request.method == "POST":
-        user_register = Users(
+        user_default = User.objects.create_user(
+            username = request.POST.get("email").lower(), 
             first_name = request.POST.get("first_name"),
             last_name = request.POST.get("last_name"),
-            email = request.POST.get("email"),
-            password = make_password(request.POST.get("password")),
+            email = request.POST.get("email").lower(),
+            password = request.POST.get("password"),
+        )
+        user_register = Users(
+            user = user_default,             
             DVC_ID = request.POST.get("DVC_ID"),
-            role = 'user'
+            role = 'user'           
         )
         user_register.save()
         return redirect("login")
