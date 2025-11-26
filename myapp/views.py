@@ -17,8 +17,25 @@ def get_data():
     return data
 
 def home(request):
-    data = get_data()
-    return render(request, 'home.html', data)
+    # All events
+    events_data = Events.objects.all()
+
+    # User favorites
+    user_favorites = []
+    if request.user.is_authenticated:
+        try:
+            user_obj = Users.objects.get(user=request.user)
+            user_favorites = list(Favorites.objects.filter(user_ID=user_obj).values_list('event_ID__id', flat=True))
+        except Users.DoesNotExist:
+            user_favorites = []
+
+    # Pass context to template
+    return render(request, 'home.html', {
+        'events_data': events_data,
+        'user_favorites': user_favorites,
+        'user_id': request.user.id if request.user.is_authenticated else None,
+        'user_name': request.user.username if request.user.is_authenticated else None,
+    })
 
 def calendar_view(request):
     user_id = request.session.get('user_id')
@@ -92,17 +109,24 @@ def event_detail(request, event_id):
     return render(request, "event_detail.html", {"event": event})
 
 def mark_favorite(request, event_id):
-    user_id = request.session.get('user_id')
-    if not user_id:
-        return JsonResponse({'status': 'error', 'message': 'User not logged in'}, status=403)
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'error', 'message': 'User not logged in'})
 
-    # Check if already favorited
-    favorite_exists = Favorites.objects.filter(user_ID=user_id, event_ID=event_id).exists()
-    if favorite_exists:
-        # Optionally, unmark if already favorited
-        Favorites.objects.filter(user_ID=user_id, event_ID=event_id).delete()
+    # Get the event instance
+    event_obj = get_object_or_404(Events, id=event_id)
+
+    # Get the corresponding Users instance for the logged-in user
+    try:
+        user_obj = Users.objects.get(user=request.user)
+    except Users.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Users profile not found'})
+
+    # Check if favorite exists
+    favorite = Favorites.objects.filter(user_ID=user_obj, event_ID=event_obj).first()
+
+    if favorite:
+        favorite.delete()
         return JsonResponse({'status': 'removed'})
-    
-    # Mark as favorite
-    Favorites.objects.create(user_ID=user_id, event_ID=event_id)
-    return JsonResponse({'status': 'added'})
+    else:
+        Favorites.objects.create(user_ID=user_obj, event_ID=event_obj)
+        return JsonResponse({'status': 'added'})

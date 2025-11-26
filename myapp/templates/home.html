@@ -5,19 +5,19 @@
     <!-- ✅ Header (outside of <head>) -->
     <header class="d-flex align-items-center p-3 bg-light border-bottom" style="position: relative;">
         <h1 class="mb-0">DVC Events</h1>
-
-        <div class="button-container" 
+        <div class="button-container"
             style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 5px;">
             {% if user_id %}
-                <!-- Logged-in user -->
-                <span>Welcome, {{ user_name }}!</span>
-                <a href="{% url 'logout' %}" class="btn btn-danger mt-2 w-100">Logout</a>
+            <!-- Logged-in user -->
+            <span>Welcome, {{ user_name }}!</span>
+            <a href="{% url 'logout' %}" class="btn btn-danger mt-2 w-100">Logout</a>
             {% else %}
-                <!-- Guest -->
-                <a href="{% url 'login' %}" class="btn btn-primary mb-2 w-100">Login</a>
-                <a href="{% url 'register' %}" class="btn btn-success w-100">Register</a>
+            <!-- Guest -->
+            <a href="{% url 'login' %}" class="btn btn-primary mb-2 w-100">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-success w-100">Register</a>
             {% endif %}
         </div>
+        <meta name="csrf-token" content="{{ csrf_token }}">
     </header>
 
 
@@ -146,9 +146,9 @@
                     <div class="row">
                         {% for event in events_data %}
                         <div class="col-md-6  mb-4">
-                            {% include 'partials/event_card.html' with event=event %} 
+                            {% include 'partials/event_card.html' with event=event %}
                         </div>
-                        {% endfor %} 
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -182,35 +182,57 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.querySelectorAll('.interested-btn').forEach(button => {
-            button.addEventListener('click', async () => {
-                const eventId = button.dataset.eventId;
-                const csrfToken = '{{ csrf_token }}';
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.interested-btn').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const eventId = button.dataset.eventId;
+                    const csrfToken = '{{ csrf_token }}';
+                    const messageDiv = document.getElementById(`favorite-message-${eventId}`);
 
-                const response = await fetch(`/favorite/${eventId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': csrfToken,
-                        'Accept': 'application/json'
+                    try {
+                        const response = await fetch(`/favorite/${eventId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': csrfToken,
+                                'Accept': 'application/json'
+                            }
+                        });
+
+                        const data = await response.json();
+
+                        if (data.status === 'added') {
+                            button.textContent = 'Unmark';
+                            button.classList.remove('btn-warning');
+                            button.classList.add('btn-success');
+                            if (messageDiv) {
+                                messageDiv.textContent = 'Added to your interested events!';
+                                messageDiv.className = 'text-success mt-1';
+                            }
+                        } else if (data.status === 'removed') {
+                            button.textContent = 'Interested';
+                            button.classList.remove('btn-success');
+                            button.classList.add('btn-warning');
+                            if (messageDiv) {
+                                messageDiv.textContent = 'Removed from your interested events.';
+                                messageDiv.className = 'text-warning mt-1';
+                            }
+                        } else if (data.status === 'error') {
+                            if (messageDiv) {
+                                messageDiv.textContent = data.message;
+                                messageDiv.className = 'text-danger mt-1';
+                            }
+                        }
+                    } catch (err) {
+                        if (messageDiv) {
+                            messageDiv.textContent = 'Error updating favorite.';
+                            messageDiv.className = 'text-danger mt-1';
+                        }
                     }
                 });
-
-                const data = await response.json();
-
-                if (data.status === 'added') {
-                    button.textContent = 'Unmark';
-                    button.classList.remove('btn-warning'); // remove yellow
-                    button.classList.add('btn-success');    // add green
-                } else if (data.status === 'removed') {
-                    button.textContent = 'Interested';
-                    button.classList.remove('btn-success'); // remove green
-                    button.classList.add('btn-warning');    // add yellow
-                } else if (data.status === 'error') {
-                    alert(data.message);
-                }
             });
         });
-        </script>
+    </script>
+
 </body>
 
 </html>
