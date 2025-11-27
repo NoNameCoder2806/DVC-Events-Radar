@@ -5,16 +5,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}
-        Django App
-        {% endblock %}</title>
+    <title>{% block title %} Django App {% endblock %}</title>
     <link rel="stylesheet" href="{% static 'home.css' %}" type="text/css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
 </head>
 
 <body>
     {% block show_header %}
-    <!-- Header -->
     <header class="d-flex align-items-center p-3 bg-light border-bottom" style="position: relative;">
         <h1 class="mb-0">DVC Events</h1>
         <div class="button-container"
@@ -27,32 +24,14 @@
             {% endif %}
         </div>
     </header>
-
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">My Django App</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item active"><a class="nav-link" href="#">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">About</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>                
-            </ul>
-        </div>
-    </nav>
     {% endblock %}
 
-    <!-- Page content -->
     <div class="container-fluid mt-4">
-        {% block content %} {% endblock %}
+        {% block content %}{% endblock %}
     </div>
 
-    <!-- Scripts -->
+    <!-- GLOBAL SCRIPTS -->
     <script>
-        // Toggle + to − for filters
         document.querySelectorAll('.toggle-btn').forEach(button => {
             button.addEventListener('click', () => {
                 const expanded = button.getAttribute('aria-expanded') === 'true';
@@ -62,7 +41,12 @@
             });
         });
     </script>
+
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 🔥 IMPORTANT: child templates insert their JS here -->
+    {% block scripts %}{% endblock %}
+
 </body>
 </html>

@@ -13,13 +13,21 @@
     </div>
 
     <div class="additional-buttons">
-        <button type="button"
-            class="btn interested-btn {% if event.id in user_favorites %}btn-success{% else %}btn-warning{% endif %}"
-            data-event-id="{{ event.id }}">
-            {% if event.id in user_favorites %}Unmark{% else %}Interested{% endif %}
+        {% if user_favorites and event.id in user_favorites %}
+        <button type="button" class="btn interested-btn btn-success" data-event-id="{{ event.id }}"
+            data-favorited="true">
+            Unmark ⭐
         </button>
+        {% else %}
+        <button type="button" class="btn interested-btn btn-warning" data-event-id="{{ event.id }}"
+            data-favorited="false">
+            Interested ⭐
+        </button>
+        {% endif %}
+
         <div id="favorite-message-{{ event.id }}" class="mt-1"></div>
-        <a href="{% url 'event_detail' event.id %}" class="btn btn-info see-details">
+
+        <a href="{% url 'event_detail' event.id %}" class="btn btn-info see-details mt-2">
             See Details
         </a>
     </div>

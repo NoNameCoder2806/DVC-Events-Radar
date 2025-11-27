@@ -103,10 +103,26 @@ def register(request):
         )
         user_register.save()
         return redirect("login")
-    
+
 def event_detail(request, event_id):
     event = get_object_or_404(Events, id=event_id)
-    return render(request, "event_detail.html", {"event": event})
+
+    # Get user's favorite event IDs
+    user_favorites = []
+    if request.user.is_authenticated:
+        try:
+            user_obj = Users.objects.get(user=request.user)
+            user_favorites = list(
+                Favorites.objects.filter(user_ID=user_obj)
+                .values_list('event_ID__id', flat=True)
+            )
+        except Users.DoesNotExist:
+            user_favorites = []
+
+    return render(request, "event_detail.html", {
+        "event": event,
+        "user_favorites": user_favorites,
+    })
 
 def mark_favorite(request, event_id):
     if not request.user.is_authenticated:
