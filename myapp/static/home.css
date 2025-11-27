@@ -125,26 +125,33 @@ header #button {
     min-width: 350px;
 }
 
-/* For the buttons in the Events display*/
-.additional-buttons {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
+.interested-btn.btn-warning {
+    background-color: #ffc107 !important;
+    color: black !important;
 }
 
-.additional-buttons button {
-    flex: 1;
-    background-color: #333;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 16px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.2s ease, transform 0.1s ease;
+.interested-btn.btn-success {
+    background-color: #28a745 !important;
+    color: white !important;
 }
 
-.additional-buttons button:hover {
-    background-color: #555;
-    transform: scale(1.03);
+/* Add hover/focus/active just in case */
+.interested-btn.btn-warning:hover,
+.interested-btn.btn-warning:focus,
+.interested-btn.btn-warning:active {
+    background-color: #ffc107 !important;
+    color: black !important;
+}
+
+.interested-btn.btn-success:hover,
+.interested-btn.btn-success:focus,
+.interested-btn.btn-success:active {
+    background-color: #28a745 !important;
+    color: white !important;
+}
+
+#calendar td.favorite {
+    background-color: #fff3cd; /* light yellow */
+    color: #856404; /* dark yellow text */
+    font-weight: bold;
 }
