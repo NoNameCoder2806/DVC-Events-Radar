@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Users, Events, Favorites
 from django.contrib.auth.models import User
@@ -54,22 +54,6 @@ def calendar_view(request):
                     print(f"Skipping invalid date {fav.event_ID.date}: {e}")
         except Users.DoesNotExist:
             pass
-
-    # if request.user.is_authenticated:
-    #     try:
-    #         user_obj = Users.objects.get(user=request.user)
-    #         # Get only favorite events for this user
-    #         favorite_events = Favorites.objects.filter(user_ID=user_obj).select_related('event_ID')
-    #         for fav in favorite_events:
-    #             try:
-    #                 event_date = datetime.datetime.strptime(fav.event_ID.date.strip(), "%Y-%m-%d")
-    #                 if event_date.month == today.month and event_date.year == today.year:
-    #                     day = event_date.day
-    #                     events_per_day[day] = events_per_day.get(day, 0) + 1
-    #             except Exception as e:
-    #                 print(f"Skipping invalid date {fav.event_ID.date}: {e}")
-    #     except Users.DoesNotExist:
-    #         pass
 
     context = {
         "events_per_day": events_per_day,  # now only includes “interested” events
@@ -160,3 +144,58 @@ def mark_favorite(request, event_id):
     else:
         Favorites.objects.create(user_ID=user_obj, event_ID=event_obj)
         return JsonResponse({'status': 'added'})
+    
+def add_event(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    try:
+        user_profile = Users.objects.get(user=request.user)
+    except Users.DoesNotExist:
+        return HttpResponseForbidden("Users profile not found")
+
+    if user_profile.role not in ["admin", "superuser"]:
+        return HttpResponseForbidden("You do not have permission to add events.")
+
+    if request.method == 'POST':
+        start_hour = int(request.POST.get('start_hour'))
+        start_minute = request.POST.get('start_minute')
+        start_period = request.POST.get('start_period')
+        if start_period == "PM" and start_hour != 12:
+            start_hour += 12
+        elif start_period == "AM" and start_hour == 12:
+            start_hour = 0
+        start_time = f"{start_hour:02d}:{start_minute}"
+
+        end_hour = int(request.POST.get('end_hour'))
+        end_minute = request.POST.get('end_minute')
+        end_period = request.POST.get('end_period')
+        if end_period == "PM" and end_hour != 12:
+            end_hour += 12
+        elif end_period == "AM" and end_hour == 12:
+            end_hour = 0
+        end_time = f"{end_hour:02d}:{end_minute}"
+
+        Events.objects.create(
+            author_ID=user_profile,
+            name=request.POST.get('name'),
+            description=request.POST.get('description'),
+            date=request.POST.get('date'),
+            days_of_week=','.join(request.POST.getlist('days_of_week')),
+            start_time=start_time,
+            end_time=end_time,
+            location=request.POST.get('location'),
+            campus=request.POST.get('location'),
+            event_type=request.POST.get('event_type'),
+            image_url=request.POST.get('image_url') or None
+        )
+        return redirect('home')
+
+    # Generate hour/minute/period options
+    hours = list(range(1, 13))  # 1 to 12
+    minutes = ["00", "15", "30", "45"]
+
+    return render(request, 'add_event.html', {
+        'hours': hours,
+        'minutes': minutes
+    })

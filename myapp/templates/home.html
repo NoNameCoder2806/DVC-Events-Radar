@@ -124,6 +124,12 @@
                 <h5>Quick Access</h5>
                 <a href="{% url 'calendar' %}" class="btn btn-primary mb-2 w-100">Full Calendar</a>
                 <a href="{% url 'map' %}" class="btn btn-success w-100">Event Map</a>
+
+                {% if user.is_authenticated and user.users.role in "admin superuser" %}
+                <a href="{% url 'add_event' %}" class="btn btn-warning mt-2 w-100">
+                    ➕ Add Event
+                </a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -186,11 +192,11 @@
 </script>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("JS Loaded!");
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("JS Loaded!");
 
-    const buttons = document.querySelectorAll('.interested-btn');
-    console.log("Found buttons:", buttons.length);
-});
+        const buttons = document.querySelectorAll('.interested-btn');
+        console.log("Found buttons:", buttons.length);
+    });
 </script>
 {% endblock %}
