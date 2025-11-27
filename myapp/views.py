@@ -38,27 +38,41 @@ def home(request):
     })
 
 def calendar_view(request):
-    user_id = request.session.get('user_id')
-    favorite_days = []
+    today = datetime.datetime.today()
+    events_per_day = {}  # key = day of month, value = count of favorite events
 
-    if user_id:
-        # Get favorite event IDs for this user
-        favorite_event_ids = Favorites.objects.filter(user_ID=user_id).values_list('event_ID', flat=True)
-        favorite_events = Events.objects.filter(id__in=favorite_event_ids)
+    if request.user.is_authenticated:
+        try:
+            user_obj = Users.objects.get(user=request.user)
+            favorite_events = Favorites.objects.filter(user_ID=user_obj).select_related('event_ID')
+            for fav in favorite_events:
+                try:
+                    event_date = datetime.datetime.strptime(fav.event_ID.date.strip(), "%Y-%m-%d")
+                    day_key = event_date.strftime("%Y-%m-%d")  # YYYY-MM-DD
+                    events_per_day[day_key] = events_per_day.get(day_key, 0) + 1
+                except Exception as e:
+                    print(f"Skipping invalid date {fav.event_ID.date}: {e}")
+        except Users.DoesNotExist:
+            pass
 
-        # Extract day numbers for events in the current month/year
-        today = datetime.today()
-        for event in favorite_events:
-            # Convert string to datetime
-            try:
-                event_date = datetime.strptime(event.date, "%Y-%m-%d")  # adjust format if needed
-                if event_date.month == today.month and event_date.year == today.year:
-                    favorite_days.append(event_date.day)
-            except Exception as e:
-                print(f"Skipping invalid date {event.date}: {e}")
+    # if request.user.is_authenticated:
+    #     try:
+    #         user_obj = Users.objects.get(user=request.user)
+    #         # Get only favorite events for this user
+    #         favorite_events = Favorites.objects.filter(user_ID=user_obj).select_related('event_ID')
+    #         for fav in favorite_events:
+    #             try:
+    #                 event_date = datetime.datetime.strptime(fav.event_ID.date.strip(), "%Y-%m-%d")
+    #                 if event_date.month == today.month and event_date.year == today.year:
+    #                     day = event_date.day
+    #                     events_per_day[day] = events_per_day.get(day, 0) + 1
+    #             except Exception as e:
+    #                 print(f"Skipping invalid date {fav.event_ID.date}: {e}")
+    #     except Users.DoesNotExist:
+    #         pass
 
     context = {
-        "user_favorites_days": favorite_days
+        "events_per_day": events_per_day,  # now only includes “interested” events
     }
     return render(request, "calendar.html", context)
 

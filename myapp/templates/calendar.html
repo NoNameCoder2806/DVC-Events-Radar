@@ -2,100 +2,132 @@
 {% block title %}Calendar{% endblock %}
 
 {% block content %}
+<!-- Inject JSON from Django -->
+{{ events_per_day|json_script:"events-per-day" }}
+
 <div class="container mt-4">
     <h2>Event Calendar</h2>
-    <p>This is the full calendar page.</p>
 
-    <!-- Calendar container -->
     <div id="calendar" class="calendar"></div>
 
-    <!-- Embed favorite days as JSON safely -->
-    {{ user_favorites_days|json_script:"favorite-days" }}
+    <div class="d-flex justify-content-between mt-2">
+        <button id="prevMonth" class="btn btn-outline-primary">Previous</button>
+        <button id="nextMonth" class="btn btn-outline-primary">Next</button>
+    </div>
 </div>
 
 <style>
-#calendar h4 {
-    text-align: center;
-    margin-bottom: 15px;
-}
-#calendar table {
-    width: 100%;
-    border-collapse: collapse;
-}
-#calendar th, #calendar td {
-    width: 14.28%;
-    text-align: center;
-    padding: 10px;
-    border: 1px solid #dee2e6;
-}
-#calendar td.empty {
-    background-color: #f8f9fa;
-}
+    #calendar h4 {
+        text-align: center;
+        margin-bottom: 15px;
+    }
 
-/* Highlight today */
-#calendar td.today {
-    background-color: #d4edda;  /* light green */
-    color: #155724;
-    font-weight: bold;
-    border-radius: 0;
-}
+    #calendar table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-/* Highlight favorite days */
-#calendar td.favorite {
-    background-color: #fff3cd;  /* light yellow */
-    color: #856404;
-    font-weight: bold;
-    border-radius: 0;
-}
+    #calendar th,
+    #calendar td {
+        width: 14.28%;
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+    }
+
+    #calendar td.empty {
+        background-color: #f8f9fa;
+    }
+
+    #calendar td.today {
+        background-color: #d4edda;
+        color: #155724;
+        font-weight: bold;
+    }
+
+    #calendar td.event-day {
+        background-color: #fff3cd; /* light yellow */
+        color: #856404;
+        font-weight: bold;
+    }
 </style>
 
 <script>
-const calendarDiv = document.getElementById("calendar");
-const today = new Date();
-const monthNames = [
-    "January","February","March","April","May","June",
-    "July","August","September","October","November","December"
-];
+document.addEventListener("DOMContentLoaded", () => {
+    const eventsPerDay = JSON.parse(document.getElementById("events-per-day").textContent);
+    console.log("eventsPerDay:", eventsPerDay); // Debug: check keys
 
-const year = today.getFullYear();
-const month = today.getMonth();
-const dateToday = today.getDate();
-const daysInMonth = new Date(year, month + 1, 0).getDate();
-const firstDay = new Date(year, month, 1).getDay();
-const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const calendarDiv = document.getElementById("calendar");
+    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const weekDays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
-// Get favorite days from JSON safely
-let favoriteDays = [];
-const favEl = document.getElementById("favorite-days");
-if (favEl) {
-    favoriteDays = JSON.parse(favEl.textContent);
-}
+    const today = new Date();
+    let currentMonth = today.getMonth();
+    let currentYear = today.getFullYear();
+    const todayDate = today.getDate();
 
-// Build calendar HTML
-let html = `<h4>${monthNames[month]} ${year}</h4>`;
-html += `<table class="table table-bordered"><tr>`;
+    function pad(num) {
+        return num.toString().padStart(2, '0');
+    }
 
-// Weekday headers
-days.forEach(d => html += `<th>${d}</th>`);
-html += `</tr><tr>`;
+    function buildCalendar(month, year) {
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-// Empty cells before first day
-for (let i = 0; i < firstDay; i++) html += `<td class="empty"></td>`;
+        let html = `<h4>${monthNames[month]} ${year}</h4>`;
+        html += `<table class="table table-bordered"><tr>`;
+        weekDays.forEach(d => html += `<th>${d}</th>`);
+        html += `</tr><tr>`;
 
-// Fill days
-for (let day = 1; day <= daysInMonth; day++) {
-    let classes = "";
-    if (day === dateToday) classes += " today";
-    if (favoriteDays.includes(day)) classes += " favorite";
-    html += `<td class="${classes.trim()}">${day}</td>`;
-    if ((day + firstDay) % 7 === 0) html += `</tr><tr>`;
-}
+        // Empty cells before 1st day
+        for (let i = 0; i < firstDay; i++) html += `<td class="empty"></td>`;
 
-// Empty cells after last day
-const remainingCells = (7 - (daysInMonth + firstDay) % 7) % 7;
-for (let i = 0; i < remainingCells; i++) html += `<td class="empty"></td>`;
+        for (let day = 1; day <= daysInMonth; day++) {
+            let classes = "";
 
-html += `</tr></table>`;
-calendarDiv.innerHTML = html;
+            // Highlight today
+            if (day === todayDate && month === today.getMonth() && year === today.getFullYear()) {
+                classes += " today";
+            }
+
+            // Check if the current day has an "interested" event
+            const dayKey = `${year}-${pad(month+1)}-${pad(day)}`;
+            if (eventsPerDay[dayKey]) {
+                classes += " event-day";
+            }
+
+            html += `<td class="${classes.trim()}">${day}</td>`;
+
+            if ((day + firstDay) % 7 === 0) html += `</tr><tr>`;
+        }
+
+        // Fill remaining empty cells at end
+        const remaining = (7 - (daysInMonth + firstDay) % 7) % 7;
+        for (let i = 0; i < remaining; i++) html += `<td class="empty"></td>`;
+
+        html += `</tr></table>`;
+        calendarDiv.innerHTML = html;
+    }
+
+    buildCalendar(currentMonth, currentYear);
+
+    document.getElementById("prevMonth").addEventListener("click", () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        buildCalendar(currentMonth, currentYear);
+    });
+
+    document.getElementById("nextMonth").addEventListener("click", () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        buildCalendar(currentMonth, currentYear);
+    });
+});
 </script>
 {% endblock %}
