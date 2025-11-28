@@ -4,6 +4,9 @@ from .models import Users, Events, Favorites
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 import datetime
+from django.utils import timezone
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib import messages
 
 def get_data():    
     users_data = Users.objects.all()
@@ -17,17 +20,23 @@ def get_data():
     return data
 
 def home(request):
-    # All events
-    events_data = Events.objects.all()
+    # Only show events today or in the future
+    today = timezone.now().date()
+    events_data = Events.objects.filter(date__gte=today).order_by('date', 'start_time')
 
     # User favorites
     user_favorites = []
+    user_role = None
+
+    # Check user role
     if request.user.is_authenticated:
         try:
             user_obj = Users.objects.get(user=request.user)
             user_favorites = list(Favorites.objects.filter(user_ID=user_obj).values_list('event_ID__id', flat=True))
+            user_role = user_obj.role
         except Users.DoesNotExist:
             user_favorites = []
+            user_role = None
 
     # Pass context to template
     return render(request, 'home.html', {
@@ -35,6 +44,7 @@ def home(request):
         'user_favorites': user_favorites,
         'user_id': request.user.id if request.user.is_authenticated else None,
         'user_name': request.user.username if request.user.is_authenticated else None,
+        'user_role': user_role,
     })
 
 def calendar_view(request):
@@ -199,3 +209,27 @@ def add_event(request):
         'hours': hours,
         'minutes': minutes
     })
+
+@user_passes_test(lambda u: u.is_authenticated and hasattr(u, "users") and u.users.role in ["admin", "superuser"])
+def manage_events(request):
+    all_events = Events.objects.all().order_by('date', 'start_time')
+    return render(request, "manage_events.html", {"all_events": all_events})
+
+def delete_event(request, event_id):
+    event = get_object_or_404(Events, id=event_id)
+
+    if request.method == "POST":
+        event.delete()
+        messages.success(request, "Event deleted successfully.")
+        return redirect("manage_events")
+
+    return render(request, "confirm_delete.html", {"event": event})
+
+def edit_event(request, event_id):
+    event = get_object_or_404(Events, id=event_id)
+    return render(request, "edit_event.html", {"event": event})
+
+@user_passes_test(lambda u: u.is_authenticated and hasattr(u, "users") and u.users.role == "superuser")
+def manage_users(request):
+    all_users = Users.objects.all()
+    return render(request, "manage_users.html", {"all_users": all_users})

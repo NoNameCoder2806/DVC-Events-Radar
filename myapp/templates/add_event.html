@@ -35,7 +35,7 @@
 
                 <select name="start_minute" class="form-control">
                     {% for m in minutes %}
-                    <option value="{{ m|stringformat:" 02d" }}">{{ m|stringformat:"02d" }}</option>
+                    <option value="{{ m }}">{{ m }}</option>
                     {% endfor %}
                 </select>
 
@@ -58,7 +58,7 @@
 
                 <select name="end_minute" class="form-control">
                     {% for m in minutes %}
-                    <option value="{{ m|stringformat:" 02d" }}">{{ m|stringformat:"02d" }}</option>
+                    <option value="{{ m }}">{{ m }}</option>
                     {% endfor %}
                 </select>
 

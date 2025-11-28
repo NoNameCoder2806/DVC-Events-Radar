@@ -122,14 +122,28 @@
         <div class="col-md-2">
             <div class="p-3 bg-light border rounded d-flex flex-column align-items-center">
                 <h5>Quick Access</h5>
-                <a href="{% url 'calendar' %}" class="btn btn-primary mb-2 w-100">Full Calendar</a>
-                <a href="{% url 'map' %}" class="btn btn-success w-100">Event Map</a>
-
-                {% if user.is_authenticated and user.users.role in "admin superuser" %}
-                <a href="{% url 'add_event' %}" class="btn btn-warning mt-2 w-100">
-                    ➕ Add Event
+                <!-- Manage Users Button -->
+                {% if user_role == "superuser" %}
+                <a href="{% url 'manage_users' %}" class="btn btn-warning mb-2 w-100">
+                    🔐 Manage Users
                 </a>
                 {% endif %}
+
+                <!-- Add Event Button -->
+                {% if user_role == "admin" or user_role == "superuser" %}
+                <a href="{% url 'add_event' %}" class="btn btn-warning mb-2 w-100">
+                    ➕ Add Event
+                </a>
+
+                <!-- Manage Events Button -->
+                <a href="{% url 'manage_events' %}" class="btn btn-warning mb-2 w-100">
+                    🛠️ Manage Events
+                </a>
+                {% endif %}
+
+                <!-- Quick Access Buttons -->
+                <a href="{% url 'calendar' %}" class="btn btn-primary mb-2 w-100">📅 Full Calendar</a>
+                <a href="{% url 'map' %}" class="btn btn-success w-100">🗺️ Event Map</a>
             </div>
         </div>
     </div>

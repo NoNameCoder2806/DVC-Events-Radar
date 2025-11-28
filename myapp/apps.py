@@ -8,7 +8,7 @@ def populate_default_data(sender, **kwargs):
     # Create users
     if not Users.objects.exists():
         default_users = [
-            {"username": "dvc_default@insite.4cd.edu", "DVC_ID": "0000000", "role": "admin"},  # default user
+            {"username": "dvc_superuser@insite.4cd.edu", "DVC_ID": "0000000", "role": "superuser"},  # default user
             {"username": "andrew@insite.4cd.edu", "DVC_ID": "0000001", "role": "admin"},
             {"username": "frank@insite.4cd.edu", "DVC_ID": "0000002", "role": "admin"},
             {"username": "heidi@insite.4cd.edu", "DVC_ID": "0000003", "role": "admin"},
