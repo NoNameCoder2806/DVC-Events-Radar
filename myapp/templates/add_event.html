@@ -78,8 +78,14 @@
         </div>
 
         <div class="mb-3">
-            <label for="location" class="form-label">Location / Campus</label>
-            <select class="form-control" id="location" name="location" required>
+            <label for="location" class="form-label">Building / Location</label>
+            <input type="text" class="form-control" id="building" name="building"
+           value="{{ previous.building|default_if_none:'' }}" placeholder="Enter building or room" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="location" class="form-label">Campus</label>
+            <select class="form-control" id="campus" name="campus" required>
                 <option value="" disabled {% if not request.POST.location %}selected{% endif %}>Select a campus</option>
                 <option value="Pleasant Hill Campus" {% if request.POST.location == "Pleasant Hill Campus" %}selected{% endif %}>Pleasant Hill Campus</option>
                 <option value="San Ramon Campus" {% if request.POST.location == "San Ramon Campus" %}selected{% endif %}>San Ramon Campus</option>
