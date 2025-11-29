@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Users, Events, Favorites
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-import datetime
+from datetime import datetime
 from django.utils import timezone
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
@@ -20,27 +20,47 @@ def get_data():
     return data
 
 def home(request):
-    # Only show events today or in the future
     today = timezone.now().date()
-    events_data = Events.objects.filter(date__gte=today).order_by('date', 'start_time')
+    events_data = Events.objects.filter(date__gte=today)
+
+    # Group events by date
+    events_by_date = {}
+    for event in events_data:
+        events_by_date.setdefault(event.date, []).append(event)
+
+    # Sort events within each date by start_time
+    for date, events in events_by_date.items():
+        def parse_time(e):
+            try:
+                return datetime.strptime(e.start_time.strip(), "%I:%M %p")
+            except ValueError:
+                # fallback if someone entered 24-hour time
+                return datetime.strptime(e.start_time.strip(), "%H:%M")
+        events.sort(key=parse_time)
+
+    # Flatten sorted events
+    sorted_events = []
+    for date in sorted(events_by_date.keys()):
+        sorted_events.extend(events_by_date[date])
+
+    # Assign display times
+    for event in sorted_events:
+        event.start_time_display = event.start_time
+        event.end_time_display = event.end_time
 
     # User favorites
     user_favorites = []
     user_role = None
-
-    # Check user role
     if request.user.is_authenticated:
         try:
             user_obj = Users.objects.get(user=request.user)
             user_favorites = list(Favorites.objects.filter(user_ID=user_obj).values_list('event_ID__id', flat=True))
             user_role = user_obj.role
         except Users.DoesNotExist:
-            user_favorites = []
-            user_role = None
+            pass
 
-    # Pass context to template
     return render(request, 'home.html', {
-        'events_data': events_data,
+        'events_data': sorted_events,
         'user_favorites': user_favorites,
         'user_id': request.user.id if request.user.is_authenticated else None,
         'user_name': request.user.username if request.user.is_authenticated else None,
@@ -156,63 +176,96 @@ def mark_favorite(request, event_id):
         return JsonResponse({'status': 'added'})
     
 def add_event(request):
+    # Only logged-in users
     if not request.user.is_authenticated:
         return redirect('login')
 
+    # Get user profile
     try:
         user_profile = Users.objects.get(user=request.user)
     except Users.DoesNotExist:
-        return HttpResponseForbidden("Users profile not found")
+        return HttpResponseForbidden("User profile not found")
 
+    # Only admins or superusers can add events
     if user_profile.role not in ["admin", "superuser"]:
         return HttpResponseForbidden("You do not have permission to add events.")
 
-    if request.method == 'POST':
-        start_hour = int(request.POST.get('start_hour'))
-        start_minute = request.POST.get('start_minute')
-        start_period = request.POST.get('start_period')
-        if start_period == "PM" and start_hour != 12:
-            start_hour += 12
-        elif start_period == "AM" and start_hour == 12:
-            start_hour = 0
-        start_time = f"{start_hour:02d}:{start_minute}"
-
-        end_hour = int(request.POST.get('end_hour'))
-        end_minute = request.POST.get('end_minute')
-        end_period = request.POST.get('end_period')
-        if end_period == "PM" and end_hour != 12:
-            end_hour += 12
-        elif end_period == "AM" and end_hour == 12:
-            end_hour = 0
-        end_time = f"{end_hour:02d}:{end_minute}"
-
-        Events.objects.create(
-            author_ID=user_profile,
-            name=request.POST.get('name'),
-            description=request.POST.get('description'),
-            date=request.POST.get('date'),
-            days_of_week=','.join(request.POST.getlist('days_of_week')),
-            start_time=start_time,
-            end_time=end_time,
-            location=request.POST.get('location'),
-            campus=request.POST.get('location'),
-            event_type=request.POST.get('event_type'),
-            image_url=request.POST.get('image_url') or None
-        )
-        return redirect('home')
-
-    # Generate hour/minute/period options
-    hours = list(range(1, 13))  # 1 to 12
+    # Hour and minute dropdown options
+    hours = list(range(1, 13))  # 1-12
     minutes = ["00", "15", "30", "45"]
+    previous = request.POST if request.method == 'POST' else None
 
+    if request.method == 'POST':
+        # Build start and end times
+        try:
+            start_hour = int(request.POST.get('start_hour'))
+            start_minute = int(request.POST.get('start_minute'))
+            start_period = request.POST.get('start_period')
+            start_time_str = f"{start_hour}:{start_minute:02d} {start_period}"
+
+            end_hour = int(request.POST.get('end_hour'))
+            end_minute = int(request.POST.get('end_minute'))
+            end_period = request.POST.get('end_period')
+            end_time_str = f"{end_hour}:{end_minute:02d} {end_period}"
+
+            # Validate time order
+            start_obj = datetime.strptime(start_time_str, "%I:%M %p")
+            end_obj = datetime.strptime(end_time_str, "%I:%M %p")
+            if start_obj >= end_obj:
+                messages.error(request, "Start time must be before end time.")
+                raise ValueError("Invalid time order")
+
+            # Parse date and day of week
+            event_date_str = request.POST.get('date')
+            event_date_obj = datetime.strptime(event_date_str, "%Y-%m-%d").date()
+            day_of_week = event_date_obj.strftime("%A")
+
+            # Save event
+            Events.objects.create(
+                author_ID=user_profile,
+                name=request.POST.get('name'),
+                description=request.POST.get('description'),
+                date=event_date_str,
+                days_of_week=day_of_week,
+                start_time=start_time_str,
+                end_time=end_time_str,
+                location=request.POST.get('building'),  # consistently using "building"
+                campus=request.POST.get('campus'),
+                event_type=request.POST.get('event_type'),
+                image_url=request.FILES.get('image') if 'image' in request.FILES else None
+            )
+            messages.success(request, "Event added successfully!")
+            return redirect('home')
+
+        except Exception as e:
+            # Re-render form with previous values
+            return render(request, 'add_event.html', {
+                'hours': hours,
+                'minutes': minutes,
+                'previous': previous
+            })
+
+    previous = request.POST if request.method == 'POST' else {}
     return render(request, 'add_event.html', {
         'hours': hours,
-        'minutes': minutes
+        'minutes': minutes,
+        'previous': previous,
     })
 
 @user_passes_test(lambda u: u.is_authenticated and hasattr(u, "users") and u.users.role in ["admin", "superuser"])
 def manage_events(request):
-    all_events = Events.objects.all().order_by('date', 'start_time')
+    all_events = list(Events.objects.all())
+
+    # Sort events by date, then by start_time (handle 12-hour and 24-hour formats)
+    def sort_key(e):
+        try:
+            t = datetime.strptime(e.start_time.strip(), "%I:%M %p")
+        except ValueError:
+            t = datetime.strptime(e.start_time.strip(), "%H:%M")
+        return (e.date, t)
+
+    all_events.sort(key=sort_key)
+
     return render(request, "manage_events.html", {"all_events": all_events})
 
 def delete_event(request, event_id):

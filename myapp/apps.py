@@ -36,7 +36,7 @@ def populate_default_data(sender, **kwargs):
                 "date": "2025-11-25",
                 "start_time": "2:30 PM",
                 "end_time": "4:00 PM",
-                "location": "Pleasant Hill, Virtual",
+                "campus": "Virtual",
             },
 
             # Nov 28
@@ -45,7 +45,7 @@ def populate_default_data(sender, **kwargs):
                 "date": "2025-11-28",
                 "start_time": "7:30 PM",
                 "end_time": "9:30 PM",
-                "location": "Pleasant Hill",
+                "campus": "Pleasant Hill",
             },
 
             # Nov 29
@@ -54,14 +54,14 @@ def populate_default_data(sender, **kwargs):
                 "date": "2025-11-29",
                 "start_time": "10:00 AM",
                 "end_time": "2:00 PM",
-                "location": "Pleasant Hill",
+                "campus": "Pleasant Hill",
             },
             {
                 "name": "All in the Timing",
                 "date": "2025-11-29",
                 "start_time": "7:30 PM",
                 "end_time": "9:30 PM",
-                "location": "Pleasant Hill",
+                "campus": "Pleasant Hill",
             },
 
             # Nov 30
@@ -70,7 +70,7 @@ def populate_default_data(sender, **kwargs):
                 "date": "2025-11-30",
                 "start_time": "2:00 PM",
                 "end_time": "4:00 PM",
-                "location": "Pleasant Hill",
+                "campus": "Pleasant Hill",
             },
 
             # Dec 01
@@ -79,14 +79,14 @@ def populate_default_data(sender, **kwargs):
                 "date": "2025-12-01",
                 "start_time": "12:30 PM",
                 "end_time": "2:00 PM",
-                "location": "Pleasant Hill, Virtual",
+                "campus": "Virtual",
             },
             {
                 "name": "Curriculum Committee Meeting",
                 "date": "2025-12-01",
                 "start_time": "2:30 PM",
                 "end_time": "4:30 PM",
-                "location": "Pleasant Hill, Virtual",
+                "campus": "Virtual",
             },
 
             # Dec 02
@@ -95,21 +95,21 @@ def populate_default_data(sender, **kwargs):
                 "date": "2025-12-02",
                 "start_time": "9:00 AM",
                 "end_time": "3:00 PM",
-                "location": "Pleasant Hill",
+                "campus": "Pleasant Hill",
             },
             {
                 "name": "Business Beyond the Classroom - Scholarships & DVC Alumni Association",
                 "date": "2025-12-02",
                 "start_time": "1:00 PM",
                 "end_time": "3:00 PM",
-                "location": "Pleasant Hill, Virtual",
+                "campus": "Virtual",
             },
             {
                 "name": "Academic Senate Meeting",
                 "date": "2025-12-02",
                 "start_time": "2:30 PM",
                 "end_time": "4:00 PM",
-                "location": "Pleasant Hill, Virtual",
+                "campus": "Virtual",
             },
         ]
 
@@ -123,7 +123,7 @@ def populate_default_data(sender, **kwargs):
                 start_time=ev["start_time"],
                 end_time=ev["end_time"],
                 location=ev["location"],
-                campus="Pleasant Hill",
+                campus=ev["location"],
                 event_type="General",
                 image_url=""
             )
