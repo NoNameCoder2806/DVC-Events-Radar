@@ -90,8 +90,10 @@
                 <!-- The Events Search Bar-->
                 <div class="p-3 bg-white border rounded">
                     <h3>Event Search</h3>
-                    <input type="text" class="form-control mb-3" placeholder="Search for events...">
-
+                    <div id="searchbar">
+                        <input id="search-input" type="text" class="form-control mb-3" placeholder="Search for events...">
+                        <div id="search-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 24 24" style="fill:#FFFFFF;"><path d="M 10 2 C 5.5965257 2 2 5.5965291 2 10 C 2 14.403471 5.5965257 18 10 18 C 11.752132 18 13.370523 17.422074 14.691406 16.458984 L 20.224609 21.992188 L 21.992188 20.224609 L 16.458984 14.691406 C 17.422074 13.370523 18 11.75213 18 10 C 18 5.5965291 14.403474 2 10 2 z M 10 4.5 C 13.052375 4.5 15.5 6.947627 15.5 10 C 15.5 13.052373 13.052375 15.5 10 15.5 C 6.9476251 15.5 4.5 13.052373 4.5 10 C 4.5 6.947627 6.9476251 4.5 10 4.5 z"></path></svg></div>
+                    </div>
                     <!-- ✅ New Bootstrap row for event grid -->
                     <div class="row">
                         {% for event in events_data %}
