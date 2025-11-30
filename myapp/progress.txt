@@ -1,0 +1,3 @@
+Hoang:
+Events that are marked as interested now is highlighted in the calendar...
+Next step: next month and previous month for the calendar page

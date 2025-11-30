@@ -1,0 +1,76 @@
+{% extends 'home.html' %}
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <a href="{% url 'home' %}" class="btn btn-secondary mb-3">← Back</a>
+
+    <div class="card shadow">
+        <div class="card-body">
+
+            <h2 class="card-title">{{ event.title }}</h2>
+
+            {% if event.image %}
+                <img src="{{ event.image.url }}" class="img-fluid mb-3" alt="Event Image">
+            {% endif %}
+
+            <h5>Description</h5>
+            <p>{{ event.description }}</p>
+
+            <h5>Details</h5>
+            <ul>
+                <li><strong>Date:</strong> {{ event.date }}</li>
+                <li><strong>Time:</strong> {{ event.start_time }} - {{ event.end_time }}</li>
+                <li><strong>Campus:</strong> {{ event.campus }}</li>
+                <li><strong>Building / Location:</strong> {{ event.location }}</li>
+            </ul>
+
+            {% if user.is_authenticated %}
+                <button type="button" class="btn btn-primary interested-btn" data-event-id="{{ event.id }}">
+                    {% if event.id in user_favorites %}Unmark ⭐{% else %}Mark as Interested ⭐{% endif %}
+                </button>
+                <div id="favorite-message"></div>
+            {% else %}
+                <p class="text-muted">Login to mark interest.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const button = document.querySelector('.interested-btn');
+    const messageDiv = document.getElementById('favorite-message');
+    
+    if (button) {
+        button.addEventListener('click', async () => {
+            const eventId = button.dataset.eventId;
+            const csrfToken = '{{ csrf_token }}';
+
+            const response = await fetch(`/favorite/${eventId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Accept': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'added') {
+                button.textContent = 'Unmark ⭐';
+                messageDiv.textContent = 'Added to your interested events!';
+                messageDiv.className = 'text-success mt-2';
+            } else if (data.status === 'removed') {
+                button.textContent = 'Mark as Interested ⭐';
+                messageDiv.textContent = 'Removed from your interested events.';
+                messageDiv.className = 'text-warning mt-2';
+            } else if (data.status === 'error') {
+                messageDiv.textContent = data.message;
+                messageDiv.className = 'text-danger mt-2';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
