@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %} Django App {% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'home.css' %}" type="text/css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+</head>
+
+<body>
+    {% block show_header %}
+    <header class="d-flex align-items-center p-3 bg-light border-bottom" style="position: relative;">
+        <h1 class="mb-0">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: inherit;">
+                DVC Events
+            </a>
+        </h1>
+        <div class="button-container"
+            style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 5px;">
+            {% if user.is_authenticated %}
+            <a href="{% url 'home' %}" class="mr-2">Welcome, {{ request.user.username }}</a>
+
+            <!-- DEBUG: show favorites_count -->
+            <p style="background:#ff0; padding:5px;">DEBUG: Total Favorites = {{ total_favorites }}</p>
+
+            <a href="{% url 'logout' %}" class="btn btn-danger mt-2 w-100">Logout</a>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn btn-primary mb-2 w-100">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-success w-100">Register</a>
+            {% endif %}
+        </div>
+    </header>
+    {% endblock %}
+
+    <div class="container-fluid mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- GLOBAL SCRIPTS -->
+    <script>
+        document.querySelectorAll('.toggle-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const expanded = button.getAttribute('aria-expanded') === 'true';
+                setTimeout(() => {
+                    button.textContent = expanded ? '+' : '−';
+                }, 150);
+            });
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 🔥 IMPORTANT: child templates insert their JS here -->
+    {% block scripts %}{% endblock %}
+
+</body>
+
+</html>

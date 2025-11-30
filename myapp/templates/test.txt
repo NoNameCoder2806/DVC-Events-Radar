@@ -1,0 +1,15 @@
+python manage.py shell
+
+from myapp.views import get_data
+
+user_1 = Users(first_name = 'Sock', last_name = 'Man', email = 'socker@gmail.com', password = '1234', DVC_ID = '0000000', role = 'user')
+user_1.save()
+
+event_1 = Events(author_ID = 1, name = 'Career Fair', description = 'join the DVC career fair and meet potential employers', date = '2025-07-25', days_of_week ='monday' , start_time = '13:00', end_time = '17:00', location = 'DVC commons', campus = 'Pleasent Hill Campus', event_type = 'Career & Academic')
+event_1.save()
+
+event_2 = Events(author_ID = 1, name = 'Classical Music Event', description = 'join the DVC classical music event', date = '2025-07-25', days_of_week ='monday' , start_time = '13:00', end_time = '17:00', location = 'DVC commons', campus = 'Pleasent Hill Campus', event_type = 'Career & Academic')
+event_2.save()
+
+event_prc = Events(author_ID = 1, name='Program Review Committee', description='The Program Review Committee reviews campus programs and data to recommend improvements for student services, instruction, and administrative support.', date='2025-11-14', days_of_week='friday', start_time='10:00', end_time='12:00', location='Community Conference Center - CCC', campus='Pleasant Hill', event_type='Career & Academic')
+event_prc.save()
