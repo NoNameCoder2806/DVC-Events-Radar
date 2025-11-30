@@ -294,7 +294,6 @@ def edit_event(request, event_id):
     event = get_object_or_404(Events, id=event_id)
     return render(request, "edit_event.html", {"event": event})
 
-@user_passes_test(lambda u: u.is_authenticated and hasattr(u, "users") and u.users.role == "superuser")
 def manage_users(request):
-    all_users = Users.objects.all()
+    all_users = User.objects.all()
     return render(request, "manage_users.html", {"all_users": all_users})
