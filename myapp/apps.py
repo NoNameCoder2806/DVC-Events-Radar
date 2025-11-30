@@ -119,7 +119,6 @@ def populate_default_data(sender, **kwargs):
                 name=ev["name"],
                 description=f"This is the event: {ev['name']}",
                 date=ev["date"],
-                days_of_week="",  # optional
                 start_time=ev["start_time"],
                 end_time=ev["end_time"],
                 location=ev["location"],
