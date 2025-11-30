@@ -36,6 +36,7 @@ def populate_default_data(sender, **kwargs):
                 "date": "2025-11-25",
                 "start_time": "2:30 PM",
                 "end_time": "4:00 PM",
+                "location": "Community Conference Center - CCC",
                 "campus": "Virtual",
             },
 
@@ -45,22 +46,17 @@ def populate_default_data(sender, **kwargs):
                 "date": "2025-11-28",
                 "start_time": "7:30 PM",
                 "end_time": "9:30 PM",
+                "location": "Arena Theater - AR",
                 "campus": "Pleasant Hill",
             },
 
             # Nov 29
             {
-                "name": "DVC Horticulture Plant Sale",
-                "date": "2025-11-29",
-                "start_time": "10:00 AM",
-                "end_time": "2:00 PM",
-                "campus": "Pleasant Hill",
-            },
-            {
                 "name": "All in the Timing",
                 "date": "2025-11-29",
                 "start_time": "7:30 PM",
                 "end_time": "9:30 PM",
+                "location": "Arena Theater - AR",
                 "campus": "Pleasant Hill",
             },
 
@@ -70,6 +66,7 @@ def populate_default_data(sender, **kwargs):
                 "date": "2025-11-30",
                 "start_time": "2:00 PM",
                 "end_time": "4:00 PM",
+                "location": "Arena Theater - AR",
                 "campus": "Pleasant Hill",
             },
 
@@ -79,6 +76,7 @@ def populate_default_data(sender, **kwargs):
                 "date": "2025-12-01",
                 "start_time": "12:30 PM",
                 "end_time": "2:00 PM",
+                "location": "Administration Building - AB | 217",
                 "campus": "Virtual",
             },
             {
@@ -86,6 +84,7 @@ def populate_default_data(sender, **kwargs):
                 "date": "2025-12-01",
                 "start_time": "2:30 PM",
                 "end_time": "4:30 PM",
+                "location": "Community Conference Center - CCC",
                 "campus": "Virtual",
             },
 
@@ -95,6 +94,7 @@ def populate_default_data(sender, **kwargs):
                 "date": "2025-12-02",
                 "start_time": "9:00 AM",
                 "end_time": "3:00 PM",
+                "location": "Art Complex - A | 101",
                 "campus": "Pleasant Hill",
             },
             {
@@ -102,6 +102,7 @@ def populate_default_data(sender, **kwargs):
                 "date": "2025-12-02",
                 "start_time": "1:00 PM",
                 "end_time": "3:00 PM",
+                "location": "Business and World Language - BWL | 109",
                 "campus": "Virtual",
             },
             {
@@ -109,6 +110,7 @@ def populate_default_data(sender, **kwargs):
                 "date": "2025-12-02",
                 "start_time": "2:30 PM",
                 "end_time": "4:00 PM",
+                "location": "Community Conference Center - CCC",
                 "campus": "Virtual",
             },
         ]
