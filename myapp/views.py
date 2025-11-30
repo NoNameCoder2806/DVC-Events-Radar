@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.utils.timezone import localtime
+from django.core.paginator import Paginator
 
 def get_data():    
     users_data = Users.objects.all()
@@ -66,8 +67,13 @@ def home(request):
         except Users.DoesNotExist:
             pass
 
+    # ===== PAGINATION =====
+    paginator = Paginator(parsed_events, 10)  # 10 events per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'home.html', {
-        'events_data': parsed_events,
+        'events_data': page_obj,
         'user_favorites': user_favorites,
         'user_id': request.user.id if request.user.is_authenticated else None,
         'user_name': request.user.username if request.user.is_authenticated else None,
