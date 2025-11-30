@@ -7,6 +7,7 @@ from datetime import datetime
 from django.utils import timezone
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
+from django.utils.timezone import localtime
 
 def get_data():    
     users_data = Users.objects.all()
@@ -20,47 +21,53 @@ def get_data():
     return data
 
 def home(request):
-    today = timezone.now().date()
-    events_data = Events.objects.filter(date__gte=today)
+    today = timezone.localtime().date()
 
-    # Group events by date
-    events_by_date = {}
-    for event in events_data:
-        events_by_date.setdefault(event.date, []).append(event)
+    # Convert string dates → real Python date objects
+    parsed_events = []
+    for e in Events.objects.all():
+        try:
+            actual_date = datetime.strptime(e.date, "%Y-%m-%d").date()
+        except ValueError:
+            continue  # skip bad dates
+        
+        e.parsed_date = actual_date
+        
+        # Filter: include today and future events
+        if actual_date >= today:
+            parsed_events.append(e)
 
-    # Sort events within each date by start_time
-    for date, events in events_by_date.items():
-        def parse_time(e):
-            try:
-                return datetime.strptime(e.start_time.strip(), "%I:%M %p")
-            except ValueError:
-                # fallback if someone entered 24-hour time
-                return datetime.strptime(e.start_time.strip(), "%H:%M")
-        events.sort(key=parse_time)
+    # Function to parse start_time (string → time object)
+    def parse_time_str(t):
+        try:
+            return datetime.strptime(t.strip(), "%I:%M %p")
+        except:
+            return datetime.strptime(t.strip(), "%H:%M")
 
-    # Flatten sorted events
-    sorted_events = []
-    for date in sorted(events_by_date.keys()):
-        sorted_events.extend(events_by_date[date])
+    # Sort by (date, start_time)
+    parsed_events.sort(key=lambda e: (e.parsed_date, parse_time_str(e.start_time)))
 
-    # Assign display times
-    for event in sorted_events:
-        event.start_time_display = event.start_time
-        event.end_time_display = event.end_time
+    # Assign display attributes
+    for e in parsed_events:
+        e.start_time_display = e.start_time
+        e.end_time_display = e.end_time
 
-    # User favorites
+    # User favorites + roles
     user_favorites = []
     user_role = None
     if request.user.is_authenticated:
         try:
             user_obj = Users.objects.get(user=request.user)
-            user_favorites = list(Favorites.objects.filter(user_ID=user_obj).values_list('event_ID__id', flat=True))
+            user_favorites = list(
+                Favorites.objects.filter(user_ID=user_obj)
+                .values_list('event_ID__id', flat=True)
+            )
             user_role = user_obj.role
         except Users.DoesNotExist:
             pass
 
     return render(request, 'home.html', {
-        'events_data': sorted_events,
+        'events_data': parsed_events,
         'user_favorites': user_favorites,
         'user_id': request.user.id if request.user.is_authenticated else None,
         'user_name': request.user.username if request.user.is_authenticated else None,
@@ -68,7 +75,7 @@ def home(request):
     })
 
 def calendar_view(request):
-    today = datetime.datetime.today()
+    today = datetime.today()
     events_per_day = {}  # key = day of month, value = count of favorite events
 
     if request.user.is_authenticated:
@@ -77,7 +84,7 @@ def calendar_view(request):
             favorite_events = Favorites.objects.filter(user_ID=user_obj).select_related('event_ID')
             for fav in favorite_events:
                 try:
-                    event_date = datetime.datetime.strptime(fav.event_ID.date.strip(), "%Y-%m-%d")
+                    event_date = datetime.strptime(fav.event_ID.date.strip(), "%Y-%m-%d")
                     day_key = event_date.strftime("%Y-%m-%d")  # YYYY-MM-DD
                     events_per_day[day_key] = events_per_day.get(day_key, 0) + 1
                 except Exception as e:
@@ -238,6 +245,11 @@ def add_event(request):
             return redirect('home')
 
         except Exception as e:
+            # Clear messages so old ones don't persist
+            storage = messages.get_messages(request)
+            for _ in storage:
+                pass  # iterating clears them
+
             # Re-render form with previous values
             return render(request, 'add_event.html', {
                 'hours': hours,

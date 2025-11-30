@@ -21,7 +21,8 @@
             <ul>
                 <li><strong>Date:</strong> {{ event.date }}</li>
                 <li><strong>Time:</strong> {{ event.start_time }} - {{ event.end_time }}</li>
-                <li><strong>Location:</strong> {{ event.location }}</li>
+                <li><strong>Campus:</strong> {{ event.campus }}</li>
+                <li><strong>Building / Location:</strong> {{ event.location }}</li>
             </ul>
 
             {% if user.is_authenticated %}
