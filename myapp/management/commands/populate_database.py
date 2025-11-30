@@ -8,17 +8,17 @@ class Command(BaseCommand):
         # Create users
         if not Users.objects.exists():
             default_users = [
-                {"username": "andrew@insite.4cd.edu", "DVC_ID": "0000001", "role": "admin"},
-                {"username": "frank@insite.4cd.edu", "DVC_ID": "0000002", "role": "admin"},
-                {"username": "heidi@insite.4cd.edu", "DVC_ID": "0000003", "role": "admin"},
-                {"username": "hoang@insite.4cd.edu", "DVC_ID": "0000004", "role": "admin"},
-                {"username": "kayla@insite.4cd.edu", "DVC_ID": "0000005", "role": "admin"},
-                {"username": "seokyoung@insite.4cd.edu", "DVC_ID": "0000006", "role": "admin"},
-                {"username": "dvc_user@insite.4cd.edu", "DVC_ID": "0000007", "role": "user"}
+                {"username": "andrew@insite.4cd.edu", "email": "andrew@insite.4cd.edu","DVC_ID": "0000001", "role": "admin"},
+                {"username": "frank@insite.4cd.edu", "email": "frank@insite.4cd.edu", "DVC_ID": "0000002", "role": "admin"},
+                {"username": "heidi@insite.4cd.edu", "email":"heidi@insite.4cd.edu", "DVC_ID": "0000003", "role": "admin"},
+                {"username": "hoang@insite.4cd.edu", "email": "hoang@insite.4cd.edu", "DVC_ID": "0000004", "role": "admin"},
+                {"username": "kayla@insite.4cd.edu", "email": "kayla@insite.4cd.edu", "DVC_ID": "0000005", "role": "admin"},
+                {"username": "seokyoung@insite.4cd.edu", "email": "seokyoung@insite.4cd.edu", "DVC_ID": "0000006", "role": "admin"},
+                {"username": "dvc_user@insite.4cd.edu", "email": "dvc_user@insite.4cd.edu", "DVC_ID": "0000007", "role": "user"}
             ]
 
         for u in default_users:
-            user_obj = User.objects.create_user(username=u["username"], password="password")
+            user_obj = User.objects.create_user(username=u["username"], email=u["email"], password="password")
             Users.objects.create(user=user_obj, DVC_ID=u["DVC_ID"], role=u["role"])
             
         if not User.objects.filter(username="dvc_default@insite.4cd.edu").exists():
