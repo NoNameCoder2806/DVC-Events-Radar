@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("", views.home, name='home'),
@@ -17,3 +19,5 @@ urlpatterns = [
     path("manage-events/delete/<int:event_id>/", views.delete_event, name="delete_event"),
     path("manage-users/", views.manage_users, name="manage_users"),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

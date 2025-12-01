@@ -11,6 +11,22 @@
 </head>
 
 <body>
+    <div id="topNotification" 
+        style="
+            position: fixed;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            z-index: 9999;
+            transition: top 0.4s ease-in-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        ">
+    </div>
+
     {% block show_header %}
     <header class="d-flex align-items-center p-3 bg-light border-bottom" style="position: relative;">
         <h1 class="mb-0">
@@ -54,9 +70,32 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 
+    <script>
+        function showTopMessage(text, type = "info") {
+            const box = document.getElementById("topNotification");
+
+            const colors = {
+                success: "#28a745",
+                error: "#dc3545",
+                warning: "#ffc107",
+                info: "#17a2b8"
+            };
+
+            box.style.background = colors[type] || colors.info;
+            box.innerText = text;
+
+            // Slide down
+            box.style.top = "20px";
+
+            // Auto-hide
+            setTimeout(() => {
+                box.style.top = "-80px";
+            }, 2500);
+        }
+    </script>
+
     <!-- 🔥 IMPORTANT: child templates insert their JS here -->
     {% block scripts %}{% endblock %}
-
 </body>
 
 </html>

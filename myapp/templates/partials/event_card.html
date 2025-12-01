@@ -1,7 +1,7 @@
 <div class="event-box">
     <p class="event-title">{{ event.name }}</p>
-    {% if event.image_url %}
-    <img src="{{ event.image_url }}" alt="Event thumbnail">
+    {% if event.image %}
+    <img src="{{ event.image.url }}" alt="Event thumbnail">
     {% else %}
     <img alt="Event thumbnail">
     {% endif %}

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import os
 
 class Users(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -8,6 +9,15 @@ class Users(models.Model):
     
     def __str__(self):
         return self.user.username
+    
+def event_image_path(instance, filename):
+    # instance.id won't exist until saved for the first time, so we handle that
+    ext = filename.split('.')[-1]
+    if instance.id:
+        filename = f'{instance.id}.{ext}'
+    else:
+        filename = f'temp.{ext}'  # temporary name, will rename after save
+    return os.path.join('events', str(instance.id or 'temp'), filename)
 
 class Events(models.Model): 
     author_ID = models.ForeignKey(Users, on_delete=models.CASCADE)
@@ -20,7 +30,12 @@ class Events(models.Model):
     location = models.CharField(max_length=100)
     campus = models.CharField(max_length=100)
     event_type = models.CharField(max_length=100)
-    image_url = models.URLField(default=None, blank=True, null=True)
+    image = models.ImageField(
+        upload_to=event_image_path,  # folder inside MEDIA_ROOT
+        default="events/default.jpg",  # optional default image
+        blank=True,
+        null=True
+    )
     
     def __str__(self):
         return self.name     
