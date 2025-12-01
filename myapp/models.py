@@ -6,6 +6,7 @@ class Users(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     DVC_ID = models.CharField(max_length=10,default=None, blank=True, null=True)
     role = models.CharField(max_length=30)
+    avatar_url = models.ImageField(upload_to='avatars/', blank=True, null=True)
     
     def __str__(self):
         return self.user.username
