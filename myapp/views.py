@@ -13,6 +13,8 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+import os
 
 def get_data():    
     users_data = Users.objects.all()
@@ -193,52 +195,39 @@ def mark_favorite(request, event_id):
         return JsonResponse({'status': 'added'})
     
 def add_event(request):
-    # Only logged-in users
     if not request.user.is_authenticated:
         return redirect('login')
 
-    # Get user profile
     try:
         user_profile = Users.objects.get(user=request.user)
     except Users.DoesNotExist:
         return HttpResponseForbidden("User profile not found")
 
-    # Only admins or superusers can add events
     if user_profile.role not in ["admin", "superuser"]:
         return HttpResponseForbidden("You do not have permission to add events.")
 
-    # Hour and minute dropdown options
-    hours = list(range(1, 13))  # 1-12
+    hours = list(range(1, 13))
     minutes = ["00", "15", "30", "45"]
-    previous = request.POST if request.method == 'POST' else None
+    previous = request.POST if request.method == 'POST' else {}
 
     if request.method == 'POST':
-        # Build start and end times
         try:
-            start_hour = int(request.POST.get('start_hour'))
-            start_minute = int(request.POST.get('start_minute'))
-            start_period = request.POST.get('start_period')
-            start_time_str = f"{start_hour}:{start_minute:02d} {start_period}"
-
-            end_hour = int(request.POST.get('end_hour'))
-            end_minute = int(request.POST.get('end_minute'))
-            end_period = request.POST.get('end_period')
-            end_time_str = f"{end_hour}:{end_minute:02d} {end_period}"
-
-            # Validate time order
+            # --- Parse times ---
+            start_time_str = f"{int(request.POST['start_hour'])}:{int(request.POST['start_minute']):02d} {request.POST['start_period']}"
+            end_time_str = f"{int(request.POST['end_hour'])}:{int(request.POST['end_minute']):02d} {request.POST['end_period']}"
             start_obj = datetime.strptime(start_time_str, "%I:%M %p")
             end_obj = datetime.strptime(end_time_str, "%I:%M %p")
             if start_obj >= end_obj:
                 messages.error(request, "Start time must be before end time.")
                 raise ValueError("Invalid time order")
 
-            # Parse date and day of week
+            # --- Parse date and day of week ---
             event_date_str = request.POST.get('date')
             event_date_obj = datetime.strptime(event_date_str, "%Y-%m-%d").date()
             day_of_week = event_date_obj.strftime("%A")
 
-            # Save event
-            Events.objects.create(
+            # --- Step 1: Create event without image to get ID ---
+            new_event = Events.objects.create(
                 author_ID=user_profile,
                 name=request.POST.get('name'),
                 description=request.POST.get('description'),
@@ -246,23 +235,44 @@ def add_event(request):
                 days_of_week=day_of_week,
                 start_time=start_time_str,
                 end_time=end_time_str,
-                location=request.POST.get('building'),  # consistently using "building"
+                location=request.POST.get('building'),
                 campus=request.POST.get('campus'),
                 event_type=request.POST.get('event_type'),
-                image_url=request.FILES.get('image') if 'image' in request.FILES else None
             )
+
+            # --- Step 2: Handle uploaded image ---
+            uploaded_file = request.FILES.get('image')
+            if uploaded_file:
+                ext = uploaded_file.name.split('.')[-1].lower()
+                filename = f"{new_event.id}.{ext}"  # save as <id>.<ext>
+                folder = os.path.join(settings.MEDIA_ROOT, 'events')
+                os.makedirs(folder, exist_ok=True)  # make sure folder exists
+                full_path = os.path.join(folder, filename)
+
+                # Delete old image if exists
+                if os.path.exists(full_path):
+                    os.remove(full_path)
+
+                # Save the uploaded file to MEDIA_ROOT/events/
+                with open(full_path, 'wb+') as f:
+                    for chunk in uploaded_file.chunks():
+                        f.write(chunk)
+
+                # Update event image field
+                new_event.image.name = f"events/{filename}"
+                new_event.save(update_fields=['image'])
+
             messages.success(request, "Event added successfully!")
             return redirect('home')
 
         except Exception as e:
-            # Re-render form with previous values
+            messages.error(request, f"Error: {str(e)}")
             return render(request, 'add_event.html', {
                 'hours': hours,
                 'minutes': minutes,
                 'previous': previous
             })
 
-    previous = request.POST if request.method == 'POST' else {}
     return render(request, 'add_event.html', {
         'hours': hours,
         'minutes': minutes,
@@ -346,11 +356,29 @@ def delete_user(request, user_id):
     
 @login_required
 def user_profile(request):
-    # Usually you want the logged-in user only:
     user_obj = request.user
-    # Or fetch by ID if necessary:
-    # user_obj = User.objects.get(id=user_id)
-    context = {
-        "user_obj": user_obj
-    }
-    return render(request, "user_profile.html", context)
+    profile_obj = user_obj.users
+
+    if request.method == "POST":
+        # Update first and last name
+        first_name = request.POST.get("first_name", "").strip()
+        last_name = request.POST.get("last_name", "").strip()
+        if first_name:
+            user_obj.first_name = first_name
+        if last_name:
+            user_obj.last_name = last_name
+
+        # Update avatar if uploaded
+        if "avatar" in request.FILES:
+            # Delete old avatar if it exists
+            if profile_obj.avatar_url and os.path.isfile(profile_obj.avatar_url.path):
+                os.remove(profile_obj.avatar_url.path)
+            # Save new avatar
+            profile_obj.avatar_url = request.FILES["avatar"]
+
+        user_obj.save()
+        profile_obj.save()
+        messages.success(request, "Profile updated successfully!")
+        return redirect("user_profile")
+
+    return render(request, "user_profile.html", {"user_obj": user_obj})

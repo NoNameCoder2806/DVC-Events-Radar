@@ -33,11 +33,15 @@
                 DVC Events
             </a>
         </h1>
-        <div class="button-container"style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+        <div class="button-container" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
            display: flex; flex-direction: column; gap: 5px; align-items: center;">
             {% if user.is_authenticated %}
             <!-- Avatar button -->
             <a href="{% url 'user_profile' %}">
+                {% if request.user.users.avatar_url %}
+                <img src="{{ request.user.users.avatar_url.url }}" alt="Avatar"
+                    style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid #007bff;">
+                {% else %}
                 <div style="
                     width: 40px;
                     height: 40px;
@@ -52,8 +56,9 @@
                     font-size: 18px;
                     cursor: pointer;
                 ">
-                    {{ request.user.first_name|first|upper }}
+                    {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
                 </div>
+                {% endif %}
             </a>
 
             <!-- Logout button -->

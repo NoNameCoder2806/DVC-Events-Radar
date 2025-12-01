@@ -1,12 +1,22 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 import os
+
+def user_avatar_path(instance, filename):
+    ext = filename.split('.')[-1]
+    # instance.user.id will always exist here because user is saved
+    return os.path.join('avatars', str(instance.user.id), f'avatar.{ext}')
 
 class Users(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     DVC_ID = models.CharField(max_length=10,default=None, blank=True, null=True)
     role = models.CharField(max_length=30)
-    avatar_url = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    avatar_url = models.ImageField(
+        upload_to=user_avatar_path,  # new path function
+        blank=True,
+        null=True
+    )
     
     def __str__(self):
         return self.user.username
@@ -37,6 +47,12 @@ class Events(models.Model):
         blank=True,
         null=True
     )
+
+    def delete(self, *args, **kwargs):
+        # Delete the image file if it exists
+        if self.image and os.path.isfile(self.image.path):
+            os.remove(self.image.path)
+        super().delete(*args, **kwargs)
     
     def __str__(self):
         return self.name     
