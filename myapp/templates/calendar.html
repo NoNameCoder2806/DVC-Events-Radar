@@ -1,18 +1,46 @@
-{% extends 'home.html' %}
+{% extends 'base.html' %}
 {% block title %}Calendar{% endblock %}
 
 {% block content %}
-<!-- Inject JSON from Django -->
-{{ events_per_day|json_script:"events-per-day" }}
 
-<div class="container mt-4">
-    <h2>Event Calendar</h2>
+<!-- 🔥 Floating top notification -->
+<div id="topNotification"
+     style="
+        position: fixed;
+        top: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        z-index: 9999;
+        transition: top 0.5s ease, opacity 0.5s ease;
+        opacity: 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+     ">
+</div>
 
-    <div id="calendar" class="calendar"></div>
+<div class="d-flex justify-content-center mt-5">
+    <div class="w-75">
 
-    <div class="d-flex justify-content-between mt-2">
-        <button id="prevMonth" class="btn btn-outline-primary">Previous</button>
-        <button id="nextMonth" class="btn btn-outline-primary">Next</button>
+        <!-- Top bar with Back button -->
+        <div class="d-flex align-items-center mb-4 position-relative">
+            <div class="position-absolute" style="left: 0;">
+                <a href="{% url 'home' %}" class="btn btn-secondary">&larr; Back</a>
+            </div>
+            <h2 class="mx-auto text-center">Event Calendar</h2>
+        </div>
+
+        <!-- Inject JSON from Django -->
+        {{ events_per_day|json_script:"events-per-day" }}
+
+        <div id="calendar" class="calendar"></div>
+
+        <div class="d-flex justify-content-between mt-2">
+            <button id="prevMonth" class="btn btn-outline-primary">Previous</button>
+            <button id="nextMonth" class="btn btn-outline-primary">Next</button>
+        </div>
     </div>
 </div>
 
@@ -46,7 +74,7 @@
     }
 
     #calendar td.event-day {
-        background-color: #fff3cd; /* light yellow */
+        background-color: #fff3cd;
         color: #856404;
         font-weight: bold;
     }
@@ -55,7 +83,6 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const eventsPerDay = JSON.parse(document.getElementById("events-per-day").textContent);
-    console.log("eventsPerDay:", eventsPerDay); // Debug: check keys
 
     const calendarDiv = document.getElementById("calendar");
     const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -79,32 +106,22 @@ document.addEventListener("DOMContentLoaded", () => {
         weekDays.forEach(d => html += `<th>${d}</th>`);
         html += `</tr><tr>`;
 
-        // Empty cells before 1st day
         for (let i = 0; i < firstDay; i++) html += `<td class="empty"></td>`;
 
         for (let day = 1; day <= daysInMonth; day++) {
             let classes = "";
-
-            // Highlight today
             if (day === todayDate && month === today.getMonth() && year === today.getFullYear()) {
                 classes += " today";
             }
-
-            // Check if the current day has an "interested" event
             const dayKey = `${year}-${pad(month+1)}-${pad(day)}`;
-            if (eventsPerDay[dayKey]) {
-                classes += " event-day";
-            }
+            if (eventsPerDay[dayKey]) classes += " event-day";
 
             html += `<td class="${classes.trim()}">${day}</td>`;
-
             if ((day + firstDay) % 7 === 0) html += `</tr><tr>`;
         }
 
-        // Fill remaining empty cells at end
         const remaining = (7 - (daysInMonth + firstDay) % 7) % 7;
         for (let i = 0; i < remaining; i++) html += `<td class="empty"></td>`;
-
         html += `</tr></table>`;
         calendarDiv.innerHTML = html;
     }
@@ -130,4 +147,5 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 </script>
+
 {% endblock %}

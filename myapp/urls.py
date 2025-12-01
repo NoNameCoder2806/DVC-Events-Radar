@@ -18,6 +18,8 @@ urlpatterns = [
     path("manage-events/edit/<int:event_id>/", views.edit_event, name="edit_event"),
     path("manage-events/delete/<int:event_id>/", views.delete_event, name="delete_event"),
     path("manage-users/", views.manage_users, name="manage_users"),
+    path("manage-users/change-role/<int:user_id>/", views.change_user_role, name="change_user_role"),
+    path("manage-users/delete/<int:user_id>/", views.delete_user, name="delete_user"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

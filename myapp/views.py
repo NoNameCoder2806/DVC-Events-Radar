@@ -9,6 +9,9 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.utils.timezone import localtime
 from django.core.paginator import Paginator
+from django.views.decorators.csrf import csrf_exempt
+import json
+from django.views.decorators.csrf import csrf_protect
 
 def get_data():    
     users_data = Users.objects.all()
@@ -251,11 +254,6 @@ def add_event(request):
             return redirect('home')
 
         except Exception as e:
-            # Clear messages so old ones don't persist
-            storage = messages.get_messages(request)
-            for _ in storage:
-                pass  # iterating clears them
-
             # Re-render form with previous values
             return render(request, 'add_event.html', {
                 'hours': hours,
@@ -303,3 +301,44 @@ def edit_event(request, event_id):
 def manage_users(request):
     all_users = User.objects.all()
     return render(request, "manage_users.html", {"all_users": all_users})
+
+@csrf_protect
+def change_user_role(request, user_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'error', 'message': 'Not logged in'})
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+    try:
+        user = User.objects.get(id=user_id)
+        profile = user.users
+        try:
+            data = json.loads(request.body)
+            new_role = data.get('role')
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'})
+
+        if new_role not in ['user', 'admin', 'superuser']:
+            return JsonResponse({'status': 'error', 'message': 'Invalid role'})
+
+        profile.role = new_role
+        profile.save()
+        return JsonResponse({'status': 'success'})
+
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'User not found'})
+
+@csrf_exempt
+def delete_user(request, user_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'error', 'message': 'Not logged in'})
+
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+    try:
+        user = User.objects.get(id=user_id)
+        user.delete()
+        return JsonResponse({'status': 'success'})
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'User not found'})
