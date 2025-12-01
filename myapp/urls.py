@@ -20,6 +20,7 @@ urlpatterns = [
     path("manage-users/", views.manage_users, name="manage_users"),
     path("manage-users/change-role/<int:user_id>/", views.change_user_role, name="change_user_role"),
     path("manage-users/delete/<int:user_id>/", views.delete_user, name="delete_user"),
+    path("profile/", views.user_profile, name="user_profile")
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

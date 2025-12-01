@@ -12,6 +12,7 @@ from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth.decorators import login_required
 
 def get_data():    
     users_data = Users.objects.all()
@@ -342,3 +343,14 @@ def delete_user(request, user_id):
         return JsonResponse({'status': 'success'})
     except User.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'User not found'})
+    
+@login_required
+def user_profile(request):
+    # Usually you want the logged-in user only:
+    user_obj = request.user
+    # Or fetch by ID if necessary:
+    # user_obj = User.objects.get(id=user_id)
+    context = {
+        "user_obj": user_obj
+    }
+    return render(request, "user_profile.html", context)

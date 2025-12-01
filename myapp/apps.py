@@ -10,18 +10,18 @@ def populate_default_data(sender, **kwargs):
     users_created = 0
     if not Users.objects.exists():
         default_users = [
-            {"username": "dvc_superuser@insite.4cd.edu", "DVC_ID": "0000000", "role": "superuser"},  # default user
-            {"username": "andrew@insite.4cd.edu", "DVC_ID": "0000001", "role": "admin"},
-            {"username": "frank@insite.4cd.edu", "DVC_ID": "0000002", "role": "admin"},
-            {"username": "heidi@insite.4cd.edu", "DVC_ID": "0000003", "role": "admin"},
-            {"username": "hoang@insite.4cd.edu", "DVC_ID": "0000004", "role": "admin"},
-            {"username": "kayla@insite.4cd.edu", "DVC_ID": "0000005", "role": "admin"},
-            {"username": "seokyoung@insite.4cd.edu", "DVC_ID": "0000006", "role": "admin"},
-            {"username": "dvc_user@insite.4cd.edu", "DVC_ID": "0000007", "role": "user"}
+            {"username": "dvc_superuser@insite.4cd.edu", "DVC_ID": "0000000", "role": "superuser", "first_name": "Superuser"},
+            {"username": "andrew@insite.4cd.edu", "DVC_ID": "0000001", "role": "admin", "first_name": "Andrew"},
+            {"username": "frank@insite.4cd.edu", "DVC_ID": "0000002", "role": "admin", "first_name": "Frank"},
+            {"username": "heidi@insite.4cd.edu", "DVC_ID": "0000003", "role": "admin", "first_name": "Heidi"},
+            {"username": "hoang@insite.4cd.edu", "DVC_ID": "0000004", "role": "admin", "first_name": "Hoang"},
+            {"username": "kayla@insite.4cd.edu", "DVC_ID": "0000005", "role": "admin", "first_name": "Kayla"},
+            {"username": "seokyoung@insite.4cd.edu", "DVC_ID": "0000006", "role": "admin", "first_name": "Seokyoung"},
+            {"username": "dvc_user@insite.4cd.edu", "DVC_ID": "0000007", "role": "user", "first_name": "User"}
         ]
 
         for u in default_users:
-            user_obj = User.objects.create_user(username=u["username"], password="password")
+            user_obj = User.objects.create_user(username=u["username"], password="password", first_name=u.get("first_name", "User"))
             Users.objects.create(user=user_obj, DVC_ID=u["DVC_ID"], role=u["role"])
             users_created += 1
         print(f"Created {users_created} default users.")
