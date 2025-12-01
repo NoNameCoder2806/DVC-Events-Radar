@@ -14,9 +14,6 @@
                 <img src="{{ event.image.url }}" class="img-fluid mb-3" alt="Event Image">
             {% endif %}
 
-            <h5>Description</h5>
-            <p>{{ event.description }}</p>
-
             <h5>Details</h5>
             <ul>
                 <li><strong>Date:</strong> {{ event.date }}</li>
@@ -24,6 +21,9 @@
                 <li><strong>Campus:</strong> {{ event.campus }}</li>
                 <li><strong>Building / Location:</strong> {{ event.location }}</li>
             </ul>
+
+            <h5>Description</h5>
+            <div>{{ event.description|safe }}</div>
 
             {% if user.is_authenticated %}
                 <button type="button" class="btn btn-primary interested-btn" data-event-id="{{ event.id }}">

@@ -2,52 +2,81 @@
 {% block title %}Manage Events{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4">Manage Events</h2>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Date</th>
-                <th>Start - End</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for event in all_events %}
-            <tr>
-                <td>{{ event.name }}</td>
-                <td>{{ event.date }}</td>
-                <td>{{ event.start_time }} - {{ event.end_time }}</td>
-                <td>
-                    <a href="{% url 'edit_event' event.id %}" class="btn btn-sm btn-warning">Edit</a>
-
-                    <!-- NEW delete button that triggers modal -->
-                    <button type="button" class="btn btn-sm btn-danger delete-btn"
-                        data-url="{% url 'delete_event' event.id %}" data-name="{{ event.name|escape }}">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" class="text-center">No events found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<!-- 🔥 FLOATING TOP DROPDOWN MESSAGE -->
+<div id="topNotification"
+     style="
+        position: fixed;
+        top: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        z-index: 9999;
+        transition: top 0.5s ease, opacity 0.5s ease;
+        opacity: 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+     ">
 </div>
 
-<!-- DELETE MODAL (Bootstrap 4) -->
+<div class="d-flex justify-content-center mt-5">
+    <div class="w-75">
+
+        <!-- Top bar -->
+        <div class="d-flex align-items-center mb-4 position-relative">
+            <div class="position-absolute" style="left: 0;">
+                <a href="{% url 'home' %}" class="btn btn-secondary">&larr; Back</a>
+            </div>
+            <h2 class="mx-auto text-center">Manage Events</h2>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Start - End</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for event in all_events %}
+                <tr>
+                    <td>{{ event.name }}</td>
+                    <td>{{ event.date }}</td>
+                    <td>{{ event.start_time }} - {{ event.end_time }}</td>
+                    <td>
+                        <a href="{% url 'edit_event' event.id %}" class="btn btn-sm btn-warning">Edit</a>
+                        <button type="button" class="btn btn-sm btn-danger delete-btn"
+                            data-url="{% url 'delete_event' event.id %}"
+                            data-name="{{ event.name|escape }}">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No events found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<!-- DELETE MODAL -->
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
 
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title">Delete Event</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
                 </button>
             </div>
 
@@ -63,9 +92,7 @@
 
                 <form id="deleteForm" method="POST" class="flex-fill">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-danger w-100">
-                        Yes, Delete
-                    </button>
+                    <button type="submit" class="btn btn-danger w-100">Yes, Delete</button>
                 </form>
             </div>
 
@@ -73,25 +100,68 @@
     </div>
 </div>
 
+<!-- JS -->
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const buttons = document.querySelectorAll(".delete-btn");
+document.addEventListener("DOMContentLoaded", function () {
 
-        buttons.forEach(btn => {
-            btn.addEventListener("click", function () {
-                const actionUrl = this.dataset.url;
-                const eventName = this.dataset.name;
+    // Modal delete button logic
+    document.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const url = this.dataset.url;
+            const name = this.dataset.name;
 
-                // Set form action
-                document.getElementById('deleteForm').action = actionUrl;
+            document.getElementById("deleteForm").action = url;
+            document.getElementById("eventNameInModal").innerText = name;
 
-                // Set event name inside modal
-                document.getElementById('eventNameInModal').innerText = eventName;
-
-                // Show modal
-                $('#deleteModal').modal('show');
-            });
+            $('#deleteModal').modal('show');
         });
     });
+
+});
 </script>
+
+<!-- 🔥 TOP NOTIFICATION FUNCTION -->
+<script>
+function showTopMessage(text, type = "info") {
+    const box = document.getElementById("topNotification");
+
+    const colors = {
+        success: "#28a745",
+        error: "#dc3545",
+        warning: "#ffc107",
+        info: "#17a2b8"
+    };
+    box.style.background = colors[type] || colors.info;
+    box.textContent = text;
+
+    // Reset position instantly
+    box.style.transition = "none";
+    box.style.top = "-80px";
+    box.style.opacity = "0";
+
+    // Force browser to notice the style reset
+    void box.offsetWidth;
+
+    // Apply transition back
+    box.style.transition = "top 0.5s ease, opacity 0.5s ease";
+
+    // Slide down + fade in
+    box.style.top = "20px";
+    box.style.opacity = "1";
+
+    // Slide back up after 2.5s
+    setTimeout(() => {
+        box.style.top = "-80px";
+        box.style.opacity = "0";
+    }, 2500);
+}
+</script>
+
+<!-- 🔥 Trigger messages ONLY on this page -->
+{% for message in messages %}
+<script>
+showTopMessage("{{ message|escapejs }}", "{{ message.tags }}");
+</script>
+{% endfor %}
+
 {% endblock %}

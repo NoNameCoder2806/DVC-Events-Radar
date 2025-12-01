@@ -2,122 +2,183 @@
 {% block title %}Add Event{% endblock %}
 
 {% block content %}
-<div class="container mt-5" style="max-width: 600px;">
-    <h2 class="mb-4 text-center">Add New Event</h2>
 
-    {% if messages %}
-      {% for message in messages %}
-        {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} 
-        alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      {% endfor %}
-    {% endif %}
+<!-- 🔥 Floating top notification -->
+<div id="topNotification"
+     style="
+        position: fixed;
+        top: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        z-index: 9999;
+        transition: top 0.5s ease, opacity 0.5s ease;
+        opacity: 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+     ">
+</div>
 
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
+<div class="d-flex justify-content-center mt-5">
+    <div class="w-75">
 
-        <div class="mb-3">
-            <label for="name" class="form-label">Event Name</label>
-            <input type="text" class="form-control" id="name" name="name"
-                   value="{{ request.POST.name|default_if_none:'' }}" required>
+        <!-- Top bar with Back button -->
+        <div class="d-flex align-items-center mb-4 position-relative">
+            <div class="position-absolute" style="left: 0;">
+                <a href="{% url 'home' %}" class="btn btn-secondary">&larr; Back</a>
+            </div>
+            <h2 class="mx-auto text-center">Add New Event</h2>
         </div>
 
-        <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="4">{{ request.POST.description|default_if_none:'' }}</textarea>
-        </div>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
 
-        <div class="mb-3">
-            <label for="date" class="form-label">Date</label>
-            <input type="date" class="form-control" id="date" name="date"
-                   value="{{ request.POST.date|default_if_none:'' }}" required>
-        </div>
+            <div class="mb-3">
+                <label for="name" class="form-label">Event Name</label>
+                <input type="text" class="form-control" id="name" name="name"
+                    value="{{ request.POST.name|default_if_none:'' }}" required>
+            </div>
 
-        <!-- Start Time -->
-        <div class="mb-3">
-            <label class="form-label">Start Time</label>
-            <div class="d-flex gap-2">
-                <select name="start_hour" class="form-control">
-                    {% for h in hours %}
-                    <option value="{{ h }}" {% if request.POST.start_hour == h|stringformat:"s" %}selected{% endif %}>{{ h }}</option>
-                    {% endfor %}
-                </select>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="4">{{ request.POST.description|default_if_none:'' }}</textarea>
+            </div>
 
-                <select name="start_minute" class="form-control">
-                    {% for m in minutes %}
-                    <option value="{{ m }}" {% if request.POST.start_minute == m %}selected{% endif %}>{{ m }}</option>
-                    {% endfor %}
-                </select>
+            <div class="mb-3">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="date" name="date"
+                    value="{{ request.POST.date|default_if_none:'' }}" required>
+            </div>
 
-                <select name="start_period" class="form-control">
-                    <option value="AM" {% if request.POST.start_period == "AM" %}selected{% endif %}>AM</option>
-                    <option value="PM" {% if request.POST.start_period == "PM" %}selected{% endif %}>PM</option>
+            <!-- Start Time -->
+            <div class="mb-3">
+                <label class="form-label">Start Time</label>
+                <div class="d-flex gap-2">
+                    <select name="start_hour" class="form-control">
+                        {% for h in hours %}
+                            <option value="{{ h }}" {% if request.POST.start_hour == h|stringformat:"s" %}selected{% endif %}>{{ h }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="start_minute" class="form-control">
+                        {% for m in minutes %}
+                            <option value="{{ m }}" {% if request.POST.start_minute == m %}selected{% endif %}>{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="start_period" class="form-control">
+                        <option value="AM" {% if request.POST.start_period == "AM" %}selected{% endif %}>AM</option>
+                        <option value="PM" {% if request.POST.start_period == "PM" %}selected{% endif %}>PM</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- End Time -->
+            <div class="mb-3">
+                <label class="form-label">End Time</label>
+                <div class="d-flex gap-2">
+                    <select name="end_hour" class="form-control">
+                        {% for h in hours %}
+                            <option value="{{ h }}" {% if request.POST.end_hour == h|stringformat:"s" %}selected{% endif %}>{{ h }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="end_minute" class="form-control">
+                        {% for m in minutes %}
+                            <option value="{{ m }}" {% if request.POST.end_minute == m %}selected{% endif %}>{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="end_period" class="form-control">
+                        <option value="AM" {% if request.POST.end_period == "AM" %}selected{% endif %}>AM</option>
+                        <option value="PM" {% if request.POST.end_period == "PM" %}selected{% endif %}>PM</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="building" class="form-label">Building / Location</label>
+                <input type="text" class="form-control" id="building" name="building"
+                    value="{{ previous.building|default_if_none:'' }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Campus</label>
+                <select class="form-control" id="campus" name="campus" required>
+                    <option value="" disabled selected>Select a campus</option>
+                    <option value="Pleasant Hill Campus" {% if request.POST.location == "Pleasant Hill Campus" %}selected{% endif %}>Pleasant Hill Campus</option>
+                    <option value="San Ramon Campus" {% if request.POST.location == "San Ramon Campus" %}selected{% endif %}>San Ramon Campus</option>
+                    <option value="Virtual" {% if request.POST.location == "Virtual" %}selected{% endif %}>Virtual</option>
                 </select>
             </div>
-        </div>
 
-        <!-- End Time -->
-        <div class="mb-3">
-            <label class="form-label">End Time</label>
-            <div class="d-flex gap-2">
-                <select name="end_hour" class="form-control">
-                    {% for h in hours %}
-                    <option value="{{ h }}" {% if request.POST.end_hour == h|stringformat:"s" %}selected{% endif %}>{{ h }}</option>
-                    {% endfor %}
-                </select>
-
-                <select name="end_minute" class="form-control">
-                    {% for m in minutes %}
-                    <option value="{{ m }}" {% if request.POST.end_minute == m %}selected{% endif %}>{{ m }}</option>
-                    {% endfor %}
-                </select>
-
-                <select name="end_period" class="form-control">
-                    <option value="AM" {% if request.POST.end_period == "AM" %}selected{% endif %}>AM</option>
-                    <option value="PM" {% if request.POST.end_period == "PM" %}selected{% endif %}>PM</option>
+            <div class="mb-3">
+                <label class="form-label">Event Type</label>
+                <select class="form-control" id="event_type" name="event_type" required>
+                    <option value="" disabled selected>Select event type</option>
+                    <option value="Sports" {% if request.POST.event_type == "Sports" %}selected{% endif %}>Sports</option>
+                    <option value="Clubs" {% if request.POST.event_type == "Clubs" %}selected{% endif %}>Clubs</option>
+                    <option value="Career & Academic" {% if request.POST.event_type == "Career & Academic" %}selected{% endif %}>Career & Academic</option>
+                    <option value="Free Food" {% if request.POST.event_type == "Free Food" %}selected{% endif %}>Free Food</option>
                 </select>
             </div>
+
+            <div class="mb-3">
+                <label class="form-label">Event Image</label>
+                <input type="file" class="form-control" id="image" name="image">
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Create Event</button>
+        </form>
+
+        <!-- Bottom Cancel/Home Button -->
+        <div class="text-center mt-3 mb-5">
+            <a href="{% url 'home' %}" class="btn btn-secondary w-100">Cancel</a>
         </div>
-
-        <div class="mb-3">
-            <label for="location" class="form-label">Building / Location</label>
-            <input type="text" class="form-control" id="building" name="building"
-           value="{{ previous.building|default_if_none:'' }}" placeholder="Enter building or room" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="location" class="form-label">Campus</label>
-            <select class="form-control" id="campus" name="campus" required>
-                <option value="" disabled {% if not request.POST.location %}selected{% endif %}>Select a campus</option>
-                <option value="Pleasant Hill Campus" {% if request.POST.location == "Pleasant Hill Campus" %}selected{% endif %}>Pleasant Hill Campus</option>
-                <option value="San Ramon Campus" {% if request.POST.location == "San Ramon Campus" %}selected{% endif %}>San Ramon Campus</option>
-                <option value="Virtual" {% if request.POST.location == "Virtual" %}selected{% endif %}>Virtual</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label for="event_type" class="form-label">Event Type</label>
-            <select class="form-control" id="event_type" name="event_type" required>
-                <option value="" disabled {% if not request.POST.event_type %}selected{% endif %}>Select event type</option>
-                <option value="Sports" {% if request.POST.event_type == "Sports" %}selected{% endif %}>Sports</option>
-                <option value="Clubs" {% if request.POST.event_type == "Clubs" %}selected{% endif %}>Clubs</option>
-                <option value="Career & Academic" {% if request.POST.event_type == "Career & Academic" %}selected{% endif %}>Career & Academic</option>
-                <option value="Free Food" {% if request.POST.event_type == "Free Food" %}selected{% endif %}>Free Food</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label for="image" class="form-label">Event Image</label>
-            <input type="file" class="form-control" id="image" name="image">
-        </div>
-
-        <button type="submit" class="btn btn-primary w-100">Create Event</button>
-    </form>
-
-    <!-- Cancel button with extra space -->
-    <div class="text-center mt-3 mb-5">
-        <a href="{% url 'home' %}" class="btn btn-secondary w-100">Cancel</a>
     </div>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Global function
+function showTopMessage(text, type = "info") {
+    const box = document.getElementById("topNotification");
+
+    const colors = {
+        success: "#28a745",
+        error: "#dc3545",
+        warning: "#ffc107",
+        info: "#17a2b8"
+    };
+    box.textContent = text;
+    box.style.background = colors[type] || colors.info;
+
+    // Reset instantly
+    box.style.transition = "none";
+    box.style.top = "-80px";
+    box.style.opacity = "0";
+    void box.offsetWidth; // force reflow
+
+    // Apply transition
+    box.style.transition = "top 0.5s ease, opacity 0.5s ease";
+
+    // Tiny delay ensures smooth slide
+    setTimeout(() => {
+        box.style.top = "20px";
+        box.style.opacity = "1";
+    }, 50);
+
+    // Auto-hide
+    setTimeout(() => {
+        box.style.top = "-80px";
+        box.style.opacity = "0";
+    }, 2600);
+}
+</script>
+
+{% for message in messages %}
+<script>
+showTopMessage("{{ message|escapejs }}", "{{ message.tags }}");
+</script>
+{% endfor %}
 {% endblock %}
