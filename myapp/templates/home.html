@@ -172,7 +172,7 @@
                 {% if user_role in "admin superuser" %}
                 <div class="mb-2 w-100 d-flex flex-column gap-2">
                     <a href="{% url 'add_event' %}" class="btn btn-primary w-100">Add Event</a>
-                    <a href="{% url 'manage_events' %}" class="btn btn-warning w-100">Edit Events</a>
+                    <a href="{% url 'manage_events' %}" class="btn btn-warning w-100">Manage Events</a>
                 </div>
                 {% endif %}
                 <a href="{% url 'calendar' %}" class="btn btn-primary mb-2 w-100">Full Calendar</a>

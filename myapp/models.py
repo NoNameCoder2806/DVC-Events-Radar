@@ -36,6 +36,9 @@ def event_image_path(instance, filename):
     return os.path.join('events', str(instance.id or 'temp'), filename)
 
 class Events(models.Model): 
+    EVENT_TYPES = [('Sports', 'Sports'), ('Clubs', 'Clubs'),('Carrer & Academic', 'Career & Academic'), ('Free Food', 'Free Food'), ('General', 'General')]    
+    CAMPUS_CHOICES = [('Pleasant Hill Campus', 'Pleasant Hill Campus'),('San Ramon Campus', 'San Ramon Campus'),('Virtual', 'Virtual')]
+    
     author_ID = models.ForeignKey(Users, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=10000)
@@ -43,8 +46,8 @@ class Events(models.Model):
     start_time = models.CharField(max_length=100)
     end_time = models.CharField(max_length=100)
     location = models.CharField(max_length=100, blank=True, null=True)
-    campus = models.CharField(max_length=100)
-    event_type = models.CharField(max_length=100)
+    campus = models.CharField(max_length=100, choices=CAMPUS_CHOICES)
+    event_type = models.CharField(max_length=100, choices=EVENT_TYPES)
     image = models.ImageField(
         upload_to=event_image_path,  # folder inside MEDIA_ROOT
         default="events/default.jpg",  # optional default image
@@ -65,6 +68,15 @@ class Events(models.Model):
             return datetime.strptime(self.end_time.strip(), "%I:%M %p").time()
         except Exception:
             return None
+            
+    @property
+    def image_or_default(self):
+        try: 
+            if self.image and os.path.isfile(self.image.path):
+                return self.image.url
+        except ValueError:
+            pass
+        return settings.MEDIA_URL + '/default.jpg'
 
     def delete(self, *args, **kwargs):
         # Delete the image file if it exists

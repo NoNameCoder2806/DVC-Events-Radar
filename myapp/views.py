@@ -11,6 +11,7 @@ from django.utils.timezone import localtime
 from datetime import datetime
 
 from .models import Users, Events, Favorites
+from .forms import EventForm
 
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt, csrf_protect 
@@ -188,86 +189,25 @@ def add_event(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    try:
-        user_profile = Users.objects.get(user=request.user)
-    except Users.DoesNotExist:
-        return HttpResponseForbidden("User profile not found")
-
-    if user_profile.role not in ["admin", "superuser"]:
-        return HttpResponseForbidden("You do not have permission to add events.")
-
-    hours = list(range(1, 13))
-    minutes = ["00", "15", "30", "45"]
-    previous = request.POST if request.method == 'POST' else {}
-
+    user_profile = getattr(request.user, 'users', None) 
+    if not user_profile or user_profile.role not in ["admin", "superuser"]:
+        messages.error(request, "You do not have permission to add events.")
+        return redirect('home')
+    
     if request.method == 'POST':
-        try:
-            # --- Parse times ---
-            start_time_str = f"{int(request.POST['start_hour'])}:{int(request.POST['start_minute']):02d} {request.POST['start_period']}"
-            end_time_str = f"{int(request.POST['end_hour'])}:{int(request.POST['end_minute']):02d} {request.POST['end_period']}"
-            start_obj = datetime.strptime(start_time_str, "%I:%M %p")
-            end_obj = datetime.strptime(end_time_str, "%I:%M %p")
-            if start_obj >= end_obj:
-                messages.error(request, "Start time must be before end time.")
-                raise ValueError("Invalid time order")
-
-            # --- Parse date and day of week ---
-            event_date_str = request.POST.get('date')
-            event_date_obj = datetime.strptime(event_date_str, "%Y-%m-%d").date()
-            day_of_week = event_date_obj.strftime("%A")
-
-            # --- Step 1: Create event without image to get ID ---
-            new_event = Events.objects.create(
-                author_ID=user_profile,
-                name=request.POST.get('name'),
-                description=request.POST.get('description'),
-                date=event_date_str,
-                days_of_week=day_of_week,
-                start_time=start_time_str,
-                end_time=end_time_str,
-                location=request.POST.get('building'),
-                campus=request.POST.get('campus'),
-                event_type=request.POST.get('event_type'),
-            )
-
-            # --- Step 2: Handle uploaded image ---
-            uploaded_file = request.FILES.get('image')
-            if uploaded_file:
-                ext = uploaded_file.name.split('.')[-1].lower()
-                filename = f"{new_event.id}.{ext}"  # save as <id>.<ext>
-                folder = os.path.join(settings.MEDIA_ROOT, 'events')
-                os.makedirs(folder, exist_ok=True)  # make sure folder exists
-                full_path = os.path.join(folder, filename)
-
-                # Delete old image if exists
-                if os.path.exists(full_path):
-                    os.remove(full_path)
-
-                # Save the uploaded file to MEDIA_ROOT/events/
-                with open(full_path, 'wb+') as f:
-                    for chunk in uploaded_file.chunks():
-                        f.write(chunk)
-
-                # Update event image field
-                new_event.image.name = f"events/{filename}"
-                new_event.save(update_fields=['image'])
-
-            messages.success(request, "Event added successfully!")
+        form = EventForm(request.POST, request.FILES)
+        if form.is_valid():
+            new_event = form.save(commit=False)
+            new_event.author_ID = user_profile
+            new_event.save()
+            messages.success(request, "Event added successfully.")
             return redirect('home')
+        else:
+            messages.error(request, "Please correct errors below.")
+    else:
+        form = EventForm()
 
-        except Exception as e:
-            messages.error(request, f"Error: {str(e)}")
-            return render(request, 'add_event.html', {
-                'hours': hours,
-                'minutes': minutes,
-                'previous': previous
-            })
-
-    return render(request, 'add_event.html', {
-        'hours': hours,
-        'minutes': minutes,
-        'previous': previous,
-    })
+    return render(request, 'event_form.html', {'form': form, 'page_title': 'Add Event', 'submit_text': 'Add Event'})
 
 @user_passes_test(lambda u: u.is_authenticated and hasattr(u, "users") and u.users.role in ["admin", "superuser"])
 def manage_events(request):
@@ -297,7 +237,16 @@ def delete_event(request, event_id):
 
 def edit_event(request, event_id):
     event = get_object_or_404(Events, id=event_id)
-    return render(request, "edit_event.html", {"event": event})
+    if request.method == 'POST':
+        form = EventForm(request.POST, request.FILES, instance=event)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Event updated successfully.")
+            return redirect('manage_events')
+    else:
+        form = EventForm(instance=event)
+        
+    return render(request, "event_form.html", {'event': event, 'form': form, 'page_title': 'Edit Event', 'submit_text': 'Update event'})
 
 def manage_users(request):
     all_users = User.objects.all()
