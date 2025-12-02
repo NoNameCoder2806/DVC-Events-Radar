@@ -33,13 +33,18 @@ def get_data():
     return data
 
 def home(request):
-    # All events
-    events_data = list(Events.objects.all())
+    query = request.GET.get('q', '')
+    if query:
+        events_data = list(Events.objects.search(query))
+    else:    
+        events_data = list(Events.objects.all())
+    
     events_data.sort(key=lambda e: (e.date, e.start_time_obj or datetime.min.time()))
 
     user_role = None
-    # User favorites
     user_favorites = []
+    
+    # User favorites
     if request.user.is_authenticated:
         try:
             user_obj = Users.objects.get(user=request.user)
@@ -59,6 +64,7 @@ def home(request):
         'user_id': request.user.id if request.user.is_authenticated else None,
         'user_name': request.user.username if request.user.is_authenticated else None,
         'user_role' : user_role, 
+        'search_query': query, 
     })
 
 def calendar_view(request):

@@ -1,8 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Q 
 from django.utils import timezone
+from datetime import datetime
 from django.conf import settings
 import os
+import re
 
 def user_avatar_path(instance, filename):
     ext = filename.split('.')[-1]
@@ -35,6 +38,28 @@ def event_image_path(instance, filename):
         filename = f'temp.{ext}'  # temporary name, will rename after save
     return os.path.join('events', str(instance.id or 'temp'), filename)
 
+
+class EventSearch(models.Manager):
+    # If you surround your query with " " , it searches events containing the exact phrase 
+    # If you search without quotemarks, it earches posts that contains all the words in the query
+    # Ex) If you search `Coffee break` events like `break with coffee` appear 
+    # Not Case sensitive
+    def search(self, query):
+        phrases = re.findall(r'"(.*?)"', query)
+        remaining = re.sub(r'"(.*?)"', '', query)
+        words = [w for w in remaining.split() if w] 
+        
+        q_objects = Q()
+        
+        # Exact phrase search
+        for phrase in phrases:
+            q_objects |= Q(name__icontains=phrase) | Q(description__icontains=phrase)
+        # Default search
+        for word in words:
+            q_objects &= Q(name__icontains=word) | Q(description__icontains=word)
+            
+        return self.get_queryset().filter(q_objects).distinct()
+
 class Events(models.Model): 
     EVENT_TYPES = [('Sports', 'Sports'), ('Clubs', 'Clubs'),('Carrer & Academic', 'Career & Academic'), ('Free Food', 'Free Food'), ('General', 'General')]    
     CAMPUS_CHOICES = [('Pleasant Hill Campus', 'Pleasant Hill Campus'),('San Ramon Campus', 'San Ramon Campus'),('Virtual', 'Virtual')]
@@ -54,6 +79,8 @@ class Events(models.Model):
         blank=True,
         null=True
     )
+    
+    objects = EventSearch()
     
     @property 
     def start_time_obj(self):
@@ -90,6 +117,8 @@ class Events(models.Model):
     class Meta:
         verbose_name = "Event"
         verbose_name_plural = "Events"
+        
+    
     
 class Favorites(models.Model):
     event_ID = models.ForeignKey(Events, on_delete=models.CASCADE)

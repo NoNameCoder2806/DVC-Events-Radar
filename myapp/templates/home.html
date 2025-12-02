@@ -15,6 +15,14 @@
     <div class="row">
         <!-- 🧭 Left Column -->
         <div class="col-md-2">
+            
+            <form method="get" action="{% url 'home' %}"  class="mb-3">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" value="{{ search_query|default:'' }}">
+                    <button class="btn btn-outline-secondary" type="submit">Search</button>
+                </div>
+            </form>
+        
             <h5 class="mb-3">Filters</h5>
             <!-- 📍 Location -->
             <div class="border-bottom mb-2 pb-2">
