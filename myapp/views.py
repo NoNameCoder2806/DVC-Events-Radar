@@ -33,9 +33,8 @@ def get_data():
 
 def home(request):
     # All events
-    events_data = Events.objects.all().order_by('-date')        
-    events_data = list(events_data)
-    events_data.sort(key=lambda e: e.start_time_obj or datetime.min.time(), reverse=True)
+    events_data = list(Events.objects.all())
+    events_data.sort(key=lambda e: (e.date, e.start_time_obj or datetime.min.time()))
 
     user_role = None
     # User favorites
