@@ -1,72 +1,81 @@
 {% extends "base.html" %}
 {% load static %}
 
-<body>
+{% block content %}
+<!-- Top slide-down alert -->
+<div id="top-alert" class="alert" role="alert" style="position: fixed; top: -60px; left: 50%; transform: translateX(-50%);
+            z-index: 1050; width: auto; max-width: 400px; transition: top 0.5s ease, opacity 0.5s ease; opacity: 0;">
+    <span id="top-alert-message"></span>
+    <button type="button" class="close" onclick="hideAlert()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
 
-    <div class="container-fluid mt-4">
-        {% block content %}
-        <div class="row">
-            <!-- 🧭 Left Column -->
-            <div class="col-md-2">
-                <h5 class="mb-3">Filters</h5>
-                <!-- 📍 Location -->
-                <div class="border-bottom mb-2 pb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold">Location</span>
-                        <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
-                            data-target="#locationFilter" aria-expanded="false" aria-controls="locationFilter">
-                            +
-                        </button>
-                    </div>
-                    <div class="collapse mt-2" id="locationFilter">
-                        <label class="form-check" for="onCampus">Pleasant Hill Campus<input type="checkbox" id="onCampus"><span class="checkmark"></span></label>
-                        <label class="form-check" for="offCampus">San Ramon Campus<input type="checkbox" id="offCampus"><span class="checkmark"></span></label>
-                        <label class="form-check" for="virtual">Virtual<input type="checkbox" id="virtual"><span class="checkmark"></span></label>
-                    </div>
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- 🧭 Left Column -->
+        <div class="col-md-2">
+            <h5 class="mb-3">Filters</h5>
+            <!-- 📍 Location -->
+            <div class="border-bottom mb-2 pb-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">Location</span>
+                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
+                        data-target="#locationFilter" aria-expanded="false" aria-controls="locationFilter">
+                        +
+                    </button>
                 </div>
-
-                <!-- 📅 Select Days -->
-                <div class="border-bottom mb-2 pb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold">Select Days</span>
-                        <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
-                            data-target="#daysFilter" aria-expanded="false" aria-controls="daysFilter">
-                            +
-                        </button>
-                    </div>
-                    <div class="collapse mt-2" id="daysFilter">
-                        <label class="form-check" for="monday"><input class="form-check-input" type="checkbox" id="monday">Monday<span class="checkmark"></span></label>
-                        <label class="form-check" for="tuesday"><input class="form-check-input" type="checkbox" id="tuesday">Tuesday<span class="checkmark"></span></label>
-                        <label class="form-check" for="wednesday"><input class="form-check-input" type="checkbox" id="wednesday">Wednesday<span class="checkmark"></span></label>
-                        <label class="form-check" for="thursday"><input class="form-check-input" type="checkbox" id="thursday">Thursday<span class="checkmark"></span></label>
-                        <label class="form-check" for="friday"><input class="form-check-input" type="checkbox" id="friday">Friday<span class="checkmark"></span></label>
-                    </div>
+                <div class="collapse mt-2" id="locationFilter">
+                    <label class="form-check" for="onCampus">Pleasant Hill Campus<input type="checkbox" id="onCampus"><span class="checkmark"></span></label>
+                    <label class="form-check" for="offCampus">San Ramon Campus<input type="checkbox" id="offCampus"><span class="checkmark"></span></label>
+                    <label class="form-check" for="virtual">Virtual<input type="checkbox" id="virtual"><span class="checkmark"></span></label>
                 </div>
+            </div>
 
-                <!-- 🕒 Time Range -->
-                <div class="border-bottom mb-2 pb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold">Select Time Range</span>
-                        <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
-                            data-target="#timeFilter" aria-expanded="false" aria-controls="timeFilter">
-                            +
-                        </button>
-                    </div>
-                    <div class="collapse mt-2" id="timeFilter">
-                        <label class="form-check" for="morning"><input class="form-check-input" type="checkbox" id="morning">Morning<br>(8am–12pm)<span class="checkmark"></span></label>
-                        <label class="form-check" for="afternoon"><input class="form-check-input" type="checkbox" id="afternoon">Afternoon<br>(12pm–5pm)<span class="checkmark"></span></label>
-                        <label class="form-check" for="evening"><input class="form-check-input" type="checkbox" id="evening">Evening<br>(5pm–9pm)<span class="checkmark"></span></label>
-                    </div>
+
+            <!-- 📅 Select Days -->
+            <div class="border-bottom mb-2 pb-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">Select Days</span>
+                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
+                        data-target="#daysFilter" aria-expanded="false" aria-controls="daysFilter">
+                        +
+                    </button>
                 </div>
+                <div class="collapse mt-2" id="daysFilter">
+                      <label class="form-check" for="monday"><input class="form-check-input" type="checkbox" id="monday">Monday<span class="checkmark"></span></label>
+                      <label class="form-check" for="tuesday"><input class="form-check-input" type="checkbox" id="tuesday">Tuesday<span class="checkmark"></span></label>
+                      <label class="form-check" for="wednesday"><input class="form-check-input" type="checkbox" id="wednesday">Wednesday<span class="checkmark"></span></label>
+                      <label class="form-check" for="thursday"><input class="form-check-input" type="checkbox" id="thursday">Thursday<span class="checkmark"></span></label>
+                      <label class="form-check" for="friday"><input class="form-check-input" type="checkbox" id="friday">Friday<span class="checkmark"></span></label>
+                  </div>
+            </div>
 
-                <!-- 🎟️ Event Type -->
-                <div class="border-bottom mb-2 pb-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="fw-bold">Event Type</span>
-                        <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
-                            data-target="#typeFilter" aria-expanded="false" aria-controls="typeFilter">
-                            +
-                        </button>
+            <!-- 🕒 Time Range -->
+            <div class="border-bottom mb-2 pb-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">Select Time Range</span>
+                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
+                        data-target="#timeFilter" aria-expanded="false" aria-controls="timeFilter">
+                        +
+                    </button>
+                </div>
+                <div class="collapse mt-2" id="timeFilter">
+                    <label class="form-check" for="morning"><input class="form-check-input" type="checkbox" id="morning">Morning<br>(8am–12pm)<span class="checkmark"></span></label>
+                    <label class="form-check" for="afternoon"><input class="form-check-input" type="checkbox" id="afternoon">Afternoon<br>(12pm–5pm)<span class="checkmark"></span></label>
+                    <label class="form-check" for="evening"><input class="form-check-input" type="checkbox" id="evening">Evening<br>(5pm–9pm)<span class="checkmark"></span></label>            
+                </div>
+            </div>
+
+            <!-- 🎟️ Event Type -->
+            <div class="border-bottom mb-2 pb-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">Event Type</span>
+                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
+                        data-target="#typeFilter" aria-expanded="false" aria-controls="typeFilter">
+                        +
+                    </button>
+                
                     </div>
                     <div class="collapse mt-2" id="typeFilter">
                         <label class="form-check" for="sports"><input class="form-check-input" type="checkbox" id="sports">Sports<span class="checkmark"></span></label>
@@ -74,18 +83,35 @@
                         <label class="form-check" for="clubs">Career & Academic<input class="form-check-input" type="checkbox" id="clubs"><span class="checkmark"></span></label>
                         <label class="form-check" for="academic"><input class="form-check-input" type="checkbox" id="academic">Free Food<span class="checkmark"></span></label>
                     </div>
-                </div>
 
-                <!-- Apply Button -->
-                <!-- <button class="btn btn-primary w-100 mt-2">Apply Filters</button> -->
+                </div>
+                <div class="collapse mt-2" id="typeFilter">
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="sports"><label
+                            class="form-check-label" for="sports">Sports</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="clubs"><label
+                            class="form-check-label" for="clubs">Clubs</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="career&academic"><label
+                            class="form-check-label" for="career&academic">Career & Academic</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" id="freefood"><label
+                            class="form-check-label" for="freefood">Free Food</label></div>
+                </div>
             </div>
 
-            <!-- 🎟️ Middle Column -->
-            <div class="col-md-8">
-                <!-- Short Description -->
-                <div>
-                    <p class="page-description">Add the Events page description here</p>
-                </div>
+            <!-- Apply Button -->
+            <!-- <button class="btn btn-primary w-100 mt-2">Apply Filters</button> -->
+        </div>
+
+        <!-- 🎟️ Middle Column -->
+        <div class="col-md-8">
+            <!-- Short Description -->
+            <div>
+                <p class="page-description">Add the Events page description here</p>
+            </div>
+
+            <!-- The Events Search Bar-->
+            <div class="p-3 bg-white border rounded">
+                <h3>Event Search</h3>
+                <input type="text" class="form-control mb-3" placeholder="Search for events...">
 
                 <!-- The Events Search Bar-->
                 <div class="p-3 bg-white border rounded">
@@ -102,37 +128,228 @@
                         </div>
                         {% endfor %} 
                     </div>
+                    {% endfor %}
                 </div>
-            </div>
 
+                <!-- Pagination Controls -->
+                <nav aria-label="Event pagination">
+                    <ul class="pagination justify-content-center mt-4">
+                        {% if events_data.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ events_data.previous_page_number }}">&#8592;
+                                Previous</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&#8592; Previous</span>
+                        </li>
+                        {% endif %}
 
-            <!-- 📅 Right Column -->
-            <div class="col-md-2">
-                <div class="p-3 bg-light border rounded d-flex flex-column align-items-center">
-                    <h5>Quick Access</h5>
-                    <a href="{% url 'calendar' %}" class="btn btn-primary mb-2 w-100">Full Calendar</a>
-                    <a href="{% url 'map' %}" class="btn btn-success w-100">Event Map</a>
-                </div>
+                        {% for num in events_data.paginator.page_range %}
+                        {% if events_data.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+
+                        {% if events_data.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ events_data.next_page_number }}">Next &#8594;</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Next &#8594;</span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
             </div>
         </div>
-        {% endblock %}
-    </div>
 
-    <!-- Scripts -->
-    <script>
-        // Change + to - when the filter is expanded
-        document.querySelectorAll('.toggle-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                const target = document.querySelector(button.dataset.target);
-                const expanded = button.getAttribute('aria-expanded') === 'true';
-                setTimeout(() => {
-                    button.textContent = expanded ? '+' : '−';
-                }, 150);
+        <!-- 📅 Right Column -->
+        <div class="col-md-2">
+            <div class="p-3 bg-light border rounded d-flex flex-column align-items-center">
+                <h5>Quick Access</h5>
+                <!-- Manage Users Button -->
+                {% if user_role == "superuser" %}
+                <a href="{% url 'manage_users' %}" class="btn btn-warning mb-2 w-100">
+                    🔐 Manage Users
+                </a>
+                {% endif %}
+
+                <!-- Add Event Button -->
+                {% if user_role == "admin" or user_role == "superuser" %}
+                <a href="{% url 'add_event' %}" class="btn btn-warning mb-2 w-100">
+                    ➕ Add Event
+                </a>
+
+                <!-- Manage Events Button -->
+                <a href="{% url 'manage_events' %}" class="btn btn-warning mb-2 w-100">
+                    🛠️ Manage Events
+                </a>
+                {% endif %}
+
+                <!-- Quick Access Buttons -->
+                <a href="{% url 'calendar' %}" class="btn btn-primary mb-2 w-100">📅 Full Calendar</a>
+                <a href="{% url 'map' %}" class="btn btn-success w-100">🗺️ Event Map</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Scripts -->
+<script>
+    // Change + to - when the filter is expanded
+    document.querySelectorAll('.toggle-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const target = document.querySelector(button.dataset.target);
+            const expanded = button.getAttribute('aria-expanded') === 'true';
+            setTimeout(() => {
+                button.textContent = expanded ? '+' : '−';
+            }, 150);
+        });
+    });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const buttons = document.querySelectorAll('.interested-btn');
+        const alertDiv = document.getElementById('top-alert');
+        const alertMessage = document.getElementById('top-alert-message');
+
+        function showAlert(message, type = 'info') {
+            alertDiv.className = `alert alert-${type}`;
+            alertMessage.textContent = message;
+
+            // Reset position instantly to hidden (no animation)
+            alertDiv.style.transition = 'none';
+            alertDiv.style.top = '-60px';
+            alertDiv.style.opacity = '0';
+
+            // Force browser to reflow so transition will work
+            void alertDiv.offsetWidth;
+
+            // Restore transition
+            alertDiv.style.transition = 'top 0.5s ease, opacity 0.5s ease';
+
+            // Slide down
+            alertDiv.style.top = '20px';
+            alertDiv.style.opacity = '1';
+
+            // Clear any existing timer
+            if (alertDiv.hideTimeout) {
+                clearTimeout(alertDiv.hideTimeout);
+            }
+
+            // Auto-hide after 3 seconds
+            alertDiv.hideTimeout = setTimeout(() => {
+                hideAlert();
+            }, 3000);
+        }
+
+        window.hideAlert = function () {
+            alertDiv.style.top = '-60px';
+            alertDiv.style.opacity = '0';
+        };
+
+        buttons.forEach(button => {
+            button.addEventListener('click', async () => {
+                const eventId = button.dataset.eventId;
+                const csrfToken = '{{ csrf_token }}';
+
+                try {
+                    const response = await fetch(`/favorite/${eventId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.status === 'error') {
+                        showAlert("⚠️ Please log in to mark an event as interested.", 'warning');
+                        return;
+                    }
+
+                    if (data.status === 'added') {
+                        button.textContent = 'Unmark ⭐';
+                        button.classList.remove('btn-warning');
+                        button.classList.add('btn-success');
+                        showAlert("⭐ Added to your interested events!", 'success');
+                    } else if (data.status === 'removed') {
+                        button.textContent = 'Interested ⭐';
+                        button.classList.remove('btn-success');
+                        button.classList.add('btn-warning');
+                        showAlert("❌ Removed from your interested events.", 'info');
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
             });
         });
-    </script>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
-</body>
+    });
+</script>
 
-</html>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("JS Loaded!");
+
+        const buttons = document.querySelectorAll('.interested-btn');
+        console.log("Found buttons:", buttons.length);
+    });
+</script>
+
+<script>
+function showTopMessage(text, type = "info") {
+    const box = document.getElementById("topNotification");
+
+    const colors = {
+        success: "#28a745",
+        error: "#dc3545",
+        warning: "#ffc107",
+        info: "#17a2b8"
+    };
+    box.textContent = text;
+    box.style.background = colors[type] || colors.info;
+
+    // Reset instantly
+    box.style.transition = "none";
+    box.style.top = "-80px";
+    box.style.opacity = "0";
+    void box.offsetWidth; // force reflow
+
+    // Apply transition
+    box.style.transition = "top 0.5s ease, opacity 0.5s ease";
+
+    // Tiny delay ensures smooth slide
+    setTimeout(() => {
+        box.style.top = "20px";
+        box.style.opacity = "1";
+    }, 50);
+
+    // Auto-hide
+    setTimeout(() => {
+        box.style.top = "-80px";
+        box.style.opacity = "0";
+    }, 2600);
+}
+</script>
+
+{% for message in messages %}
+<script>
+showTopMessage("{{ message|escapejs }}", "{{ message.tags }}");
+</script>
+{% endfor %}
+{% endblock %}

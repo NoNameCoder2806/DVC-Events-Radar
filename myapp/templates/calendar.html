@@ -1,34 +1,150 @@
-{% extends 'home.html' %}
+{% extends 'base.html' %}
 {% block title %}Calendar{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <h2>Event Calendar</h2>
-    <p>This is the full calendar page.</p>
-    <div id="calendar"></div>
+
+<!-- 🔥 Floating top notification -->
+<div id="topNotification"
+     style="
+        position: fixed;
+        top: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        z-index: 9999;
+        transition: top 0.5s ease, opacity 0.5s ease;
+        opacity: 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+     ">
 </div>
 
-<script>
-    // ✅ This script dynamically generates a simple static calendar based on current date
-    const calendarDiv = document.getElementById("calendar");
-    const today = new Date();
-    const month = today.toLocaleString('default', { month: 'long' });
-    const year = today.getFullYear();
+<div class="d-flex justify-content-center mt-5">
+    <div class="w-75">
 
-    let daysInMonth = new Date(year, today.getMonth() + 1, 0).getDate();
-    let firstDay = new Date(year, today.getMonth(), 1).getDay();
+        <!-- Top bar with Back button -->
+        <div class="d-flex align-items-center mb-4 position-relative">
+            <div class="position-absolute" style="left: 0;">
+                <a href="{% url 'home' %}" class="btn btn-secondary">&larr; Back</a>
+            </div>
+            <h2 class="mx-auto text-center">Event Calendar</h2>
+        </div>
 
-    let html = `<h4>${month} ${year}</h4><table class="table table-bordered"><tr>`;
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    days.forEach(d => html += `<th>${d}</th>`);
-    html += "</tr><tr>";
+        <!-- Inject JSON from Django -->
+        {{ events_per_day|json_script:"events-per-day" }}
 
-    for (let i = 0; i < firstDay; i++) html += "<td></td>";
-    for (let day = 1; day <= daysInMonth; day++) {
-        html += `<td>${day}</td>`;
-        if ((day + firstDay) % 7 === 0) html += "</tr><tr>";
+        <div id="calendar" class="calendar"></div>
+
+        <div class="d-flex justify-content-between mt-2">
+            <button id="prevMonth" class="btn btn-outline-primary">Previous</button>
+            <button id="nextMonth" class="btn btn-outline-primary">Next</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    #calendar h4 {
+        text-align: center;
+        margin-bottom: 15px;
     }
-    html += "</tr></table>";
 
-    calendarDiv.innerHTML = html;
+    #calendar table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    #calendar th,
+    #calendar td {
+        width: 14.28%;
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #dee2e6;
+    }
+
+    #calendar td.empty {
+        background-color: #f8f9fa;
+    }
+
+    #calendar td.today {
+        background-color: #d4edda;
+        color: #155724;
+        font-weight: bold;
+    }
+
+    #calendar td.event-day {
+        background-color: #fff3cd;
+        color: #856404;
+        font-weight: bold;
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const eventsPerDay = JSON.parse(document.getElementById("events-per-day").textContent);
+
+    const calendarDiv = document.getElementById("calendar");
+    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const weekDays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+    const today = new Date();
+    let currentMonth = today.getMonth();
+    let currentYear = today.getFullYear();
+    const todayDate = today.getDate();
+
+    function pad(num) {
+        return num.toString().padStart(2, '0');
+    }
+
+    function buildCalendar(month, year) {
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        let html = `<h4>${monthNames[month]} ${year}</h4>`;
+        html += `<table class="table table-bordered"><tr>`;
+        weekDays.forEach(d => html += `<th>${d}</th>`);
+        html += `</tr><tr>`;
+
+        for (let i = 0; i < firstDay; i++) html += `<td class="empty"></td>`;
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            let classes = "";
+            if (day === todayDate && month === today.getMonth() && year === today.getFullYear()) {
+                classes += " today";
+            }
+            const dayKey = `${year}-${pad(month+1)}-${pad(day)}`;
+            if (eventsPerDay[dayKey]) classes += " event-day";
+
+            html += `<td class="${classes.trim()}">${day}</td>`;
+            if ((day + firstDay) % 7 === 0) html += `</tr><tr>`;
+        }
+
+        const remaining = (7 - (daysInMonth + firstDay) % 7) % 7;
+        for (let i = 0; i < remaining; i++) html += `<td class="empty"></td>`;
+        html += `</tr></table>`;
+        calendarDiv.innerHTML = html;
+    }
+
+    buildCalendar(currentMonth, currentYear);
+
+    document.getElementById("prevMonth").addEventListener("click", () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        buildCalendar(currentMonth, currentYear);
+    });
+
+    document.getElementById("nextMonth").addEventListener("click", () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        buildCalendar(currentMonth, currentYear);
+    });
+});
 </script>
 {% endblock %}

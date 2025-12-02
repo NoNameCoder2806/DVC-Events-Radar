@@ -1,0 +1,2 @@
+- Check whether the image is saved when we create Event and upload a custom image
+- Let user update their information and avatar (first, last name, password, avatar)
