@@ -14,7 +14,7 @@
 <div class="container-fluid mt-4">
     <div class="row">
         <!-- 🧭 Left Column -->
-        <div class="col-md-2">
+        <div class="col-12 col-md-2">
             <h5 class="mb-3">Filters</h5>
             <!-- 📍 Location -->
             <div class="border-bottom mb-2 pb-2">
@@ -31,7 +31,6 @@
                     <label class="form-check" for="virtual">Virtual<input type="checkbox" id="virtual"><span class="checkmark"></span></label>
                 </div>
             </div>
-
 
             <!-- 📅 Select Days -->
             <div class="border-bottom mb-2 pb-2">
@@ -75,25 +74,12 @@
                         data-target="#typeFilter" aria-expanded="false" aria-controls="typeFilter">
                         +
                     </button>
-                
-                    </div>
-                    <div class="collapse mt-2" id="typeFilter">
-                        <label class="form-check" for="sports"><input class="form-check-input" type="checkbox" id="sports">Sports<span class="checkmark"></span></label>
-                        <label class="form-check" for="music"><input class="form-check-input" type="checkbox" id="music">Clubs<span class="checkmark"></span></label>
-                        <label class="form-check" for="clubs">Career & Academic<input class="form-check-input" type="checkbox" id="clubs"><span class="checkmark"></span></label>
-                        <label class="form-check" for="academic"><input class="form-check-input" type="checkbox" id="academic">Free Food<span class="checkmark"></span></label>
-                    </div>
-
                 </div>
                 <div class="collapse mt-2" id="typeFilter">
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="sports"><label
-                            class="form-check-label" for="sports">Sports</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="clubs"><label
-                            class="form-check-label" for="clubs">Clubs</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="career&academic"><label
-                            class="form-check-label" for="career&academic">Career & Academic</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="freefood"><label
-                            class="form-check-label" for="freefood">Free Food</label></div>
+                    <label class="form-check" for="sports"><input class="form-check-input" type="checkbox" id="sports">Sports<span class="checkmark"></span></label>
+                    <label class="form-check" for="music"><input class="form-check-input" type="checkbox" id="music">Clubs<span class="checkmark"></span></label>
+                    <label class="form-check" for="clubs">Career & Academic<input class="form-check-input" type="checkbox" id="clubs"><span class="checkmark"></span></label>
+                    <label class="form-check" for="academic"><input class="form-check-input" type="checkbox" id="academic">Free Food<span class="checkmark"></span></label>
                 </div>
             </div>
 
@@ -102,7 +88,7 @@
         </div>
 
         <!-- 🎟️ Middle Column -->
-        <div class="col-md-8">
+        <div class="col-12 col-md-8">
             <!-- Short Description -->
             <div>
                 <p class="page-description">Add the Events page description here</p>
@@ -111,15 +97,13 @@
             <!-- The Events Search Bar-->
             <div class="p-3 bg-white border rounded">
                 <h3>Event Search</h3>
-                <input type="text" class="form-control mb-3" placeholder="Search for events...">
-
+                <div id="searchbar">
+                    <input id="search-input" type="text" class="form-control mb-3" placeholder="Search for events...">
+                    <div id="search-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 24 24" style="fill:#FFFFFF;"><path d="M 10 2 C 5.5965257 2 2 5.5965291 2 10 C 2 14.403471 5.5965257 18 10 18 C 11.752132 18 13.370523 17.422074 14.691406 16.458984 L 20.224609 21.992188 L 21.992188 20.224609 L 16.458984 14.691406 C 17.422074 13.370523 18 11.75213 18 10 C 18 5.5965291 14.403474 2 10 2 z M 10 4.5 C 13.052375 4.5 15.5 6.947627 15.5 10 C 15.5 13.052373 13.052375 15.5 10 15.5 C 6.9476251 15.5 4.5 13.052373 4.5 10 C 4.5 6.947627 6.9476251 4.5 10 4.5 z"></path></svg></div>
+                </div>
+                
                 <!-- The Events Search Bar-->
                 <div class="p-3 bg-white border rounded">
-                    <h3>Event Search</h3>
-                    <div id="searchbar">
-                        <input id="search-input" type="text" class="form-control mb-3" placeholder="Search for events...">
-                        <div id="search-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 24 24" style="fill:#FFFFFF;"><path d="M 10 2 C 5.5965257 2 2 5.5965291 2 10 C 2 14.403471 5.5965257 18 10 18 C 11.752132 18 13.370523 17.422074 14.691406 16.458984 L 20.224609 21.992188 L 21.992188 20.224609 L 16.458984 14.691406 C 17.422074 13.370523 18 11.75213 18 10 C 18 5.5965291 14.403474 2 10 2 z M 10 4.5 C 13.052375 4.5 15.5 6.947627 15.5 10 C 15.5 13.052373 13.052375 15.5 10 15.5 C 6.9476251 15.5 4.5 13.052373 4.5 10 C 4.5 6.947627 6.9476251 4.5 10 4.5 z"></path></svg></div>
-                    </div>
                     <!-- ✅ New Bootstrap row for event grid -->
                     <div class="row">
                         {% for event in events_data %}
@@ -128,7 +112,6 @@
                         </div>
                         {% endfor %} 
                     </div>
-                    {% endfor %}
                 </div>
 
                 <!-- Pagination Controls -->
@@ -172,7 +155,7 @@
         </div>
 
         <!-- 📅 Right Column -->
-        <div class="col-md-2">
+        <div class="col-12 col-md-2">
             <div class="p-3 bg-light border rounded d-flex flex-column align-items-center">
                 <h5>Quick Access</h5>
                 <!-- Manage Users Button -->
