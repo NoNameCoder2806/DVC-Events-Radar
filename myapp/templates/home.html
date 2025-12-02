@@ -20,60 +20,50 @@
             <div class="border-bottom mb-2 pb-2">
                 <div class="d-flex justify-content-between align-items-center">
                     <span class="fw-bold">Location</span>
-                    <button class="btn btn-sm btn-outline-secondary toggle-btn" type="button" data-toggle="collapse"
+                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
                         data-target="#locationFilter" aria-expanded="false" aria-controls="locationFilter">
                         +
                     </button>
                 </div>
                 <div class="collapse mt-2" id="locationFilter">
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="onCampus"><label
-                            class="form-check-label" for="onCampus">Pleasant Hill Campus</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="offCampus"><label
-                            class="form-check-label" for="offCampus">San Ramon Campus</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="virtual"><label
-                            class="form-check-label" for="virtual">Virtual</label></div>
+                    <label class="form-check" for="onCampus">Pleasant Hill Campus<input type="checkbox" id="onCampus"><span class="checkmark"></span></label>
+                    <label class="form-check" for="offCampus">San Ramon Campus<input type="checkbox" id="offCampus"><span class="checkmark"></span></label>
+                    <label class="form-check" for="virtual">Virtual<input type="checkbox" id="virtual"><span class="checkmark"></span></label>
                 </div>
             </div>
+
 
             <!-- 📅 Select Days -->
             <div class="border-bottom mb-2 pb-2">
                 <div class="d-flex justify-content-between align-items-center">
                     <span class="fw-bold">Select Days</span>
-                    <button class="btn btn-sm btn-outline-secondary toggle-btn" type="button" data-toggle="collapse"
+                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
                         data-target="#daysFilter" aria-expanded="false" aria-controls="daysFilter">
                         +
                     </button>
                 </div>
                 <div class="collapse mt-2" id="daysFilter">
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="monday"><label
-                            class="form-check-label" for="monday">Monday</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="tuesday"><label
-                            class="form-check-label" for="tuesday">Tuesday</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="wednesday"><label
-                            class="form-check-label" for="wednesday">Wednesday</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="thursday"><label
-                            class="form-check-label" for="thursday">Thursday</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="friday"><label
-                            class="form-check-label" for="friday">Friday</label></div>
-                </div>
+                      <label class="form-check" for="monday"><input class="form-check-input" type="checkbox" id="monday">Monday<span class="checkmark"></span></label>
+                      <label class="form-check" for="tuesday"><input class="form-check-input" type="checkbox" id="tuesday">Tuesday<span class="checkmark"></span></label>
+                      <label class="form-check" for="wednesday"><input class="form-check-input" type="checkbox" id="wednesday">Wednesday<span class="checkmark"></span></label>
+                      <label class="form-check" for="thursday"><input class="form-check-input" type="checkbox" id="thursday">Thursday<span class="checkmark"></span></label>
+                      <label class="form-check" for="friday"><input class="form-check-input" type="checkbox" id="friday">Friday<span class="checkmark"></span></label>
+                  </div>
             </div>
 
             <!-- 🕒 Time Range -->
             <div class="border-bottom mb-2 pb-2">
                 <div class="d-flex justify-content-between align-items-center">
                     <span class="fw-bold">Select Time Range</span>
-                    <button class="btn btn-sm btn-outline-secondary toggle-btn" type="button" data-toggle="collapse"
+                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
                         data-target="#timeFilter" aria-expanded="false" aria-controls="timeFilter">
                         +
                     </button>
                 </div>
                 <div class="collapse mt-2" id="timeFilter">
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="morning"><label
-                            class="form-check-label" for="morning">Morning (8am–12pm)</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="afternoon"><label
-                            class="form-check-label" for="afternoon">Afternoon (12pm–5pm)</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="evening"><label
-                            class="form-check-label" for="evening">Evening (5pm–9pm)</label></div>
+                    <label class="form-check" for="morning"><input class="form-check-input" type="checkbox" id="morning">Morning<br>(8am–12pm)<span class="checkmark"></span></label>
+                    <label class="form-check" for="afternoon"><input class="form-check-input" type="checkbox" id="afternoon">Afternoon<br>(12pm–5pm)<span class="checkmark"></span></label>
+                    <label class="form-check" for="evening"><input class="form-check-input" type="checkbox" id="evening">Evening<br>(5pm–9pm)<span class="checkmark"></span></label>            
                 </div>
             </div>
 
@@ -81,10 +71,19 @@
             <div class="border-bottom mb-2 pb-2">
                 <div class="d-flex justify-content-between align-items-center">
                     <span class="fw-bold">Event Type</span>
-                    <button class="btn btn-sm btn-outline-secondary toggle-btn" type="button" data-toggle="collapse"
+                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
                         data-target="#typeFilter" aria-expanded="false" aria-controls="typeFilter">
                         +
                     </button>
+                
+                    </div>
+                    <div class="collapse mt-2" id="typeFilter">
+                        <label class="form-check" for="sports"><input class="form-check-input" type="checkbox" id="sports">Sports<span class="checkmark"></span></label>
+                        <label class="form-check" for="music"><input class="form-check-input" type="checkbox" id="music">Clubs<span class="checkmark"></span></label>
+                        <label class="form-check" for="clubs">Career & Academic<input class="form-check-input" type="checkbox" id="clubs"><span class="checkmark"></span></label>
+                        <label class="form-check" for="academic"><input class="form-check-input" type="checkbox" id="academic">Free Food<span class="checkmark"></span></label>
+                    </div>
+
                 </div>
                 <div class="collapse mt-2" id="typeFilter">
                     <div class="form-check"><input class="form-check-input" type="checkbox" id="sports"><label
@@ -114,12 +113,20 @@
                 <h3>Event Search</h3>
                 <input type="text" class="form-control mb-3" placeholder="Search for events...">
 
-                <!-- ✅ New Bootstrap row for event grid -->
-                <div class="row">
-                    {% for event in events_data %}
-                    <div class="col-md-6  mb-4">
-                        <!-- {% include 'partials/event_card.html' with event=event %} -->
-                        {% include 'partials/event_card.html' with event=event user_favorites=user_favorites %}
+                <!-- The Events Search Bar-->
+                <div class="p-3 bg-white border rounded">
+                    <h3>Event Search</h3>
+                    <div id="searchbar">
+                        <input id="search-input" type="text" class="form-control mb-3" placeholder="Search for events...">
+                        <div id="search-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 24 24" style="fill:#FFFFFF;"><path d="M 10 2 C 5.5965257 2 2 5.5965291 2 10 C 2 14.403471 5.5965257 18 10 18 C 11.752132 18 13.370523 17.422074 14.691406 16.458984 L 20.224609 21.992188 L 21.992188 20.224609 L 16.458984 14.691406 C 17.422074 13.370523 18 11.75213 18 10 C 18 5.5965291 14.403474 2 10 2 z M 10 4.5 C 13.052375 4.5 15.5 6.947627 15.5 10 C 15.5 13.052373 13.052375 15.5 10 15.5 C 6.9476251 15.5 4.5 13.052373 4.5 10 C 4.5 6.947627 6.9476251 4.5 10 4.5 z"></path></svg></div>
+                    </div>
+                    <!-- ✅ New Bootstrap row for event grid -->
+                    <div class="row">
+                        {% for event in events_data %}
+                        <div class="col-md-6  mb-4">
+                            {% include 'partials/event_card.html' with event=event %} 
+                        </div>
+                        {% endfor %} 
                     </div>
                     {% endfor %}
                 </div>
