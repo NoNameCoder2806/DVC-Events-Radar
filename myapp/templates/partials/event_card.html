@@ -1,7 +1,7 @@
 <div class="event-box">
     <p class="event-title">{{ event.name }}</p>
     {% if event.image %}
-    <img src="{{ event.image.url }}" alt="Event thumbnail">
+    <img src="{{ event.image.url }}" alt="Event thumbnail" class="event-image">
     {% else %}
     <img alt="Event thumbnail">
     {% endif %}
@@ -9,6 +9,7 @@
     <div class="info-summary">
         <p class="date">{{ event.date }}</p>
         <p class="time">{{ event.start_time_display }} - {{ event.end_time_display }}</p>
+        <p class="location">{{ event.location }}</p>
         <p class="campus">{{ event.campus }}</p>
     </div>
 

@@ -1,20 +1,22 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Users, Events, Favorites
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
-from datetime import datetime
-from django.utils import timezone
-from django.contrib.auth.decorators import user_passes_test
+
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+from django.utils import timezone
 from django.utils.timezone import localtime
+from datetime import datetime
+
+from .models import Users, Events, Favorites
+
 from django.core.paginator import Paginator
-from django.views.decorators.csrf import csrf_exempt
-import json
-from django.views.decorators.csrf import csrf_protect
-from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt, csrf_protect 
 from django.conf import settings
 import os
+import json
 
 def get_data():    
     users_data = Users.objects.all()
@@ -29,14 +31,16 @@ def get_data():
 
 def home(request):
     # All events
-    events_data = Events.objects.all()
+    events_data = Events.objects.all().order_by('-date')
 
+    user_role = None
     # User favorites
     user_favorites = []
     if request.user.is_authenticated:
         try:
             user_obj = Users.objects.get(user=request.user)
             user_favorites = list(Favorites.objects.filter(user_ID=user_obj).values_list('event_ID__id', flat=True))
+            user_role = user_obj.role
         except Users.DoesNotExist:
             user_favorites = []
 
@@ -50,10 +54,11 @@ def home(request):
         'user_favorites': user_favorites,
         'user_id': request.user.id if request.user.is_authenticated else None,
         'user_name': request.user.username if request.user.is_authenticated else None,
+        'user_role' : user_role, 
     })
 
 def calendar_view(request):
-    today = datetime.datetime.today()
+    today = datetime.today()
     events_per_day = {}  # key = day of month, value = count of favorite events
 
     if request.user.is_authenticated:
