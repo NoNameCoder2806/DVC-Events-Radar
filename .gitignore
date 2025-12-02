@@ -8,6 +8,9 @@ venv/
 # Database
 db.sqlite3
 
+# User uploaded media files 
+media/events/temp/
+
 # Environment variables
 .env
 

@@ -211,7 +211,15 @@ def add_event(request):
 
 @user_passes_test(lambda u: u.is_authenticated and hasattr(u, "users") and u.users.role in ["admin", "superuser"])
 def manage_events(request):
-    all_events = list(Events.objects.all())
+    user_profile = getattr(request.user, 'users', None)
+    if not request.user.is_authenticated or not user_profile:
+        messages.error(request, "Not Authorized.")
+        return redirect('home')
+    
+    if user_profile.role  == "superuser":
+        all_events = list(Events.objects.all())
+    elif user_profile.role == "admin":
+        all_events = list(Events.objects.filter(author_ID=user_profile))
 
     # Sort events by date, then by start_time (handle 12-hour and 24-hour formats)
     def sort_key(e):
@@ -237,6 +245,18 @@ def delete_event(request, event_id):
 
 def edit_event(request, event_id):
     event = get_object_or_404(Events, id=event_id)
+    
+    user_profile = getattr(request.user, 'users', None)    
+    
+    if not request.user.is_authenticated or not user_profile:
+        messages.error(request, "Not Authorized.")
+        return redirect('home')
+        
+
+    if user_profile.role  == "user" or (user_profile.role == 'admin' and event.author_ID != user_profile):
+        messages.error(request, "You do not have permission to edit this event.")
+        return redirect('home')
+    
     if request.method == 'POST':
         form = EventForm(request.POST, request.FILES, instance=event)
         if form.is_valid():
