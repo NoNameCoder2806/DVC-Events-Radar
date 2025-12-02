@@ -51,6 +51,20 @@ class Events(models.Model):
         blank=True,
         null=True
     )
+    
+    @property 
+    def start_time_obj(self):
+        try:
+            return datetime.strptime(self.start_time.strip(), "%I:%M %p").time()
+        except Exception:
+            return None
+    
+    @property
+    def end_time_obj(self):
+        try:    
+            return datetime.strptime(self.end_time.strip(), "%I:%M %p").time()
+        except Exception:
+            return None
 
     def delete(self, *args, **kwargs):
         # Delete the image file if it exists

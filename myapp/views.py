@@ -18,6 +18,8 @@ from django.conf import settings
 import os
 import json
 
+from PIL import Image
+
 def get_data():    
     users_data = Users.objects.all()
     events_data = Events.objects.all()
@@ -31,7 +33,9 @@ def get_data():
 
 def home(request):
     # All events
-    events_data = Events.objects.all().order_by('-date')
+    events_data = Events.objects.all().order_by('-date')        
+    events_data = list(events_data)
+    events_data.sort(key=lambda e: e.start_time_obj or datetime.min.time(), reverse=True)
 
     user_role = None
     # User favorites
