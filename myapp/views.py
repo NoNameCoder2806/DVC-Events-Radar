@@ -3,7 +3,18 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Users, Events, Favorites
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-import datetime
+from datetime import datetime
+from django.utils import timezone
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib import messages
+from django.utils.timezone import localtime
+from django.core.paginator import Paginator
+from django.views.decorators.csrf import csrf_exempt
+import json
+from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
+import os
 
 def get_data():    
     users_data = Users.objects.all()
@@ -29,9 +40,13 @@ def home(request):
         except Users.DoesNotExist:
             user_favorites = []
 
-    # Pass context to template
+    # ===== PAGINATION =====
+    paginator = Paginator(events_data, 10)  # 10 events per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'home.html', {
-        'events_data': events_data,
+        'events_data': page_obj,
         'user_favorites': user_favorites,
         'user_id': request.user.id if request.user.is_authenticated else None,
         'user_name': request.user.username if request.user.is_authenticated else None,
@@ -160,3 +175,192 @@ def mark_favorite(request, event_id):
     else:
         Favorites.objects.create(user_ID=user_obj, event_ID=event_obj)
         return JsonResponse({'status': 'added'})
+    
+def add_event(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    try:
+        user_profile = Users.objects.get(user=request.user)
+    except Users.DoesNotExist:
+        return HttpResponseForbidden("User profile not found")
+
+    if user_profile.role not in ["admin", "superuser"]:
+        return HttpResponseForbidden("You do not have permission to add events.")
+
+    hours = list(range(1, 13))
+    minutes = ["00", "15", "30", "45"]
+    previous = request.POST if request.method == 'POST' else {}
+
+    if request.method == 'POST':
+        try:
+            # --- Parse times ---
+            start_time_str = f"{int(request.POST['start_hour'])}:{int(request.POST['start_minute']):02d} {request.POST['start_period']}"
+            end_time_str = f"{int(request.POST['end_hour'])}:{int(request.POST['end_minute']):02d} {request.POST['end_period']}"
+            start_obj = datetime.strptime(start_time_str, "%I:%M %p")
+            end_obj = datetime.strptime(end_time_str, "%I:%M %p")
+            if start_obj >= end_obj:
+                messages.error(request, "Start time must be before end time.")
+                raise ValueError("Invalid time order")
+
+            # --- Parse date and day of week ---
+            event_date_str = request.POST.get('date')
+            event_date_obj = datetime.strptime(event_date_str, "%Y-%m-%d").date()
+            day_of_week = event_date_obj.strftime("%A")
+
+            # --- Step 1: Create event without image to get ID ---
+            new_event = Events.objects.create(
+                author_ID=user_profile,
+                name=request.POST.get('name'),
+                description=request.POST.get('description'),
+                date=event_date_str,
+                days_of_week=day_of_week,
+                start_time=start_time_str,
+                end_time=end_time_str,
+                location=request.POST.get('building'),
+                campus=request.POST.get('campus'),
+                event_type=request.POST.get('event_type'),
+            )
+
+            # --- Step 2: Handle uploaded image ---
+            uploaded_file = request.FILES.get('image')
+            if uploaded_file:
+                ext = uploaded_file.name.split('.')[-1].lower()
+                filename = f"{new_event.id}.{ext}"  # save as <id>.<ext>
+                folder = os.path.join(settings.MEDIA_ROOT, 'events')
+                os.makedirs(folder, exist_ok=True)  # make sure folder exists
+                full_path = os.path.join(folder, filename)
+
+                # Delete old image if exists
+                if os.path.exists(full_path):
+                    os.remove(full_path)
+
+                # Save the uploaded file to MEDIA_ROOT/events/
+                with open(full_path, 'wb+') as f:
+                    for chunk in uploaded_file.chunks():
+                        f.write(chunk)
+
+                # Update event image field
+                new_event.image.name = f"events/{filename}"
+                new_event.save(update_fields=['image'])
+
+            messages.success(request, "Event added successfully!")
+            return redirect('home')
+
+        except Exception as e:
+            messages.error(request, f"Error: {str(e)}")
+            return render(request, 'add_event.html', {
+                'hours': hours,
+                'minutes': minutes,
+                'previous': previous
+            })
+
+    return render(request, 'add_event.html', {
+        'hours': hours,
+        'minutes': minutes,
+        'previous': previous,
+    })
+
+@user_passes_test(lambda u: u.is_authenticated and hasattr(u, "users") and u.users.role in ["admin", "superuser"])
+def manage_events(request):
+    all_events = list(Events.objects.all())
+
+    # Sort events by date, then by start_time (handle 12-hour and 24-hour formats)
+    def sort_key(e):
+        try:
+            t = datetime.strptime(e.start_time.strip(), "%I:%M %p")
+        except ValueError:
+            t = datetime.strptime(e.start_time.strip(), "%H:%M")
+        return (e.date, t)
+
+    all_events.sort(key=sort_key)
+
+    return render(request, "manage_events.html", {"all_events": all_events})
+
+def delete_event(request, event_id):
+    event = get_object_or_404(Events, id=event_id)
+
+    if request.method == "POST":
+        event.delete()
+        messages.success(request, "Event deleted successfully.")
+        return redirect("manage_events")
+
+    return render(request, "confirm_delete.html", {"event": event})
+
+def edit_event(request, event_id):
+    event = get_object_or_404(Events, id=event_id)
+    return render(request, "edit_event.html", {"event": event})
+
+def manage_users(request):
+    all_users = User.objects.all()
+    return render(request, "manage_users.html", {"all_users": all_users})
+
+@csrf_protect
+def change_user_role(request, user_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'error', 'message': 'Not logged in'})
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+    try:
+        user = User.objects.get(id=user_id)
+        profile = user.users
+        try:
+            data = json.loads(request.body)
+            new_role = data.get('role')
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'})
+
+        if new_role not in ['user', 'admin', 'superuser']:
+            return JsonResponse({'status': 'error', 'message': 'Invalid role'})
+
+        profile.role = new_role
+        profile.save()
+        return JsonResponse({'status': 'success'})
+
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'User not found'})
+
+@csrf_exempt
+def delete_user(request, user_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'error', 'message': 'Not logged in'})
+
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+    try:
+        user = User.objects.get(id=user_id)
+        user.delete()
+        return JsonResponse({'status': 'success'})
+    except User.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'User not found'})
+    
+@login_required
+def user_profile(request):
+    user_obj = request.user
+    profile_obj = user_obj.users
+
+    if request.method == "POST":
+        # Update first and last name
+        first_name = request.POST.get("first_name", "").strip()
+        last_name = request.POST.get("last_name", "").strip()
+        if first_name:
+            user_obj.first_name = first_name
+        if last_name:
+            user_obj.last_name = last_name
+
+        # Update avatar if uploaded
+        if "avatar" in request.FILES:
+            # Delete old avatar if it exists
+            if profile_obj.avatar_url and os.path.isfile(profile_obj.avatar_url.path):
+                os.remove(profile_obj.avatar_url.path)
+            # Save new avatar
+            profile_obj.avatar_url = request.FILES["avatar"]
+
+        user_obj.save()
+        profile_obj.save()
+        messages.success(request, "Profile updated successfully!")
+        return redirect("user_profile")
+
+    return render(request, "user_profile.html", {"user_obj": user_obj})

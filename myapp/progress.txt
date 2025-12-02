@@ -1,3 +1,2 @@
-Hoang:
-Events that are marked as interested now is highlighted in the calendar...
-Next step: next month and previous month for the calendar page
+- Check whether the image is saved when we create Event and upload a custom image
+- Let user update their information and avatar (first, last name, password, avatar)
