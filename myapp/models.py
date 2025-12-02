@@ -38,7 +38,6 @@ def event_image_path(instance, filename):
         filename = f'temp.{ext}'  # temporary name, will rename after save
     return os.path.join('events', str(instance.id or 'temp'), filename)
 
-
 class EventSearch(models.Manager):
     # If you surround your query with " " , it searches events containing the exact phrase 
     # If you search without quotemarks, it earches posts that contains all the words in the query
@@ -53,16 +52,16 @@ class EventSearch(models.Manager):
         
         # Exact phrase search
         for phrase in phrases:
-            q_objects |= Q(name__icontains=phrase) | Q(description__icontains=phrase)
+            q_objects |= Q(name__icontains=phrase) | Q(description__icontains=phrase)  | Q(location__icontains=phrase)
         # Default search
         for word in words:
-            q_objects &= Q(name__icontains=word) | Q(description__icontains=word)
+            q_objects &= Q(name__icontains=word) | Q(description__icontains=word) | Q(location__icontains=word)
             
         return self.get_queryset().filter(q_objects).distinct()
 
 class Events(models.Model): 
     EVENT_TYPES = [('Sports', 'Sports'), ('Clubs', 'Clubs'),('Carrer & Academic', 'Career & Academic'), ('Free Food', 'Free Food'), ('General', 'General')]    
-    CAMPUS_CHOICES = [('Pleasant Hill Campus', 'Pleasant Hill Campus'),('San Ramon Campus', 'San Ramon Campus'),('Virtual', 'Virtual')]
+    CAMPUS_CHOICES = [('Pleasant Hill', 'Pleasant Hill'),('San Ramon', 'San Ramon'),('Virtual', 'Virtual')]
     
     author_ID = models.ForeignKey(Users, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)

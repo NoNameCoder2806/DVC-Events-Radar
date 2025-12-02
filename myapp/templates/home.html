@@ -16,98 +16,26 @@
         <!-- 🧭 Left Column -->
         <div class="col-md-2">
             
-            <form method="get" action="{% url 'home' %}"  class="mb-3">
-                <div class="input-group">
-                    <input type="text" name="q" class="form-control" value="{{ search_query|default:'' }}">
-                    <button class="btn btn-outline-secondary" type="submit">Search</button>
-                </div>
-            </form>
-        
             <h5 class="mb-3">Filters</h5>
-            <!-- 📍 Location -->
-            <div class="border-bottom mb-2 pb-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-bold">Location</span>
-                    <button class="btn btn-sm btn-outline-secondary toggle-btn" type="button" data-toggle="collapse"
-                        data-target="#locationFilter" aria-expanded="false" aria-controls="locationFilter">
-                        +
-                    </button>
-                </div>
-                <div class="collapse mt-2" id="locationFilter">
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="onCampus"><label
-                            class="form-check-label" for="onCampus">Pleasant Hill Campus</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="offCampus"><label
-                            class="form-check-label" for="offCampus">San Ramon Campus</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="virtual"><label
-                            class="form-check-label" for="virtual">Virtual</label></div>
-                </div>
-            </div>
+            <form method="get">
+                {% for field in form %}
+                    <div class="border-bottom mb-2 pb-2">
+                        <div class="d-flex justify-content-between align-items-center>
+                            <span class="fw-bold">{{ field.label }}</span>
+                            <button class="btn btn-sm btn-outline-secondary toggle-btn" type="button" data-toggle="collapse" data-target="#{{ field.name }}Filter">
+                            +
+                            </button>
+                        </div>
+                        
+                        <div class="collapse mt-2" id="{{ field.name}}Filter">
+                            {{ field }}
+                        </div>
+                    </div>
+                {% endfor %}
 
-            <!-- 📅 Select Days -->
-            <div class="border-bottom mb-2 pb-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-bold">Select Days</span>
-                    <button class="btn btn-sm btn-outline-secondary toggle-btn" type="button" data-toggle="collapse"
-                        data-target="#daysFilter" aria-expanded="false" aria-controls="daysFilter">
-                        +
-                    </button>
-                </div>
-                <div class="collapse mt-2" id="daysFilter">
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="monday"><label
-                            class="form-check-label" for="monday">Monday</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="tuesday"><label
-                            class="form-check-label" for="tuesday">Tuesday</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="wednesday"><label
-                            class="form-check-label" for="wednesday">Wednesday</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="thursday"><label
-                            class="form-check-label" for="thursday">Thursday</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="friday"><label
-                            class="form-check-label" for="friday">Friday</label></div>
-                </div>
-            </div>
-
-            <!-- 🕒 Time Range -->
-            <div class="border-bottom mb-2 pb-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-bold">Select Time Range</span>
-                    <button class="btn btn-sm btn-outline-secondary toggle-btn" type="button" data-toggle="collapse"
-                        data-target="#timeFilter" aria-expanded="false" aria-controls="timeFilter">
-                        +
-                    </button>
-                </div>
-                <div class="collapse mt-2" id="timeFilter">
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="morning"><label
-                            class="form-check-label" for="morning">Morning (8am–12pm)</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="afternoon"><label
-                            class="form-check-label" for="afternoon">Afternoon (12pm–5pm)</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="evening"><label
-                            class="form-check-label" for="evening">Evening (5pm–9pm)</label></div>
-                </div>
-            </div>
-
-            <!-- 🎟️ Event Type -->
-            <div class="border-bottom mb-2 pb-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-bold">Event Type</span>
-                    <button class="btn btn-sm btn-outline-secondary toggle-btn" type="button" data-toggle="collapse"
-                        data-target="#typeFilter" aria-expanded="false" aria-controls="typeFilter">
-                        +
-                    </button>
-                </div>
-                <div class="collapse mt-2" id="typeFilter">
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="sports"><label
-                            class="form-check-label" for="sports">Sports</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="clubs"><label
-                            class="form-check-label" for="clubs">Clubs</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="career&academic"><label
-                            class="form-check-label" for="career&academic">Career & Academic</label></div>
-                    <div class="form-check"><input class="form-check-input" type="checkbox" id="freefood"><label
-                            class="form-check-label" for="freefood">Free Food</label></div>
-                </div>
-            </div>
-
-            <!-- Apply Button -->
-            <!-- <button class="btn btn-primary w-100 mt-2">Apply Filters</button> -->
+                <!-- Apply Button -->
+                <button class="btn btn-primary w-100 mt-2">Apply Filters</button>
+            </form>
         </div>
 
         <!-- 🎟️ Middle Column -->
@@ -120,8 +48,13 @@
             <!-- The Events Search Bar-->
             <div class="p-3 bg-white border rounded">
                 <h3>Event Search</h3>
-                <input type="text" class="form-control mb-3" placeholder="Search for events...">
-
+                <form method="get" action="{% url 'home' %}"  class="mb-3"  placeholder="Search for events...">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" value="{{ search_query|default:'' }}">
+                        <button class="btn btn-outline-secondary" type="submit">Search</button>
+                    </div>
+                </form>
+        
                 <!-- ✅ New Bootstrap row for event grid -->
                 <div class="row">
                     {% for event in events_data %}

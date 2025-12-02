@@ -11,7 +11,8 @@ from django.utils.timezone import localtime
 from datetime import datetime
 
 from .models import Users, Events, Favorites
-from .forms import EventForm
+from .forms import EventForm, EventFilterForm
+from .filters import filter_events
 
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt, csrf_protect 
@@ -39,6 +40,16 @@ def home(request):
     else:    
         events_data = list(Events.objects.all())
     
+    form = EventFilterForm(request.GET or None)
+    if form.is_valid():
+        events_data = filter_events(
+            events_data,
+            campus = form.cleaned_data.get('campus'),
+            days = form.cleaned_data.get('days'),
+            time_ranges = form.cleaned_data.get('time_range'),
+            event_types = form.cleaned_data.get('event_type'),
+        )
+            
     events_data.sort(key=lambda e: (e.date, e.start_time_obj or datetime.min.time()))
 
     user_role = None
@@ -60,6 +71,7 @@ def home(request):
 
     return render(request, 'home.html', {
         'events_data': page_obj,
+        'form': form,
         'user_favorites': user_favorites,
         'user_id': request.user.id if request.user.is_authenticated else None,
         'user_name': request.user.username if request.user.is_authenticated else None,

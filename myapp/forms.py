@@ -56,3 +56,14 @@ class EventForm(forms.ModelForm):
             except ValueError:
                 raise forms.ValidationError("Time format must be HH:MM AM/PM")
         return cleaned_data 
+        
+class EventFilterForm(forms.Form):
+    CAMPUS_CHOICES = [('Pleasant Hill', 'Pleasant Hill'),('San Ramon', 'San Ramon'),('Virtual', 'Virtual')]
+    DAYS_OF_WEEK = [('Monday','Monday'),('Tuesday','Tuesday'),('Wednesday','Wednesday'),('Thursday','Thursday'),('Friday','Friday'),('Saturday','Saturday'),('Sunday','Sunday')]
+    TIME_RANGES = [('Morning', 'Morning (8am-12pm)'),('Afternoon','Afternoon (12pm-5pm)'), ('Evening', 'Evening (5pm-9pm)')]
+    EVENT_TYPES = [('Sports', 'Sports'), ('Clubs', 'Clubs'),('Carrer & Academic', 'Career & Academic'), ('Free Food', 'Free Food'), ('General', 'General')]    
+    
+    campus = forms.MultipleChoiceField(choices=CAMPUS_CHOICES,  required=False, widget=forms.CheckboxSelectMultiple())
+    days = forms.MultipleChoiceField(choices=DAYS_OF_WEEK,  required=False, widget=forms.CheckboxSelectMultiple())
+    time_range = forms.MultipleChoiceField(choices=TIME_RANGES,  required=False, widget=forms.CheckboxSelectMultiple())
+    event_type = forms.MultipleChoiceField(choices=EVENT_TYPES,  required=False, widget=forms.CheckboxSelectMultiple())
