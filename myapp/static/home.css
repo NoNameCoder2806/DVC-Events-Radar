@@ -6,6 +6,120 @@
 
 body {
     --green: #017550;
+    --blue: #173f6c;
+    --purple: #5d2e8f;
+    --green: #017550;
+    --offwhite: #f5fcff;
+}
+
+/* Filter button */
+.col-md-2 button{
+    background-color: var(--blue) !important;
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    font-size: 23px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+/* Hover effect make filter button larger and purple */
+.col-md-2 button:hover{
+    background-color: var(--purple) !important;
+    -webkit-transform: scale(1.2);
+    -ms-transform: scale(1.2);
+    transform: scale(1.2);
+}
+
+/* Activated filter */
+.col-md-2 button:not(.collapsed){
+    background-color: var(--purple) !important;
+}
+
+/* The container */
+.form-check {
+    display: flex !important;
+    min-height: 35px;
+    align-items: center;
+    position: relative !important;
+    padding: 5px 0 5px 35px !important;
+    line-height: 17px;
+    cursor: pointer;
+    font-size: medium;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Hide default checkbox */
+.form-check input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* Custom checkbox */
+.checkmark {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    height: 30px;
+    width: 30px;
+    background-color: #eee;
+    border-radius: 4px;
+    border: 2px solid black;
+    box-sizing:border-box;
+}
+
+/* On mouse-over, border changes */
+.form-check:hover input ~ .checkmark {
+    border: 4px solid var(--purple);
+}
+
+/* When the checkbox is checked, change to blue background */
+.form-check input:checked ~ .checkmark {
+    background-color: var(--blue);
+}
+
+/* Show the checkmark when checked */
+.form-check input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Checkmark styling */
+.form-check .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 10px;
+    top: 4px;
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+/* On mouse-over, border changes */
+.form-check:hover input ~ .checkmark:after {
+    left: 8px;
+    top: 2px;
+}
+/* Black border whenchecked */
+.form-check:hover input:checked ~ .checkmark {
+    border-color:black;
 }
 
 header {
@@ -20,6 +134,8 @@ header h1 {
     position: absolute;
     left: 50%;
     top: 50%;
+    -webkit-transform: translate(-50%, 50%);
+    -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
 }
 
@@ -27,6 +143,8 @@ header #button {
     position: absolute;
     cursor: pointer;
     top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
     transform: translateY(-50%);
     right: 50px;
     color: white;
@@ -38,6 +156,36 @@ header #button {
     height: 50px;
     background-color: var(--green);
     box-sizing: border-box;
+}
+#searchbar{
+    position: relative;
+}
+input[type='text']{
+    height: 52px;
+    border-radius: 50px;
+    border: 2px solid var(--blue);
+}.p-3 #search-icon{
+    position: absolute;
+    right: 6px;
+    cursor: pointer;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    width: 27px;
+    height: 27px;
+    padding: 6px;
+    background-color: var(--blue);
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    box-sizing: content-box;
+}.p-3 #search-icon:hover{
+    background-color: var(--purple);
+    padding: 12px;
+    right: 0;
+}.p-3 svg{
+    width: 100%;
+    height: 100%;
 }
 
 .page-description {
@@ -159,4 +307,11 @@ header #button {
     background-color: #fff3cd; /* light yellow */
     color: #856404; /* dark yellow text */
     font-weight: bold;
+}
+
+.additional-buttons button:hover {
+    background-color: #555;
+    -webkit-transform: scale(1.03);
+    -ms-transform: scale(1.03);
+    transform: scale(1.03);
 }

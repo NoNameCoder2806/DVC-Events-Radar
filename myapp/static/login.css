@@ -66,3 +66,36 @@ input[type="password"] {
     font-weight: bold;
     text-decoration: underline;
 }
+
+.register-text a:hover {
+    color: var(--dvc-navy);
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 768px) {
+    .login-container {
+        max-width: 100%;
+        padding: 2.25rem 1.75rem 2.4rem;
+        border-radius: 20px;
+    }
+
+    .title {
+        font-size: 1.8rem;
+    }
+}
+/* Make ALL inputs look the same */
+.auth-wrapper input {
+    border: 1px solid #e6e6e6;        /* light gray border just like email/password */
+    border-radius: 30px;              /* match bubble shape */
+    padding: 12px 18px;
+    width: 100%;
+    font-size: 16px;
+    outline: none;
+}
+
+/* Optional: green highlight on focus (same as login page) */
+.auth-wrapper input:focus {
+    border: 1px solid #6abf69;
+    box-shadow: 0 0 5px rgba(106, 191, 105, 0.3);
+}

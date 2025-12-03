@@ -14,9 +14,10 @@
 <div class="container-fluid mt-4">
     <div class="row">
         <!-- 🧭 Left Column -->
-        <div class="col-md-2">
-            
+<!-- sh-branch -->
+        <div class="col-12 col-md-2">
             <h5 class="mb-3">Filters</h5>
+      
             <form method="get">
                 {% for field in form %}
                     <div class="border-bottom mb-2 pb-2">
@@ -32,6 +33,76 @@
                         </div>
                     </div>
                 {% endfor %}
+<!-- separator -->
+        <div class="col-12 col-md-2">
+            <h5 class="mb-3">Filters</h5>
+            <!-- 📍 Location -->
+            <div class="border-bottom mb-2 pb-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">Location</span>
+                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
+                        data-target="#locationFilter" aria-expanded="false" aria-controls="locationFilter">
+                        +
+                    </button>
+                </div>
+                <div class="collapse mt-2" id="locationFilter">
+                    <label class="form-check" for="onCampus">Pleasant Hill Campus<input type="checkbox" id="onCampus"><span class="checkmark"></span></label>
+                    <label class="form-check" for="offCampus">San Ramon Campus<input type="checkbox" id="offCampus"><span class="checkmark"></span></label>
+                    <label class="form-check" for="virtual">Virtual<input type="checkbox" id="virtual"><span class="checkmark"></span></label>
+                </div>
+            </div>
+
+            <!-- 📅 Select Days -->
+            <div class="border-bottom mb-2 pb-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">Select Days</span>
+                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
+                        data-target="#daysFilter" aria-expanded="false" aria-controls="daysFilter">
+                        +
+                    </button>
+                </div>
+                <div class="collapse mt-2" id="daysFilter">
+                      <label class="form-check" for="monday"><input class="form-check-input" type="checkbox" id="monday">Monday<span class="checkmark"></span></label>
+                      <label class="form-check" for="tuesday"><input class="form-check-input" type="checkbox" id="tuesday">Tuesday<span class="checkmark"></span></label>
+                      <label class="form-check" for="wednesday"><input class="form-check-input" type="checkbox" id="wednesday">Wednesday<span class="checkmark"></span></label>
+                      <label class="form-check" for="thursday"><input class="form-check-input" type="checkbox" id="thursday">Thursday<span class="checkmark"></span></label>
+                      <label class="form-check" for="friday"><input class="form-check-input" type="checkbox" id="friday">Friday<span class="checkmark"></span></label>
+                  </div>
+            </div>
+
+            <!-- 🕒 Time Range -->
+            <div class="border-bottom mb-2 pb-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">Select Time Range</span>
+                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
+                        data-target="#timeFilter" aria-expanded="false" aria-controls="timeFilter">
+                        +
+                    </button>
+                </div>
+                <div class="collapse mt-2" id="timeFilter">
+                    <label class="form-check" for="morning"><input class="form-check-input" type="checkbox" id="morning">Morning<br>(8am–12pm)<span class="checkmark"></span></label>
+                    <label class="form-check" for="afternoon"><input class="form-check-input" type="checkbox" id="afternoon">Afternoon<br>(12pm–5pm)<span class="checkmark"></span></label>
+                    <label class="form-check" for="evening"><input class="form-check-input" type="checkbox" id="evening">Evening<br>(5pm–9pm)<span class="checkmark"></span></label>            
+                </div>
+            </div>
+
+            <!-- 🎟️ Event Type -->
+            <div class="border-bottom mb-2 pb-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">Event Type</span>
+                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
+                        data-target="#typeFilter" aria-expanded="false" aria-controls="typeFilter">
+                        +
+                    </button>
+                </div>
+                <div class="collapse mt-2" id="typeFilter">
+                    <label class="form-check" for="sports"><input class="form-check-input" type="checkbox" id="sports">Sports<span class="checkmark"></span></label>
+                    <label class="form-check" for="music"><input class="form-check-input" type="checkbox" id="music">Clubs<span class="checkmark"></span></label>
+                    <label class="form-check" for="clubs">Career & Academic<input class="form-check-input" type="checkbox" id="clubs"><span class="checkmark"></span></label>
+                    <label class="form-check" for="academic"><input class="form-check-input" type="checkbox" id="academic">Free Food<span class="checkmark"></span></label>
+                </div>
+            </div>
+<!-- master -->
 
                 <!-- Apply Button -->
                 <button class="btn btn-primary w-100 mt-2">Apply Filters</button>
@@ -39,31 +110,45 @@
         </div>
 
         <!-- 🎟️ Middle Column -->
-        <div class="col-md-8">
+        <div class="col-12 col-md-8">
             <!-- Short Description -->
             <div>
                 <p class="page-description">Add the Events page description here</p>
             </div>
 
             <!-- The Events Search Bar-->
-            <div class="p-3 bg-white border rounded">
+            <div class="p-3 bg-white border rounded mb-3">
                 <h3>Event Search</h3>
-                <form method="get" action="{% url 'home' %}"  class="mb-3"  placeholder="Search for events...">
-                    <div class="input-group">
-                        <input type="text" name="q" class="form-control" value="{{ search_query|default:'' }}">
-                        <button class="btn btn-outline-secondary" type="submit">Search</button>
-                    </div>
+
+                <!-- Search form (functional with icon) -->
+                <form method="get" action="{% url 'home' %}" class="d-flex align-items-center mb-3">
+                    <input 
+                        id="search-input"
+                        type="text"
+                        name="q"
+                        class="form-control me-2"
+                        placeholder="Search for events..."
+                        value="{{ search_query|default:'' }}"
+                    >
+                    <button type="submit" class="btn btn-outline-secondary">
+                        <!-- Search icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
                 </form>
-        
-                <!-- ✅ New Bootstrap row for event grid -->
+
+                <!-- ✅ Events grid -->
                 <div class="row">
                     {% for event in events_data %}
-                    <div class="col-md-6  mb-4">
-                        <!-- {% include 'partials/event_card.html' with event=event %} -->
+                    <div class="col-md-6 mb-4">
                         {% include 'partials/event_card.html' with event=event user_favorites=user_favorites %}
                     </div>
                     {% endfor %}
                 </div>
+            </div>
+
 
                 <!-- Pagination Controls -->
                 <nav aria-label="Event pagination">
@@ -107,8 +192,9 @@
 
 
         <!-- 📅 Right Column -->
-        <div class="col-md-2">
-            <div class="p-3 bg-light border rounded d-flex flex-column align-items-center">            
+
+        <div class="col-12 col-md-2">
+            <div class="p-3 bg-light border rounded d-flex flex-column align-items-center">
                 <h5>Quick Access</h5>
                 {% if user_role in "admin superuser" %}
                 <div class="mb-2 w-100 d-flex flex-column gap-2">

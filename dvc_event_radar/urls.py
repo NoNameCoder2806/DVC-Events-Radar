@@ -23,4 +23,3 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('myapp.urls')),      # routes all other requests to myapp
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
