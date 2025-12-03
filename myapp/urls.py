@@ -7,6 +7,7 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path("", views.home, name='home'),
+    # path("calendar/", views.calendar, name='calendar'),
     path('calendar/', views.calendar_view, name='calendar'),  # use calendar_view
     path("map/", views.map, name="map"),
     path("login/", views.app_login, name="login"),
