@@ -97,22 +97,6 @@ def calendar_view(request):
         except Users.DoesNotExist:
             pass
 
-    # if request.user.is_authenticated:
-    #     try:
-    #         user_obj = Users.objects.get(user=request.user)
-    #         # Get only favorite events for this user
-    #         favorite_events = Favorites.objects.filter(user_ID=user_obj).select_related('event_ID')
-    #         for fav in favorite_events:
-    #             try:
-    #                 event_date = datetime.datetime.strptime(fav.event_ID.date.strip(), "%Y-%m-%d")
-    #                 if event_date.month == today.month and event_date.year == today.year:
-    #                     day = event_date.day
-    #                     events_per_day[day] = events_per_day.get(day, 0) + 1
-    #             except Exception as e:
-    #                 print(f"Skipping invalid date {fav.event_ID.date}: {e}")
-    #     except Users.DoesNotExist:
-    #         pass
-
     context = {
         "events_per_day": events_per_day,  # now only includes “interested” events
     }

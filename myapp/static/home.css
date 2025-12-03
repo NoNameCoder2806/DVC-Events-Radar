@@ -157,9 +157,27 @@ header #button {
     background-color: var(--green);
     box-sizing: border-box;
 }
-#searchbar{
-    position: relative;
+
+form.d-flex {
+    width: 100%;
 }
+
+#searchbar {
+    position: relative;
+    flex-grow: 1;  /* This is the key */
+    min-width: 0;  /* Prevent overflow in flexbox */
+}
+
+#searchbar input {
+    width: 100%;
+    height: 52px;
+    padding: 0 50px 0 20px; /* space for icon */
+    border-radius: 50px;
+    border: 2px solid var(--blue);
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
 input[type='text']{
     height: 52px;
     border-radius: 50px;
@@ -197,25 +215,20 @@ input[type='text']{
     background-color: #202020;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     border-radius: 10px;
     padding: 20px;
-    height: 100%;     
-    overflow: hidden; 
+    height: 100%;
 }
 
 .event-box .event-title {
     font-size: 1.6em;
     text-align: center;
-    padding: 5px;
-    height: 120px;       
-    display: flex;
-    justify-content: center;
-    align-items: center;    
-    overflow: hidden;
+    padding: 25px;
 }
 
 .event-box img {
-    height: auto;
+    height: 250px;
     width: 100%;
     background-color: gray;
 }
@@ -224,8 +237,8 @@ input[type='text']{
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    height: 200px;
-    width: 80%;
+    height: 150px;
+    width: 50%;
     box-sizing: border-box;
     padding: 15px;
 }
@@ -314,4 +327,119 @@ input[type='text']{
     -webkit-transform: scale(1.03);
     -ms-transform: scale(1.03);
     transform: scale(1.03);
+}
+
+/* Pagination wrapper */
+#pagination {
+    font-size: 1.6rem; /* bigger text */
+    color: #003366;    /* default dark blue for numbers */
+    text-align: center;
+    margin-top: 30px;
+}
+
+/* Pagination wrapper */
+#pagination {
+    font-size: 1.6rem; /* slightly bigger */
+    text-align: center;
+    margin-top: 30px;
+}
+
+/* Pagination wrapper */
+#pagination {
+    font-size: 1.6rem; /* slightly bigger */
+    text-align: center;
+    margin-top: 30px;
+}
+
+/* Page numbers */
+.pagination-number {
+    display: inline-block;
+    margin: 0 5px;
+    font-size: 1.5rem; /* bigger font */
+    color: #003366; /* dark blue */
+    text-decoration: none;
+    transition: all 0.2s;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold; /* bold all page numbers */
+}
+
+/* Current page */
+.pagination-number.active {
+    text-decoration: underline;
+    font-weight: bold;
+    pointer-events: none; /* optional, prevents clicking current page */
+}
+
+/* Hover effect for other pages */
+.pagination-number:not(.active):hover {
+    background-color: #800080; /* purple */
+    color: white;
+    transform: scale(1.1);
+    text-decoration: none;
+}
+
+/* Arrows */
+.pagination-arrow {
+    display: inline-block;
+    margin: 0 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #003366; /* dark blue circle */
+    color: white; /* arrow stays white */
+    text-align: center;
+    line-height: 40px;
+    font-size: 1.3rem;
+    transition: all 0.2s;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Arrow hover */
+.pagination-arrow:hover {
+    background-color: #800080; /* purple background on hover */
+    color: white;              /* arrow text stays white */
+    transform: scale(1.2);     /* enlarge slightly */
+    text-decoration: none;
+}
+
+.pagination-arrow.disabled {
+    background-color: #ccc;
+    color: #888;
+    cursor: default;
+}
+
+/* Filters main title */
+.filter-title {
+    font-size: 200%;
+    color: #003366; /* dark blue */
+    font-weight: bold;
+    border-bottom: 2px solid #003366; /* small line under text */
+    padding-bottom: 5px;     /* space between text and line */
+    display: inline-block;   /* line width matches text */
+}
+
+/* Each category label */
+.filter-category {
+    font-size: 125%;
+    color: #003366; /* dark blue */
+    font-weight: bold;
+}
+
+/* Each checkbox label and box */
+.filter-checkbox-label {
+    font-size: 120%;
+}
+
+.filter-checkbox-label input[type="checkbox"] {
+    transform: scale(1.5); /* Makes the checkbox itself larger */
+    margin-right: 0.5rem; /* spacing between box and text */
+    font-weight: bold;
+}
+
+.filter-block {
+    margin-bottom: 1.5rem; /* space between blocks */
+    border-bottom: 1px solid #dee2e6; /* keep the border if you want */
+    padding-bottom: 0.5rem; /* optional */
 }
