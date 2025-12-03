@@ -174,3 +174,18 @@ input[type="password"]:focus {
         font-size: 1.8rem;
     }
 }
+/* Make ALL inputs look the same */
+.auth-wrapper input {
+    border: 1px solid #e6e6e6;        /* light gray border just like email/password */
+    border-radius: 30px;              /* match bubble shape */
+    padding: 12px 18px;
+    width: 100%;
+    font-size: 16px;
+    outline: none;
+}
+
+/* Optional: green highlight on focus (same as login page) */
+.auth-wrapper input:focus {
+    border: 1px solid #6abf69;
+    box-shadow: 0 0 5px rgba(106, 191, 105, 0.3);
+}
