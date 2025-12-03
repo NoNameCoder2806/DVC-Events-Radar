@@ -1,20 +1,26 @@
-from django.http import JsonResponse, HttpResponse, HttpResponseForbidden
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Users, Events, Favorites
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
-from datetime import datetime
-from django.utils import timezone
-from django.contrib.auth.decorators import user_passes_test
+
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+from django.utils import timezone
 from django.utils.timezone import localtime
+from datetime import datetime
+
+from .models import Users, Events, Favorites
+from .forms import EventForm, EventFilterForm
+from .filters import filter_events
+
 from django.core.paginator import Paginator
-from django.views.decorators.csrf import csrf_exempt
-import json
-from django.views.decorators.csrf import csrf_protect
-from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt, csrf_protect 
 from django.conf import settings
 import os
+import json
+
+from PIL import Image
 
 def get_data():    
     users_data = Users.objects.all()
@@ -28,62 +34,49 @@ def get_data():
     return data
 
 def home(request):
-    today = timezone.localtime().date()
+    query = request.GET.get('q', '')
+    if query:
+        events_data = list(Events.objects.search(query))
+    else:    
+        events_data = list(Events.objects.all())
+    
+    form = EventFilterForm(request.GET or None)
+    if form.is_valid():
+        events_data = filter_events(
+            events_data,
+            campus = form.cleaned_data.get('campus'),
+            days = form.cleaned_data.get('days'),
+            time_ranges = form.cleaned_data.get('time_range'),
+            event_types = form.cleaned_data.get('event_type'),
+        )
+            
+    events_data.sort(key=lambda e: (e.date, e.start_time_obj or datetime.min.time()))
 
-    # Convert string dates → real Python date objects
-    parsed_events = []
-    for e in Events.objects.all():
-        try:
-            actual_date = datetime.strptime(e.date, "%Y-%m-%d").date()
-        except ValueError:
-            continue  # skip bad dates
-        
-        e.parsed_date = actual_date
-        
-        # Filter: include today and future events
-        if actual_date >= today:
-            parsed_events.append(e)
-
-    # Function to parse start_time (string → time object)
-    def parse_time_str(t):
-        try:
-            return datetime.strptime(t.strip(), "%I:%M %p")
-        except:
-            return datetime.strptime(t.strip(), "%H:%M")
-
-    # Sort by (date, start_time)
-    parsed_events.sort(key=lambda e: (e.parsed_date, parse_time_str(e.start_time)))
-
-    # Assign display attributes
-    for e in parsed_events:
-        e.start_time_display = e.start_time
-        e.end_time_display = e.end_time
-
-    # User favorites + roles
-    user_favorites = []
     user_role = None
+    user_favorites = []
+    
+    # User favorites
     if request.user.is_authenticated:
         try:
             user_obj = Users.objects.get(user=request.user)
-            user_favorites = list(
-                Favorites.objects.filter(user_ID=user_obj)
-                .values_list('event_ID__id', flat=True)
-            )
+            user_favorites = list(Favorites.objects.filter(user_ID=user_obj).values_list('event_ID__id', flat=True))
             user_role = user_obj.role
         except Users.DoesNotExist:
-            pass
+            user_favorites = []
 
     # ===== PAGINATION =====
-    paginator = Paginator(parsed_events, 10)  # 10 events per page
+    paginator = Paginator(events_data, 10)  # 10 events per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     return render(request, 'home.html', {
         'events_data': page_obj,
+        'form': form,
         'user_favorites': user_favorites,
         'user_id': request.user.id if request.user.is_authenticated else None,
         'user_name': request.user.username if request.user.is_authenticated else None,
-        'user_role': user_role,
+        'user_role' : user_role, 
+        'search_query': query, 
     })
 
 def calendar_view(request):
@@ -96,13 +89,29 @@ def calendar_view(request):
             favorite_events = Favorites.objects.filter(user_ID=user_obj).select_related('event_ID')
             for fav in favorite_events:
                 try:
-                    event_date = datetime.strptime(fav.event_ID.date.strip(), "%Y-%m-%d")
+                    event_date = datetime.datetime.strptime(fav.event_ID.date.strip(), "%Y-%m-%d")
                     day_key = event_date.strftime("%Y-%m-%d")  # YYYY-MM-DD
                     events_per_day[day_key] = events_per_day.get(day_key, 0) + 1
                 except Exception as e:
                     print(f"Skipping invalid date {fav.event_ID.date}: {e}")
         except Users.DoesNotExist:
             pass
+
+    # if request.user.is_authenticated:
+    #     try:
+    #         user_obj = Users.objects.get(user=request.user)
+    #         # Get only favorite events for this user
+    #         favorite_events = Favorites.objects.filter(user_ID=user_obj).select_related('event_ID')
+    #         for fav in favorite_events:
+    #             try:
+    #                 event_date = datetime.datetime.strptime(fav.event_ID.date.strip(), "%Y-%m-%d")
+    #                 if event_date.month == today.month and event_date.year == today.year:
+    #                     day = event_date.day
+    #                     events_per_day[day] = events_per_day.get(day, 0) + 1
+    #             except Exception as e:
+    #                 print(f"Skipping invalid date {fav.event_ID.date}: {e}")
+    #     except Users.DoesNotExist:
+    #         pass
 
     context = {
         "events_per_day": events_per_day,  # now only includes “interested” events
@@ -198,90 +207,37 @@ def add_event(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    try:
-        user_profile = Users.objects.get(user=request.user)
-    except Users.DoesNotExist:
-        return HttpResponseForbidden("User profile not found")
-
-    if user_profile.role not in ["admin", "superuser"]:
-        return HttpResponseForbidden("You do not have permission to add events.")
-
-    hours = list(range(1, 13))
-    minutes = ["00", "15", "30", "45"]
-    previous = request.POST if request.method == 'POST' else {}
-
+    user_profile = getattr(request.user, 'users', None) 
+    if not user_profile or user_profile.role not in ["admin", "superuser"]:
+        messages.error(request, "You do not have permission to add events.")
+        return redirect('home')
+    
     if request.method == 'POST':
-        try:
-            # --- Parse times ---
-            start_time_str = f"{int(request.POST['start_hour'])}:{int(request.POST['start_minute']):02d} {request.POST['start_period']}"
-            end_time_str = f"{int(request.POST['end_hour'])}:{int(request.POST['end_minute']):02d} {request.POST['end_period']}"
-            start_obj = datetime.strptime(start_time_str, "%I:%M %p")
-            end_obj = datetime.strptime(end_time_str, "%I:%M %p")
-            if start_obj >= end_obj:
-                messages.error(request, "Start time must be before end time.")
-                raise ValueError("Invalid time order")
-
-            # --- Parse date and day of week ---
-            event_date_str = request.POST.get('date')
-            event_date_obj = datetime.strptime(event_date_str, "%Y-%m-%d").date()
-            day_of_week = event_date_obj.strftime("%A")
-
-            # --- Step 1: Create event without image to get ID ---
-            new_event = Events.objects.create(
-                author_ID=user_profile,
-                name=request.POST.get('name'),
-                description=request.POST.get('description'),
-                date=event_date_str,
-                days_of_week=day_of_week,
-                start_time=start_time_str,
-                end_time=end_time_str,
-                location=request.POST.get('building'),
-                campus=request.POST.get('campus'),
-                event_type=request.POST.get('event_type'),
-            )
-
-            # --- Step 2: Handle uploaded image ---
-            uploaded_file = request.FILES.get('image')
-            if uploaded_file:
-                ext = uploaded_file.name.split('.')[-1].lower()
-                filename = f"{new_event.id}.{ext}"  # save as <id>.<ext>
-                folder = os.path.join(settings.MEDIA_ROOT, 'events')
-                os.makedirs(folder, exist_ok=True)  # make sure folder exists
-                full_path = os.path.join(folder, filename)
-
-                # Delete old image if exists
-                if os.path.exists(full_path):
-                    os.remove(full_path)
-
-                # Save the uploaded file to MEDIA_ROOT/events/
-                with open(full_path, 'wb+') as f:
-                    for chunk in uploaded_file.chunks():
-                        f.write(chunk)
-
-                # Update event image field
-                new_event.image.name = f"events/{filename}"
-                new_event.save(update_fields=['image'])
-
-            messages.success(request, "Event added successfully!")
+        form = EventForm(request.POST, request.FILES)
+        if form.is_valid():
+            new_event = form.save(commit=False)
+            new_event.author_ID = user_profile
+            new_event.save()
+            messages.success(request, "Event added successfully.")
             return redirect('home')
+        else:
+            messages.error(request, "Please correct errors below.")
+    else:
+        form = EventForm()
 
-        except Exception as e:
-            messages.error(request, f"Error: {str(e)}")
-            return render(request, 'add_event.html', {
-                'hours': hours,
-                'minutes': minutes,
-                'previous': previous
-            })
-
-    return render(request, 'add_event.html', {
-        'hours': hours,
-        'minutes': minutes,
-        'previous': previous,
-    })
+    return render(request, 'event_form.html', {'form': form, 'page_title': 'Add Event', 'submit_text': 'Add Event'})
 
 @user_passes_test(lambda u: u.is_authenticated and hasattr(u, "users") and u.users.role in ["admin", "superuser"])
 def manage_events(request):
-    all_events = list(Events.objects.all())
+    user_profile = getattr(request.user, 'users', None)
+    if not request.user.is_authenticated or not user_profile:
+        messages.error(request, "Not Authorized.")
+        return redirect('home')
+    
+    if user_profile.role  == "superuser":
+        all_events = list(Events.objects.all())
+    elif user_profile.role == "admin":
+        all_events = list(Events.objects.filter(author_ID=user_profile))
 
     # Sort events by date, then by start_time (handle 12-hour and 24-hour formats)
     def sort_key(e):
@@ -307,7 +263,28 @@ def delete_event(request, event_id):
 
 def edit_event(request, event_id):
     event = get_object_or_404(Events, id=event_id)
-    return render(request, "edit_event.html", {"event": event})
+    
+    user_profile = getattr(request.user, 'users', None)    
+    
+    if not request.user.is_authenticated or not user_profile:
+        messages.error(request, "Not Authorized.")
+        return redirect('home')
+        
+
+    if user_profile.role  == "user" or (user_profile.role == 'admin' and event.author_ID != user_profile):
+        messages.error(request, "You do not have permission to edit this event.")
+        return redirect('home')
+    
+    if request.method == 'POST':
+        form = EventForm(request.POST, request.FILES, instance=event)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Event updated successfully.")
+            return redirect('manage_events')
+    else:
+        form = EventForm(instance=event)
+        
+    return render(request, "event_form.html", {'event': event, 'form': form, 'page_title': 'Edit Event', 'submit_text': 'Update event'})
 
 def manage_users(request):
     all_users = User.objects.all()

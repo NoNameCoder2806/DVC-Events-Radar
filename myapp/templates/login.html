@@ -3,12 +3,10 @@
 {% block show_header %}{% endblock %} <!-- hides header/navbar -->
 {% block content %}
 {% load static %}
-<link rel="stylesheet" href="{% static 'login.css' %}?v=9">
+<link rel="stylesheet" href="{% static 'login.css' %}">
 
-<div class="auth-wrapper">
-    <div class="login-container">
-        <h1 class="title">DVC Event Radar</h1>
-
+<div class="login-container">
+    <h1 class="title">DVC Event Radar</h1>
         {% if error %}
         <p style="color:red">{{ error }}</p>
         {% endif %}
@@ -24,9 +22,8 @@
             <button type="submit" class="login-btn">LOGIN</button>
         </form>
 
-        <p class="register-text">
-            First-time user? <a href="{% url 'register' %}">Register</a> here
-        </p>
-    </div>
+    <p class="register-text">
+        First-time user? <a href="{% url 'register' %}">Register</a> here
+    </p>
 </div>
 {% endblock %}

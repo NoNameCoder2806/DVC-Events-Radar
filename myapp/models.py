@@ -1,7 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Q 
+from django.utils import timezone
+from datetime import datetime
 from django.conf import settings
 import os
+import re
 
 def user_avatar_path(instance, filename):
     ext = filename.split('.')[-1]
@@ -21,6 +25,10 @@ class Users(models.Model):
     def __str__(self):
         return self.user.username
     
+    class Meta:
+        verbose_name = "User"
+        verbose_name_plural = "Users"
+        
 def event_image_path(instance, filename):
     # instance.id won't exist until saved for the first time, so we handle that
     ext = filename.split('.')[-1]
@@ -30,23 +38,71 @@ def event_image_path(instance, filename):
         filename = f'temp.{ext}'  # temporary name, will rename after save
     return os.path.join('events', str(instance.id or 'temp'), filename)
 
+class EventSearch(models.Manager):
+    # If you surround your query with " " , it searches events containing the exact phrase 
+    # If you search without quotemarks, it earches posts that contains all the words in the query
+    # Ex) If you search `Coffee break` events like `break with coffee` appear 
+    # Not Case sensitive
+    def search(self, query):
+        phrases = re.findall(r'"(.*?)"', query)
+        remaining = re.sub(r'"(.*?)"', '', query)
+        words = [w for w in remaining.split() if w] 
+        
+        q_objects = Q()
+        
+        # Exact phrase search
+        for phrase in phrases:
+            q_objects |= Q(name__icontains=phrase) | Q(description__icontains=phrase)  | Q(location__icontains=phrase)
+        # Default search
+        for word in words:
+            q_objects &= Q(name__icontains=word) | Q(description__icontains=word) | Q(location__icontains=word)
+            
+        return self.get_queryset().filter(q_objects).distinct()
+
 class Events(models.Model): 
+    EVENT_TYPES = [('Sports', 'Sports'), ('Clubs', 'Clubs'),('Carrer & Academic', 'Career & Academic'), ('Free Food', 'Free Food'), ('General', 'General')]    
+    CAMPUS_CHOICES = [('Pleasant Hill', 'Pleasant Hill'),('San Ramon', 'San Ramon'),('Virtual', 'Virtual')]
+    
     author_ID = models.ForeignKey(Users, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=10000)
-    date = models.CharField(max_length=100)
-    days_of_week = models.CharField(max_length=30)
+    date = models.DateField(default=timezone.now)
     start_time = models.CharField(max_length=100)
     end_time = models.CharField(max_length=100)
-    location = models.CharField(max_length=100)
-    campus = models.CharField(max_length=100)
-    event_type = models.CharField(max_length=100)
+    location = models.CharField(max_length=100, blank=True, null=True)
+    campus = models.CharField(max_length=100, choices=CAMPUS_CHOICES)
+    event_type = models.CharField(max_length=100, choices=EVENT_TYPES)
     image = models.ImageField(
         upload_to=event_image_path,  # folder inside MEDIA_ROOT
         default="events/default.jpg",  # optional default image
         blank=True,
         null=True
     )
+    
+    objects = EventSearch()
+    
+    @property 
+    def start_time_obj(self):
+        try:
+            return datetime.strptime(self.start_time.strip(), "%I:%M %p").time()
+        except Exception:
+            return None
+    
+    @property
+    def end_time_obj(self):
+        try:    
+            return datetime.strptime(self.end_time.strip(), "%I:%M %p").time()
+        except Exception:
+            return None
+            
+    @property
+    def image_or_default(self):
+        try: 
+            if self.image and os.path.isfile(self.image.path):
+                return self.image.url
+        except ValueError:
+            pass
+        return settings.MEDIA_URL + '/default.jpg'
 
     def delete(self, *args, **kwargs):
         # Delete the image file if it exists
@@ -55,8 +111,18 @@ class Events(models.Model):
         super().delete(*args, **kwargs)
     
     def __str__(self):
-        return self.name     
+        return self.name             
+        
+    class Meta:
+        verbose_name = "Event"
+        verbose_name_plural = "Events"
+        
+    
     
 class Favorites(models.Model):
     event_ID = models.ForeignKey(Events, on_delete=models.CASCADE)
-    user_ID = models.ForeignKey(Users, on_delete=models.CASCADE)
+    user_ID = models.ForeignKey(Users, on_delete=models.CASCADE)    
+    
+    class Meta:
+        verbose_name = "Favorite"
+        verbose_name_plural = "Favorites"
