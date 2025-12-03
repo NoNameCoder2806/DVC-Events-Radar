@@ -24,8 +24,6 @@ urlpatterns = [
     path("profile/", views.user_profile, name="user_profile")
 ]
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
 urlpatterns += [
     path('password_change/', auth_views.PasswordChangeView.as_view(
         template_name='registration/password_change_form.html',
