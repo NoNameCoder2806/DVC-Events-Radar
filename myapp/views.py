@@ -110,10 +110,15 @@ def event_map(request):
     user = request.user
     user_profile = Users.objects.get(user=user)
 
-    # Only interested events (favorited by this user)
+    # Get only events the user favorited
     interested_events = Events.objects.filter(favorites__user_ID=user_profile).distinct()
 
-    # Convert events to JSON-ready objects
+    # Group events by campus
+    pleasant_hill_events = interested_events.filter(campus="Pleasant Hill")
+    san_ramon_events = interested_events.filter(campus="San Ramon")
+    virtual_events = interested_events.filter(campus="Virtual")  # ← your guarantee
+
+    # Convert all interested events to JSON for the map
     events_for_js = []
     for e in interested_events:
         coords = e.coordinates
@@ -122,11 +127,18 @@ def event_map(request):
             "name": e.name,
             "date": e.date.strftime("%Y-%m-%d"),
             "building_code": e.building_code,
+            "campus": e.campus,
             "lat": coords[0] if coords else None,
             "lng": coords[1] if coords else None,
         })
 
-    return render(request, "event_map.html", {"events": events_for_js})
+    return render(request, "event_map.html", {
+        "events": events_for_js,
+        "count_ph": pleasant_hill_events.count(),
+        "count_sr": san_ramon_events.count(),
+        "count_virtual": virtual_events.count(),
+        "count_total": interested_events.count(),
+    })
 
 def app_login(request):
     if request.method == "POST":
