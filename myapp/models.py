@@ -206,7 +206,6 @@ class Events(models.Model):
         verbose_name_plural = "Events"
         
     
-    
 class Favorites(models.Model):
     event_ID = models.ForeignKey(Events, on_delete=models.CASCADE)
     user_ID = models.ForeignKey(Users, on_delete=models.CASCADE)    

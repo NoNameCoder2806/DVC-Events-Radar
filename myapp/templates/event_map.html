@@ -12,6 +12,25 @@
     </div>
 
     <p>Scroll around to explore events.</p>
+
+    <!-- Filters -->
+    <div class="mb-2">
+        <label for="time-filter" class="form-label">Show events:</label>
+        <select id="time-filter" class="form-select" style="width: 200px;">
+            <option value="all" selected>All time</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+        </select>
+    </div>
+
+    <!-- Total events -->
+    <p id="event-count"></p>
+    <p id="virtual-count"></p>
+
+    <!-- Debug list of events -->
+    <ul id="debug-list"></ul>
+
     <div id="map" style="height: 500px; width: 100%;"></div>
 
     <!-- Store events as JSON safely -->
@@ -24,28 +43,115 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize map centered at DVC Pleasant Hill
+    const allEvents = JSON.parse(document.getElementById('event-data').textContent);
     const map = L.map('map').setView([37.9680, -122.0720], 15);
 
-    // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // Add a sample marker
-    L.marker([37.9680, -122.0720])
-        .addTo(map)
-        .bindPopup('DVC Pleasant Hill')
-        .openPopup();
+    let markers = [];
 
-    // Load events safely
-    const eventList = JSON.parse(document.getElementById('event-data').textContent);
+    function parseDateYMD(dateStr) {
+        const parts = dateStr.split('-');
+        return { year: parseInt(parts[0]), month: parseInt(parts[1])-1, day: parseInt(parts[2]) };
+    }
 
-    eventList.forEach(e => {
-        L.marker([e.lat, e.lng])
-            .addTo(map)
-            .bindPopup(`<b>${e.name}</b><br>${e.date}<br><a href="/event/${e.id}">View Event</a>`);
+    function showEvents(filter) {
+        // Clear previous markers
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
+
+        const today = new Date();
+        const todayYMD = { year: today.getFullYear(), month: today.getMonth(), day: today.getDate() };
+
+        let filtered = allEvents;
+
+        // Filter events by date
+        filtered = filtered.filter(e => {
+            const eYMD = parseDateYMD(e.date);
+
+            if (filter === 'today') {
+                return eYMD.year === todayYMD.year &&
+                       eYMD.month === todayYMD.month &&
+                       eYMD.day === todayYMD.day;
+            } else if (filter === 'week') {
+                const startOfWeek = new Date(today);
+                startOfWeek.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+                const endOfWeek = new Date(startOfWeek);
+                endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+                const startYMD = { year: startOfWeek.getFullYear(), month: startOfWeek.getMonth(), day: startOfWeek.getDate() };
+                const endYMD   = { year: endOfWeek.getFullYear(), month: endOfWeek.getMonth(), day: endOfWeek.getDate() };
+
+                return (eYMD.year > startYMD.year ||
+                        (eYMD.year === startYMD.year && eYMD.month > startYMD.month) ||
+                        (eYMD.year === startYMD.year && eYMD.month === startYMD.month && eYMD.day >= startYMD.day)) &&
+                       (eYMD.year < endYMD.year ||
+                        (eYMD.year === endYMD.year && eYMD.month < endYMD.month) ||
+                        (eYMD.year === endYMD.year && eYMD.month === endYMD.month && eYMD.day <= endYMD.day));
+            } else if (filter === 'month') {
+                return eYMD.year === todayYMD.year && eYMD.month === todayYMD.month;
+            }
+            return true; // 'all' filter
+        });
+
+        // Separate virtual events
+        const virtualEvents = filtered.filter(e => !e.lat || !e.lng);
+        const mapEvents = filtered.filter(e => e.lat && e.lng);
+
+        // Handle overlapping coordinates
+        const coordMap = {};
+
+        mapEvents.forEach(e => {
+            let lat = e.lat;
+            let lng = e.lng;
+            const key = `${lat},${lng}`;
+
+            if (coordMap[key]) {
+                const offsets = [
+                    [0.00005, 0],    // right
+                    [-0.00005, 0],   // left
+                    [0, 0.00005],    // up
+                    [0, -0.00005],   // down
+                    [0.00005, 0.00005],   // top-right
+                    [-0.00005, -0.00005], // bottom-left
+                ];
+                const idx = coordMap[key] % offsets.length; // cycle through directions
+                lat += offsets[idx][0];
+                lng += offsets[idx][1];
+                coordMap[key]++;
+            } else {
+                coordMap[key] = 1;
+            }
+
+            const marker = L.marker([lat, lng])
+                .addTo(map)
+                .bindPopup(`<b>${e.name}</b><br>${e.date}<br><a href="/event/${e.id}">View Event</a>`);
+            markers.push(marker);
+        });
+
+        // Update counts
+        document.getElementById('event-count').textContent =
+            `Total interested events: ${filtered.length} (${mapEvents.length} on map + ${virtualEvents.length} virtual)`;
+
+        if (markers.length > 0) {
+            map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2));
+        } else {
+            map.setView([37.9680, -122.0720], 15);
+        }
+
+        console.log(`Filtered events (${filter}):`, filtered);
+        console.log(`Virtual events (${filter}):`, virtualEvents);
+    }
+
+    // Initial load: all time
+    showEvents('all');
+
+    // Handle filter change
+    document.getElementById('time-filter').addEventListener('change', function() {
+        showEvents(this.value);
     });
 });
 </script>

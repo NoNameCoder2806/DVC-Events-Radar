@@ -36,21 +36,24 @@ def get_data():
 
 def home(request):
     query = request.GET.get('q', '')
+    
+    today = datetime.today().date()  # only future or today
     if query:
         events_data = list(Events.objects.search(query))
     else:    
-        events_data = list(Events.objects.all())
+        events_data = list(Events.objects.filter(date__gte=today))  # <- only future events
     
     form = EventFilterForm(request.GET or None)
     if form.is_valid():
         events_data = filter_events(
             events_data,
-            campus = form.cleaned_data.get('campus'),
-            days = form.cleaned_data.get('days'),
-            time_ranges = form.cleaned_data.get('time_range'),
-            event_types = form.cleaned_data.get('event_type'),
+            campus=form.cleaned_data.get('campus'),
+            days=form.cleaned_data.get('days'),
+            time_ranges=form.cleaned_data.get('time_range'),
+            event_types=form.cleaned_data.get('event_type'),
         )
             
+    # Sort by date and start_time
     events_data.sort(key=lambda e: (e.date, e.start_time_obj or datetime.min.time()))
 
     user_role = None
@@ -66,7 +69,7 @@ def home(request):
             user_favorites = []
 
     # ===== PAGINATION =====
-    paginator = Paginator(events_data, 10)  # 10 events per page
+    paginator = Paginator(events_data, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -76,7 +79,7 @@ def home(request):
         'user_favorites': user_favorites,
         'user_id': request.user.id if request.user.is_authenticated else None,
         'user_name': request.user.username if request.user.is_authenticated else None,
-        'user_role' : user_role, 
+        'user_role': user_role, 
         'search_query': query, 
     })
 
@@ -104,30 +107,26 @@ def calendar_view(request):
     return render(request, "calendar.html", context)
 
 def event_map(request):
-    if not request.user.is_authenticated:
-        return render(request, "event_map.html", {"events": json.dumps([])})
+    user = request.user
+    user_profile = Users.objects.get(user=user)
 
-    try:
-        user_obj = Users.objects.get(user=request.user)
-    except Users.DoesNotExist:
-        return render(request, "event_map.html", {"events": json.dumps([])})
+    # Only interested events (favorited by this user)
+    interested_events = Events.objects.filter(favorites__user_ID=user_profile).distinct()
 
-    # Get only favorite events with coordinates
-    favorite_events = Favorites.objects.filter(user_ID=user_obj).select_related('event_ID')
-    event_list = []
-    for fav in favorite_events:
-        e = fav.event_ID
-        if e.coordinates:  # only include events with coordinates
-            lat, lng = e.coordinates
-            event_list.append({
-                "id": e.id,
-                "name": e.name,
-                "date": e.date.strftime("%b %d, %Y"),
-                "lat": lat,
-                "lng": lng,
-            })
+    # Convert events to JSON-ready objects
+    events_for_js = []
+    for e in interested_events:
+        coords = e.coordinates
+        events_for_js.append({
+            "id": e.id,
+            "name": e.name,
+            "date": e.date.strftime("%Y-%m-%d"),
+            "building_code": e.building_code,
+            "lat": coords[0] if coords else None,
+            "lng": coords[1] if coords else None,
+        })
 
-    return render(request, "event_map.html", {"events": json.dumps(event_list)})
+    return render(request, "event_map.html", {"events": events_for_js})
 
 def app_login(request):
     if request.method == "POST":
@@ -339,7 +338,6 @@ def delete_user(request, user_id):
     except User.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'User not found'})
     
-@login_required
 @login_required
 def user_profile(request):
     user_obj = request.user
