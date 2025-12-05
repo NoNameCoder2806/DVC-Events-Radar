@@ -3,7 +3,6 @@
 
 {% block content %}
 <div class="container mt-4">
-
     <!-- Header -->
     <div class="d-flex align-items-center mb-3">
         <button type="button" class="btn btn-outline-secondary me-auto" onclick="history.back()">
@@ -44,7 +43,7 @@
     <p id="event-count" class="fw-bold"></p>
 
     <!-- Map -->
-    <div id="map" style="height: 500px; width: 100%;"></div>
+    <div id="map" class="map-container"></div>
 
     {{ events|json_script:"event-data" }}
 </div>
@@ -60,6 +59,12 @@
     border-radius: 6px;
     box-shadow: 0 0 6px rgba(0,0,0,0.3);
     font-size: 14px;
+}
+
+.map-container {
+    height: 700px;       /* map height */
+    width: 100%;
+    margin-bottom: 50px; /* space below */
 }
 </style>
 
@@ -277,7 +282,17 @@ document.addEventListener('DOMContentLoaded', function() {
         markers = [];
 
         const today = new Date();
+        today.setHours(0, 0, 0, 0); // start of today
+
         let filtered = allEvents.slice();
+
+        // Remove past events
+        filtered = filtered.filter(e => {
+            if (!e.date) return true;
+            const d = parseDate(e.date);
+            if (!d) return true;
+            return d >= today;
+        });
 
         // Campus filtering (note: Virtual handled specially below)
         if (campusFilter !== 'all' && campusFilter !== 'Virtual') {
