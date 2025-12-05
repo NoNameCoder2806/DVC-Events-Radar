@@ -41,6 +41,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "12:30 PM",
                 "end_time": "2:00 PM",
                 "location": "Administration Building - AB | 217",
+                "building_code": "VR",
                 "campus": "Virtual",
                 "description": """
         <p>The Distance Education & Digital Equity (DEDE) Committee is charged with reviewing, creating, and recommending policies, procedures, and practices to the Faculty Senate in order to promote strategic, high-quality, and sustainable growth and delivery of distance education at DVC that fosters academic excellence, equity, and student success.</p>
@@ -56,6 +57,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "2:30 PM",
                 "end_time": "4:30 PM",
                 "location": "Community Conference Center - CCC",
+                "building_code": "VR",
                 "campus": "Virtual",
                 "description": """
         <p>The Curriculum Committee oversees the college curriculum and makes recommendations to the Vice President of Instruction regarding new courses and programs, degree, certificate and transfer requirements including General Education requirements, and other matters which concern curriculum.</p>
@@ -73,6 +75,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "9:00 AM",
                 "end_time": "3:00 PM",
                 "location": "Art Complex - A | 101",
+                "building_code": "A",
                 "campus": "Pleasant Hill",
                 "description": """
         <p><strong><em>All proceeds benefit the photography, printmaking and ceramic areas.</em></strong></p>
@@ -88,6 +91,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "1:00 PM",
                 "end_time": "3:00 PM",
                 "location": "Business and World Language - BWL | 109",
+                "building_code": "VR",
                 "campus": "Virtual",
                 "description": """
         <p>Attend this workshop to learn about the DVC Foundation - your source for scholarships, alumni association benefits, and more!</p>
@@ -102,6 +106,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "2:30 PM",
                 "end_time": "4:00 PM",
                 "location": "Community Conference Center - CCC",
+                "building_code": "VR",
                 "campus": "Virtual",
                 "description": """
         <p>The Academic Senate is the representative body of faculty that advises and collaborates with college leadership on academic and professional matters. It ensures faculty have a voice in shaping policies, curriculum, and initiatives that support student success and the college mission.</p>
@@ -117,6 +122,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "4:00 PM",
                 "end_time": "5:30 PM",
                 "location": "Virtual",
+                "building_code": "VR",
                 "campus": "Virtual",
                 "description": """
         <p><strong><em>Go beyond the textbook and learn by doing!</em></strong></p>
@@ -132,6 +138,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "4:00 PM",
                 "end_time": "4:45 PM",
                 "location": "Virtual",
+                "building_code": "VR",
                 "campus": "Virtual",
                 "description": """
         <p><strong><em>What you eat before a game can be your biggest advantage!</em></strong></p>
@@ -146,6 +153,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "7:00 PM",
                 "end_time": "8:30 PM",
                 "location": "Music - M | 101",
+                "building_code": "M",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>Step into a world of spontaneous creativity as small jazz combos reimagine the classics and explore the cutting edge of contemporary jazz. Experience the art of musical conversation at its most dynamic.</p>
@@ -161,6 +169,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "9:00 AM",
                 "end_time": "6:00 PM",
                 "location": "Art Complex - A | 101",
+                "building_code": "A",
                 "campus": "Pleasant Hill",
                 "description": """
         <p><strong><em>All proceeds benefit the photography, printmaking and ceramic areas.</em></strong></p>
@@ -176,6 +185,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "10:00 AM",
                 "end_time": "2:00 PM",
                 "location": "Commons Plaza",
+                "building_code": "CP",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>Embrace the holiday spirit with unique shopping, festive cheer, and a special raffle.</p>
@@ -190,6 +200,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "12:00 PM",
                 "end_time": "2:00 PM",
                 "location": "West Building - W | Learning Commons",
+                "building_code": "SR-WEST",
                 "campus": "San Ramon",
                 "description": """
         <p>Buying groceries? In this economy? Join us in the San Ramon Campus Learning Commons on the first Wednesday of every month to grab a quick bite and learn about CalFresh eligibility requirements, get help with your EBT application, and more.</p>
@@ -203,6 +214,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "1:00 PM",
                 "end_time": "2:00 PM",
                 "location": "Library & Academic Success Center - L & ASC",
+                "building_code": "SR-LIB",
                 "campus": "San Ramon",
                 "description": """
         <p>Join a DVC Counselor and other students for a fun time of playing board games – all DVC students are welcome to enjoy a 1-hour mid-week break from the mental stressors of school.</p>
@@ -217,6 +229,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "2:30 PM",
                 "end_time": "4:30 PM",
                 "location": "Community Conference Center - CCC",
+                "building_code": "CCC",
                 "campus": "Pleasant Hill",
                 "description": """
         <p><strong><em>The College Council meets the 1st, 3rd and 5th Wednesday during the semester</em></strong></p>
@@ -233,6 +246,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "2:30 PM",
                 "end_time": "4:30 PM",
                 "location": "Library & Academic Success Center - L & ASC",
+                "building_code": "SR-LIB",
                 "campus": "San Ramon",
                 "description": """
         <p><strong><em>The College Council meets the 1st, 3rd and 5th Wednesday during the semester</em></strong></p>
@@ -251,6 +265,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "12:00 PM",
                 "end_time": "2:00 PM",
                 "location": "Student Union - SU | 101",
+                "building_code": "SU",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>Buying groceries? In this economy? Join us in the Pleasant Hill Campus Student Union on Thursday to grab a quick bite and learn about CalFresh eligibility requirements, get help with your EBT application, and more.</p>
@@ -266,6 +281,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "2:00 PM",
                 "end_time": "6:00 PM",
                 "location": "Learning Center - LC | 200",
+                "building_code": "LC",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>Math tutors and faculty will be available to help with any math course.</p>
@@ -280,6 +296,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "8:00 PM",
                 "end_time": "10:00 PM",
                 "location": "Performing Arts Center - PAC",
+                "building_code": "PAC",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>Experience the full spectrum of movement in a single production.</p>
@@ -297,6 +314,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "8:00 PM",
                 "end_time": "10:00 PM",
                 "location": "Performing Arts Center - PAC",
+                "building_code": "PAC",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>Experience the full spectrum of movement in a single production.</p>
@@ -314,6 +332,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "2:00 PM",
                 "end_time": "4:00 PM",
                 "location": "Performing Arts Center - PAC",
+                "building_code": "PAC",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>Experience the full spectrum of movement in a single production.</p>
@@ -329,6 +348,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "3:00 PM",
                 "end_time": "5:00 PM",
                 "location": "Administration Building - AB | 108",
+                "building_code": "AB",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>The college established a Budget Committee to ensure a representative body of the college community is educated regarding all aspects of the college budget and actively participates in recommending resource allocations.</p>
@@ -345,6 +365,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "7:00 PM",
                 "end_time": "8:30 PM",
                 "location": "Performing Arts Center - PAC",
+                "building_code": "PAC",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>Our talented intermediate and advanced guitarists explore the full range of their instrument.</p>
@@ -361,6 +382,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "9:00 AM",
                 "end_time": "6:00 PM",
                 "location": "Learning Center - LC | 200",
+                "building_code": "LC",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>Power through your finals with complimentary coffee and snacks, available all week in the Math & Engineering Student Center.</p>
@@ -375,6 +397,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "2:30 PM",
                 "end_time": "4:30 PM",
                 "location": "Student Services Center - SSC | 232",
+                "building_code": "SSC",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>The Student Equity and Success Committee monitors, evaluates and advances the institutional level progress on achieving the Educational Master Plan outcomes for equitable student success.</p>
@@ -392,7 +415,8 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "2:30 PM",
                 "end_time": "4:00 PM",
                 "location": "Community Conference Center - CCC",
-                "campus": "Pleasant Hill, Virtual",
+                "building_code": "VR",
+                "campus": "Virtual",
                 "description": """
         <p>The Curriculum Committee oversees the college curriculum and makes recommendations to the Vice President of Instruction regarding new courses and programs, degree, certificate and transfer requirements including General Education requirements, and other matters which concern curriculum.</p>
         <p>Meeting Agendas & Minutes on BoardDocs:</p>
@@ -409,6 +433,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "9:00 AM",
                 "end_time": "6:00 PM",
                 "location": "Learning Center - LC | 200",
+                "building_code": "LC",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>Power through your finals with complimentary coffee and snacks, available all week in the Math & Engineering Student Center.</p>
@@ -423,6 +448,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "7:00 PM",
                 "end_time": "8:30 PM",
                 "location": "Music - M | 101",
+                "building_code": "M",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>Witness the future of music as Songwriting students (MUSX-182/282) debut their original works, brought to life by the expert live sound production of AV Essentials (MUSX-100/150LS) students.</p>
@@ -439,6 +465,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "9:00 AM",
                 "end_time": "6:00 PM",
                 "location": "Learning Center - LC | 200",
+                "building_code": "LC",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>Power through your finals with complimentary coffee and snacks, available all week in the Math & Engineering Student Center.</p>
@@ -453,6 +480,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "2:30 PM",
                 "end_time": "4:30 PM",
                 "location": "Administration Building - AB | President's Office Conference Room",
+                "building_code": "AB",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>The Research, Planning, and Evaluation Committee (RPEC), taking direction from College Council, supports the work of the college to achieve its Educational Master Plan, annual priorities, and other objectives.</p>
@@ -472,6 +500,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "9:00 AM",
                 "end_time": "6:00 PM",
                 "location": "Learning Center - LC | 200",
+                "building_code": "LC",
                 "campus": "Pleasant Hill",
                 "description": """
         <p>Power through your finals with complimentary coffee and snacks, available all week in the Math & Engineering Student Center.</p>
@@ -486,6 +515,7 @@ def populate_default_data(sender, **kwargs):
                 "start_time": "2:00 PM",
                 "end_time": "4:00 PM",
                 "location": "Virtual",
+                "building_code": "VR",
                 "campus": "Virtual",
                 "description": """
         <p>The Information and Instructional Technology Committee (IITC) researches, prioritizes and recommends technology-centered outcomes that directly or indirectly impact equitable student success and the core values of DVC.</p>
@@ -503,10 +533,10 @@ def populate_default_data(sender, **kwargs):
                 name=ev["name"],
                 description=ev["description"],
                 date=ev["date"],
-                days_of_week="",  # optional
                 start_time=ev["start_time"],
                 end_time=ev["end_time"],
                 location=ev["location"],
+                building_code=ev["building_code"],
                 campus=ev["campus"],
                 event_type=ev.get("event_type") or "General",
             )

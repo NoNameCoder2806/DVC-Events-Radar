@@ -19,6 +19,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.conf import settings
 import os
 import json
+from datetime import date, timedelta
 
 from PIL import Image
 
@@ -102,8 +103,31 @@ def calendar_view(request):
     }
     return render(request, "calendar.html", context)
 
-def map(request):
-    return render(request, 'map.html')
+def event_map(request):
+    if not request.user.is_authenticated:
+        return render(request, "event_map.html", {"events": json.dumps([])})
+
+    try:
+        user_obj = Users.objects.get(user=request.user)
+    except Users.DoesNotExist:
+        return render(request, "event_map.html", {"events": json.dumps([])})
+
+    # Get only favorite events with coordinates
+    favorite_events = Favorites.objects.filter(user_ID=user_obj).select_related('event_ID')
+    event_list = []
+    for fav in favorite_events:
+        e = fav.event_ID
+        if e.coordinates:  # only include events with coordinates
+            lat, lng = e.coordinates
+            event_list.append({
+                "id": e.id,
+                "name": e.name,
+                "date": e.date.strftime("%b %d, %Y"),
+                "lat": lat,
+                "lng": lng,
+            })
+
+    return render(request, "event_map.html", {"events": json.dumps(event_list)})
 
 def app_login(request):
     if request.method == "POST":

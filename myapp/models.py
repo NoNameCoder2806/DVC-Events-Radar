@@ -71,7 +71,8 @@ class Events(models.Model):
         ('PAO', 'Performing Arts Office'), ('PL', 'Planetarium'), ('POL', 'Police Services'), ('PS', 'Physical Science'),
         ('SSC', 'Student Services Center'), ('ST', 'Science and Technology Center'), ('SU', 'Student Union'), ('W', 'Warehouse'),
         ('WLC', 'West Library Classrooms'), ('AQ', 'Aquatics'), ('FBO', 'Football Office'), ('FH', 'Field House'), ('FTX', 'Fitness & Exercise'),
-        ('GYM', 'Gym'), ('PB', 'Press Box'), ('AR', 'Arena Theater'), ('PAC', 'Performing Arts Center'),
+        ('GYM', 'Gym'), ('PB', 'Press Box'), ('AR', 'Arena Theater'), ('PAC', 'Performing Arts Center'), ('CCC', 'Community Conference Center'),
+        ('CP', 'Commons Plaza'), ('DR', 'Diablo Room'), ('F', 'Forums'), ('LQ', 'Library Quad')
     ]
     SR_BUILDINGS = [
         ('SR-WEST', 'West Building'), ('SR-EAST', 'East Building'), ('SR-LC', 'Learning Commons'), ('SR-LIB', 'Library'), ('SR-MP', 'Mechanical Plant'),
@@ -121,6 +122,9 @@ class Events(models.Model):
         "PB":  (37.96701950000009, -122.06959786249988),    # Press Box
         "AR":  (37.96922400000022, -122.06971000000016),    # Arena Theater
         "PAC": (37.96944105691815, -122.06996933834286),    # Performing Arts Center
+        "CCC": (37.96973561953551, -122.07227012028410),    # Community Conference Center
+        "CP":  (37.96904845587510, -122.07072091984182),    # Commons Plaza
+        "LQ":  (37.96798978512093, -122.07230950939937),    # Library Quad
 
         # San Ramon
         "SR-WEST": (37.75496847390289, -121.91041226441861),      # San Ramon West Building
@@ -141,14 +145,14 @@ class Events(models.Model):
     end_time = models.CharField(max_length=100)
     location = models.CharField(max_length=100, blank=True, null=True)
     campus = models.CharField(max_length=100, choices=CAMPUS_CHOICES)
-    # building_code = models.CharField(
-    #     max_length=10,
-    #     choices=BUILDING_CODES,
-    #     default = "VR",
-    #     blank=True,
-    #     null=True,
-    #     help_text="Select a building for on-campus events (VR for Virtual)."
-    # )
+    building_code = models.CharField(
+        max_length=10,
+        choices=BUILDING_CODES,
+        default = "VR",
+        blank=True,
+        null=True,
+        help_text="Select a building for on-campus events (VR for Virtual)."
+    )
     event_type = models.CharField(max_length=100, choices=EVENT_TYPES)
     image = models.ImageField(
         upload_to=event_image_path,  # folder inside MEDIA_ROOT

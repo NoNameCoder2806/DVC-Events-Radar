@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Event Map{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex align-items-center mb-3">
+        <button type="button" class="btn btn-outline-secondary me-auto" onclick="history.back()">
+            ← Back
+        </button>
+        <h2 class="text-center flex-grow-1 m-0">Event Map</h2>
+        <div style="width: 75px;"></div>
+    </div>
+
+    <p>Scroll around to explore events.</p>
+    <div id="map" style="height: 500px; width: 100%;"></div>
+
+    <!-- Store events as JSON safely -->
+    {{ events|json_script:"event-data" }}
+</div>
+
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize map centered at DVC Pleasant Hill
+    const map = L.map('map').setView([37.9680, -122.0720], 15);
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Add a sample marker
+    L.marker([37.9680, -122.0720])
+        .addTo(map)
+        .bindPopup('DVC Pleasant Hill')
+        .openPopup();
+
+    // Load events safely
+    const eventList = JSON.parse(document.getElementById('event-data').textContent);
+
+    eventList.forEach(e => {
+        L.marker([e.lat, e.lng])
+            .addTo(map)
+            .bindPopup(`<b>${e.name}</b><br>${e.date}<br><a href="/event/${e.id}">View Event</a>`);
+    });
+});
+</script>
+{% endblock %}
