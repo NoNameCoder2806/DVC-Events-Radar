@@ -21,6 +21,8 @@ class Users(models.Model):
         blank=True,
         null=True
     )
+    biography = models.TextField(blank=True, null=True)  # <-- add this
+    links = models.TextField(blank=True, null=True)      # <-- add this
     
     def __str__(self):
         return self.user.username

@@ -43,18 +43,26 @@
         background: linear-gradient(90deg, #2e7d32 0%, #5e35b1 100%);
     }
 
-    .left-section {
-        flex: 0 0 200px;
-        padding-top: 60px;
-    }
-
     .right-section {
         flex: 1;
+        padding-left: 20px;
+    }
+
+    .left-section {
+        flex: 0 0 200px;
+        display: flex;            /* make it a flex container */
+        flex-direction: column;   /* stack items vertically */
+        align-items: center;      /* center horizontally */
+        padding-top: 60px;
+        justify-content: center;
+        min-height: 100%;
     }
 
     .avatar-section {
-        text-align: left;
-        margin-bottom: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;      /* center avatar + button horizontally */
+        width: 100%;              /* optional: take full width of left-section */
     }
 
     .avatar-circle {
@@ -296,7 +304,7 @@
                     <h3 class="info-section-title">Links</h3>
                     <p class="info-text">
                         {% if user_obj.users.links %}
-                            {{ user_obj.users.links|linebreaks }}
+                            {{ user_obj.users.links|linebreaks|urlize }}
                         {% else %}
                             No links have been added
                         {% endif %}

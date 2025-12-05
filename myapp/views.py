@@ -340,6 +340,7 @@ def delete_user(request, user_id):
         return JsonResponse({'status': 'error', 'message': 'User not found'})
     
 @login_required
+@login_required
 def user_profile(request):
     user_obj = request.user
     profile_obj = user_obj.users
@@ -353,6 +354,12 @@ def user_profile(request):
         if last_name:
             user_obj.last_name = last_name
 
+        # Update biography and links
+        biography = request.POST.get("biography", "").strip()
+        links = request.POST.get("links", "").strip()
+        profile_obj.biography = biography
+        profile_obj.links = links
+
         # Update avatar if uploaded
         if "avatar" in request.FILES:
             # Delete old avatar if it exists
@@ -361,6 +368,7 @@ def user_profile(request):
             # Save new avatar
             profile_obj.avatar_url = request.FILES["avatar"]
 
+        # Save changes
         user_obj.save()
         profile_obj.save()
         messages.success(request, "Profile updated successfully!")
