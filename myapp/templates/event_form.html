@@ -35,9 +35,87 @@
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
-            {{ form.as_p }}
+            <div class="mb-3">
+                <label class="form-label fs-5">{{ form.name.label }}</label>
+                {{ form.name }}
+                {{ form.name.errors }}
+            </div>
 
-            <button type="submit" class="btn btn-primary w-100">{{ submit_text }}</button>
+            <div class="mb-3">
+                {{ form.description.label_tag }}
+
+                <!-- Mini toolbar -->
+                <div class="mb-2">
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="wrapText('<strong>', '</strong>')">B</button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="wrapText('<em>', '</em>')">I</button>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="wrapText('<u>', '</u>')">U</button>
+                </div>
+
+                {{ form.description }}
+
+                <div class="form-text">
+                    Use the buttons above to format text. You can also use basic HTML tags for links: <code>&lt;a href="URL"&gt;Link&lt;/a&gt;</code>.
+                </div>
+                {{ form.description.errors }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fs-5">{{ form.date.label }}</label>
+                {{ form.date }}
+                {{ form.date.errors }}
+            </div>
+
+            <!-- Start Time -->
+            <div class="mb-3">
+                <label class="form-label fs-5">Start Time</label>
+                <div class="d-flex gap-2">
+                    {{ form.start_hour }}
+                    {{ form.start_minute }}
+                    {{ form.start_period }}
+                </div>
+                {% if form.start_hour.errors %}<div class="text-danger">{{ form.start_hour.errors }}</div>{% endif %}
+                {% if form.start_minute.errors %}<div class="text-danger">{{ form.start_minute.errors }}</div>{% endif %}
+                {% if form.start_period.errors %}<div class="text-danger">{{ form.start_period.errors }}</div>{% endif %}
+            </div>
+
+            <!-- End Time -->
+            <div class="mb-3">
+                <label class="form-label fs-5">End Time</label>
+                <div class="d-flex gap-2">
+                    {{ form.end_hour }}
+                    {{ form.end_minute }}
+                    {{ form.end_period }}
+                </div>
+                {% if form.end_hour.errors %}<div class="text-danger">{{ form.end_hour.errors }}</div>{% endif %}
+                {% if form.end_minute.errors %}<div class="text-danger">{{ form.end_minute.errors }}</div>{% endif %}
+                {% if form.end_period.errors %}<div class="text-danger">{{ form.end_period.errors }}</div>{% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fs-5">{{ form.location.label }}</label>
+                {{ form.location }}
+                {{ form.location.errors }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fs-5">{{ form.campus.label }}</label>
+                {{ form.campus }}
+                {{ form.campus.errors }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fs-5">{{ form.event_type.label }}</label>
+                {{ form.event_type }}
+                {{ form.event_type.errors }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fs-5">{{ form.image.label }}</label>
+                {{ form.image }}
+                {{ form.image.errors }}
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Create Event</button>
         </form>
 
         <!-- Bottom Cancel/Home Button -->
@@ -84,6 +162,19 @@ function showTopMessage(text, type = "info") {
         box.style.top = "-80px";
         box.style.opacity = "0";
     }, 2600);
+}
+</script>
+
+<script>
+function wrapText(openTag, closeTag) {
+    const textarea = document.getElementById("id_description"); // Django default id
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    textarea.value = textarea.value.substring(0, start) + openTag + selectedText + closeTag + textarea.value.substring(end);
+    textarea.focus();
+    textarea.selectionStart = start + openTag.length;
+    textarea.selectionEnd = end + openTag.length;
 }
 </script>
 

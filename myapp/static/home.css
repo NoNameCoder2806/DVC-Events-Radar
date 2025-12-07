@@ -5,6 +5,7 @@
 }
 
 body {
+    background-color: #F5FCFF;
     --green: #017550;
     --blue: #173f6c;
     --purple: #5d2e8f;
@@ -13,7 +14,7 @@ body {
 }
 
 /* Filter button */
-.col-md-2 button{
+.col-md-3 button{
     background-color: var(--blue) !important;
     height: 30px;
     width: 30px;
@@ -29,7 +30,7 @@ body {
 }
 
 /* Hover effect make filter button larger and purple */
-.col-md-2 button:hover{
+.col-md-3 button:hover{
     background-color: var(--purple) !important;
     -webkit-transform: scale(1.2);
     -ms-transform: scale(1.2);
@@ -37,8 +38,15 @@ body {
 }
 
 /* Activated filter */
-.col-md-2 button:not(.collapsed){
+.col-md-3 button:not(.collapsed){
     background-color: var(--purple) !important;
+}
+
+.collapse {
+    overflow: hidden;       /* essential for collapse */
+    transition: height 0.35s ease;
+    display: block;          /* allow JS to control height */
+    height: 0;               /* start closed */
 }
 
 /* The container */
@@ -122,11 +130,18 @@ body {
     border-color:black;
 }
 
-header {
+/* header {
     height: 20vh;
     color: var(--green);
     background-color: white;
     position: relative;
+} */
+
+header {
+    color: var(--green);
+    background-color: white;
+    position: relative;
+    height: auto; /* <-- important */
 }
 
 header h1 {
@@ -134,8 +149,6 @@ header h1 {
     position: absolute;
     left: 50%;
     top: 50%;
-    -webkit-transform: translate(-50%, 50%);
-    -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
 }
 
@@ -157,9 +170,27 @@ header #button {
     background-color: var(--green);
     box-sizing: border-box;
 }
-#searchbar{
-    position: relative;
+
+form.d-flex {
+    width: 100%;
 }
+
+#searchbar {
+    position: relative;
+    flex-grow: 1;  /* This is the key */
+    min-width: 0;  /* Prevent overflow in flexbox */
+}
+
+#searchbar input {
+    width: 100%;
+    height: 52px;
+    padding: 0 50px 0 20px; /* space for icon */
+    border-radius: 50px;
+    border: 2px solid var(--blue);
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
 input[type='text']{
     height: 52px;
     border-radius: 50px;
@@ -205,7 +236,7 @@ input[type='text']{
 }
 
 .event-box .event-title {
-    font-size: 1.6em;
+    font-size: 1.3em;
     text-align: center;
 }
 
@@ -231,8 +262,6 @@ input[type='text']{
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    height: 200px;
-    width: 80%;
     box-sizing: border-box;
     padding: 15px;
 }
@@ -332,11 +361,506 @@ input[type='text']{
     width: 82%;
 }
 
-.page-item a{
-    color: var(--blue)!important;
+/* Pagination wrapper */
+#pagination {
+    font-size: 1.6rem; /* bigger text */
+    color: #003366;    /* default dark blue for numbers */
+    text-align: center;
+    margin-top: 30px;
 }
-.page-item.active span{
-    background-color: var(--blue)!important;
-    color: white!important;
-    border-color: var(--blue)!important;
+
+/* Pagination wrapper */
+#pagination {
+    font-size: 1.6rem; /* slightly bigger */
+    text-align: center;
+    margin-top: 30px;
+}
+
+/* Pagination wrapper */
+#pagination {
+    font-size: 1.6rem; /* slightly bigger */
+    text-align: center;
+    margin-top: 30px;
+}
+
+/* Page numbers */
+.pagination-number {
+    display: inline-block;
+    margin: 0 5px;
+    font-size: 1.5rem; /* bigger font */
+    color: #003366; /* dark blue */
+    text-decoration: none;
+    transition: all 0.2s;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold; /* bold all page numbers */
+}
+
+/* Current page */
+.pagination-number.active {
+    text-decoration: underline;
+    font-weight: bold;
+    pointer-events: none; /* optional, prevents clicking current page */
+}
+
+/* Hover effect for other pages */
+.pagination-number:not(.active):hover {
+    background-color: #800080; /* purple */
+    color: white;
+    transform: scale(1.1);
+    text-decoration: none;
+}
+
+/* Arrows */
+.pagination-arrow {
+    display: inline-block;
+    margin: 0 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #003366; /* dark blue circle */
+    color: white; /* arrow stays white */
+    text-align: center;
+    line-height: 40px;
+    font-size: 1.3rem;
+    transition: all 0.2s;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Arrow hover */
+.pagination-arrow:hover {
+    background-color: #800080; /* purple background on hover */
+    color: white;              /* arrow text stays white */
+    transform: scale(1.2);     /* enlarge slightly */
+    text-decoration: none;
+}
+
+.pagination-arrow.disabled {
+    background-color: #ccc;
+    color: #888;
+    cursor: default;
+}
+
+/* Filters main title */
+.filter-title {
+    margin-left: 5%;
+    margin-top: 20px;
+    font-size: 200%;
+    color: #003366; /* dark blue */
+    font-weight: bold;
+    border-bottom: 2px solid #003366; /* small line under text */
+    display: inline-block;
+    margin-bottom: 25px !important;
+}
+
+/* Each category label */
+.filter-category {
+    font-size: 125%;
+    color: #003366; /* dark blue */
+    font-weight: bold;
+}
+
+/* Each checkbox label and box */
+.filter-checkbox-label {
+    font-size: 120%;
+}
+
+.filter-checkbox-label input[type="checkbox"] {
+    transform: scale(1.5); /* Makes the checkbox itself larger */
+    margin-right: 0.5rem; /* spacing between box and text */
+    font-weight: bold;
+}
+
+.filter-block {
+    margin-left: 5%;
+    margin-bottom: 1rem; /* space between blocks */
+    border-bottom: 1px solid #dee2e6; /* keep the border if you want */
+    padding-bottom: 0.5rem; /* optional */
+}
+
+.filter-box {
+    background: white;
+    border-radius: 30px;
+    max-width: 300px;       /* fills the column */
+}
+
+/* Base File */
+.stripe-container {
+    width: 100%;
+    max-width: 1300px; /* or whatever max width you want */
+    margin: 0 auto;    /* center it */
+    padding: 0 20px;   /* horizontal inset for all stripes */
+}
+
+/* Make header fixed if you want it to stay on top */
+header.dvc-header {
+    position: relative; /* or fixed if you want sticky header */
+    z-index: 1000;
+}
+
+/* Push content below header */
+.container-fluid.mt-4 {
+    margin-top: 250px; /* sum of stripe heights */
+}
+
+/* General stripe styling */
+.dvc-header .stripe {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Stripe colors */
+.stripe-1 {
+    background-color: #173F6C;
+    color: white;
+    height: 86px; /* bigger height */
+    display: flex;
+    justify-content: center; /* center the inner content */
+    align-items: center;
+    font-family: "Jasan Bold", sans-serif;
+}
+
+.icon-wrapper {
+    background-color: white;
+    padding: 12px;        /* make this larger */
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-right: 12px; /* adjust as needed */
+}
+
+.icon-wrapper img {
+    mask-image: url('/static/images/megaphone.png');
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    background-color: #173F6C; /* your blue */
+}
+
+.filter-icon {
+    width: 23px;   /* adjust if needed */
+    height: 23px;  /* adjust if needed */
+}
+
+.stripe-inner {
+    width: 100%;
+    max-width: 1200px; /* controls spacing from edges */
+    padding: 0 20px;   /* space from left and right */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.megaphone {
+    font-size: 20px;
+}
+
+.stripe-text {
+    font-size: 23px;
+    font-weight: bold;
+}
+
+.plus-icon {
+    font-size: 35px;        /* size of the + */
+    font-weight: 200;       /* slimmer */
+    width: 35px;            /* circle width */
+    height: 35px;           /* circle height */
+    background-color: white;
+    color: #173F6C;         /* blue + */
+    border-radius: 50%;     /* makes it a circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15); /* optional slight depth */
+}
+
+.dvclogo {
+    width: 80px;
+    height: 100%;
+}
+
+.textlogo {
+    font-family: "Arial Narrow", Arial, sans-serif;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between DVC and the text */
+    padding: 10px;
+    color: #00833B; /* same green */
+    font-weight: normal;
+    font-size: 20px;
+    margin-top: 5px; /* adjust number to nudge down */
+}
+
+.stripe-2 { background-color: #ffffff; color: #333; height: 74px; }
+.stripe-3 { background-color: #017550; color: white; height: 58px; }
+
+.stripe-2, .stripe-3 {
+    display: flex;
+    align-items: center;
+}
+
+/* Second stripe links: smaller + black underline on hover */
+.stripe-2 .top-links a {
+    font-size: 15px;
+    color: #173F6C;
+    text-decoration: none;
+    position: relative;
+    font-weight: bold;
+    margin: 0 12px;
+
+    display: inline-flex;        /* treat the link as a small flex box */
+    align-items: center;         /* vertically center text */
+
+    letter-spacing: 1px; /* adjust this value to widen spacing */
+}
+
+/* Pseudo-element for animated underline */
+.stripe-2 .top-links a::after {
+    content: "";
+    position: absolute;
+    left: -10%;                   /* start from left */
+    bottom: 0;                 /* right under the text */
+    width: 0;                  /* initially hidden */
+    height: 2px;               /* thickness of underline */
+    background-color: black;
+    border-radius: 1px;        /* optional: rounded edges */
+    transition: width 0.3s ease;  /* smooth left-to-right animation */
+}
+
+.stripe-2 .top-links a:hover::after {
+    width: 120%;               /* expand to full width on hover */
+}
+
+/* Purple mini bar */
+.purple-bar {
+    min-height: 46px;
+    background-color: #5D2E8F;
+    color: white;
+    margin: 0 12px;
+    border-radius: 23px;  /* <-- bigger value = softer edges */
+    padding: 20px 20px;       /* taller padding */
+
+    letter-spacing: 1px; /* adjust this value to widen spacing */
+}
+
+.purple-bar .separator {
+    background-color: white; /* matches text */
+    opacity: 0.6;
+    height: 30px;
+}
+
+.purple-bar a {
+    display: inline-flex;      /* same as left links */
+    align-items: center;
+    margin: 0 12px;            /* same horizontal spacing */
+    color: white !important;
+    text-decoration: none !important;
+    font-weight: bold;
+    position: relative;
+}
+
+/* Pseudo-element for animated underline */
+.purple-bar a::after {
+    content: "";
+    position: absolute;
+    left: 0;              /* start at left */
+    bottom: 0;            /* just below text */
+    width: 0;             /* hidden initially */
+    height: 2px;          /* underline thickness */
+    background-color: white;
+    border-radius: 2px;   /* optional: rounded edges */
+    transition: width 0.3s ease; /* smooth left-to-right animation */
+}
+
+.purple-bar a:hover::after {
+    width: 100%;          /* expand to full width on hover */
+}
+
+.search-icon-wrapper {
+    background-color: #5D2E8F; /* purple */
+    width: 40px;                /* make the circle bigger if needed */
+    height: 40px;
+    border-radius: 50%;         /* makes it circular */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.search-icon-wrapper i {
+    color: white;               /* icon color */
+    font-size: 18px;            /* adjust icon size */
+}
+
+/* College name */
+.college-left .college-name {
+    font-size: 20px; /* bigger font */
+}
+
+.separator {
+    display: inline-block;
+    width: 1px;            /* thin line */
+    height: 30px;          /* adjust as needed */
+    background-color: #ccc; /* or any color */
+    margin: 0 8px;         /* spacing on both sides */
+}
+
+.stripe-3 .separator {
+    color: white;  /* override color for green stripe */
+}
+
+/* Stripe 3 links */
+.stripe-3 a {
+    letter-spacing: 1px;       /* spacing between characters */
+    font-size: 20px;
+    position: relative;        /* needed for pseudo-element */
+    text-decoration: none !important; /* FORCE removal of default underline */
+    color: white;
+    font-weight: bold;
+    padding-bottom: 5px;  /* space for underline */
+    padding-bottom: 0px;       /* space between text and underline */
+}
+
+.stripe-3 a::after {
+    content: "";
+    position: absolute;
+    left: -5%;                 /* center line horizontally */
+    bottom: 0;                 /* position just below text */
+    width: 0;                  /* start hidden */
+    height: 4px;               /* thickness of underline */
+    background-color: white;    /* underline color */
+    border-radius: 2px;        /* rounded edges */
+    transition: width 0.3s ease; /* smooth animation for hover */
+}
+
+.stripe-3 a:hover::after {
+    width: 110%;               /* full width on hover */
+}
+
+/* Avatar styling */
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #007bff;
+    margin-right: 40px;
+}
+
+.avatar-placeholder {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    color: #5e35b1;
+    border: 3px solid #5e35b1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    margin-right: 40px;
+    font-weight: 700;
+}
+
+.user-header .btn {
+    margin-right: 40px;
+    width: 80px;          /* shorter width */
+    padding: 6px 10px;    /* adjust height */
+    font-size: 14px;      /* smaller text */
+    font-weight: bold;
+    border-radius: 10%;
+}
+
+/* Make the three stripes responsive */
+@media(max-width: 768px) {
+    .stripe-2, .stripe-3 { flex-direction: column; align-items: flex-start; gap: 5px; }
+    .purple-bar { width: 100%; justify-content: space-around; margin-top: 5px; }
+}
+
+.page-title {
+    font-family: 'Arial Black', Arial, sans-serif;
+    margin-left: 115px; /* space after the title */
+    display: inline-block; /* ensure spacing works with buttons next to it */
+    font-weight: bold;
+    color: #017550;   /* green color */
+    font-size: 63px;
+    margin-top: -10px;     /* move up a bit */
+}
+
+.quick-access-buttons a {
+    margin-right: 20px !important;
+    margin-left: 20px !important;
+}
+
+.quick-access-buttons .qa-btn {
+    background-color: white;
+    min-width: 140px !important;  /* 🔥 All buttons same width */
+    text-align: center;
+    padding: 12px 15px;
+    margin-left: 12px;  /* spacing between buttons */
+    margin-right: 12px;
+    font-weight: 600;
+}
+
+.qa-btn {
+    text-decoration: none;  /* remove underline */
+    padding: 15px 15px;
+    font-weight: 600;
+    text-align: center;
+    border: 2px solid;        /* outline color set per button */
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;           /* inherit the border color */
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Specific colors */
+.btn-outline-purple {
+    border-color: #5c2d91;
+    color: #5c2d91;
+}
+.btn-outline-blue {
+    border-color: #003366;
+    color: #003366;
+}
+.btn-outline-green {
+    border-color: #0a7a33;
+    color: #0a7a33;
+}
+
+/* Hover effect: fill background and invert text color */
+.qa-btn:hover {
+    color: white !important;
+    text-decoration: none;  /* remove underline */
+}
+
+.btn-outline-purple:hover {
+    background-color: #5c2d91;
+    text-decoration: none;  /* remove underline */
+}
+.btn-outline-blue:hover {
+    background-color: #003366;
+    text-decoration: none;  /* remove underline */
+}
+.btn-outline-green:hover {
+    background-color: #0a7a33;
+    text-decoration: none;  /* remove underline */
+}
+
+.filter-content {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.35s ease;
+}
+.filter-content.show {
+    height: auto; /* handled in JS via scrollHeight */
 }

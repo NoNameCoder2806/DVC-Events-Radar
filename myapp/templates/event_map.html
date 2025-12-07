@@ -1,0 +1,388 @@
+{% extends 'base.html' %}
+{% block title %}Event Map{% endblock %}
+
+{% block page_title %}
+<div class="page-header-title-wrapper">
+    <button type="button" class="map-back-btn" onclick="history.back()">← Back</button>
+
+    <span class="page-title">Events Map</span>
+</div>
+{% endblock %}
+
+{% block header_spacer2 %}
+<div style="height: 30px;"></div>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div style="width: 100%;">
+        <p style="margin: 0 0 15px 0;">
+            <span style="
+                font-weight: bold;
+                font-style: italic;
+                color: #003366;
+                background-color: white;
+                padding: 5px;
+                font-size: 125%;
+                border-radius: 6px;      /* optional: looks cleaner */
+            ">
+                Scroll and zoom to explore the events you marked around the campus.
+            </span>
+        </p>
+    </div>
+
+    <!-- Filters -->
+    <div class="mb-3 d-flex gap-4 align-items-end filter-container">
+        <!-- Time filter -->
+        <div class="filter-group">
+            <label for="time-filter" class="form-label">Show events of:</label>
+            <select id="time-filter" class="form-select filter-select" style="width: 200px;">
+                <option value="all" selected>All time</option>
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+            </select>
+        </div>
+
+        <!-- Campus filter -->
+        <div class="filter-group">
+            <label for="campus-filter" class="form-label">Campus:</label>
+            <select id="campus-filter" class="form-select filter-select" style="width: 200px;">
+                <option value="all" selected>All campuses</option>
+                <option value="Pleasant Hill">Pleasant Hill</option>
+                <option value="San Ramon">San Ramon</option>
+                <option value="Virtual">Virtual</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Event count -->
+    <p id="event-count" class="fw-bold"></p>
+
+    <!-- Map -->
+    <div id="map" class="map-container"></div>
+
+    {{ events|json_script:"event-data" }}
+</div>
+
+<!-- Leaflet CSS/JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<link rel=”stylesheet” type=”text/css” href=”leaflet/leaflet.css”/>
+<script type='text/javascript' src=”leaflet/leaflet.js”></script>
+
+<style>
+.map-container {
+    height: 575px;       /* map height */
+    width: 110%;
+    transform: translateX(-5%);
+    margin-bottom: 50px; /* space below */
+}
+
+/* Title */
+.page-header-title-wrapper {
+    position: relative;
+    width: 100%;
+    height: 80px;
+}
+
+.page-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(calc(-50% - 20%));
+    font-weight: bold;
+    font-size: 63px;
+    color: #017550;
+    white-space: nowrap;
+}
+
+/* Back button */
+.map-back-btn {
+    position: absolute;
+    top: 16%;
+    left: 0;
+    margin-left: 10%;
+    padding: 12px 20px;
+    background: white;          /* white by default */
+    color: #0a7a33;             /* green border/text */
+    border: 2px solid #0a7a33; 
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.map-back-btn:hover {
+    background-color: #0a7a33; /* fill green on hover */
+    color: white;               /* text turns white */
+    transform: translateY(-1px);
+}
+
+/* Filters */
+/* Make the filter labels bolder and colored */
+.filter-group label {
+    font-weight: 600;        /* slightly heavier */
+    color: #003366;          /* green, or any color you want */
+    font-size: 105%;         /* optional: slightly bigger */
+}
+
+/* Optional: make the select text match the label style */
+.filter-select {
+    font-weight: 500;        /* a bit bold */
+    color: #003366;          /* darker green text */
+}
+
+.filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+#event-count {
+    font-weight: 600;
+    font-size: 16px;
+    color: white;
+    background-color: #0a7a33;
+    padding: 8px 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.virtual-info {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 12px 16px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    font-size: 14px;
+    color: black;
+    font-weight: 600;
+    line-height: 1.4;
+    min-width: 150px;
+    text-align: center;
+}
+
+.virtual-info b {
+    color: #017550; /* make the title green */
+    font-size: 15px;
+}
+
+.virtual-info a.btn {
+    background-color: white;   /* default button background */
+    color: #173F6C;            /* default text color */
+    border: 2px solid #173F6C; /* optional: border to match text */
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+/* Hover effect for the button only */
+.virtual-info a.btn:hover {
+    background-color: #173F6C; /* fill dark blue */
+    color: white;               /* text turns white */
+    font-weight: 700;           /* bold text */
+    text-decoration: none;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const allEvents = JSON.parse(document.getElementById('event-data').textContent || '[]');
+
+    const map = L.map('map').setView([37.9680, -122.0720], 15);
+
+    // Google Maps tiles
+    L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        maxZoom: 19,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    const CAMPUS_COORDS = {
+        "Pleasant Hill": [37.96869136039808, -122.07115448710432],
+        "San Ramon": [37.75485204390859, -121.91025560942018],
+        "Virtual": [37.96869136039808, -122.07115448710432],
+        "all": [37.96869136039808, -122.07115448710432]
+    };
+
+    // Campus borders placeholders (coordinates omitted)
+    let PH_CAMPUS_BORDER = L.polygon([], { color: "#0066ff", weight: 2, fillOpacity: 0.03 });
+    let SR_CAMPUS_BORDER = L.polygon([], { color: "#0066ff", weight: 2, fillOpacity: 0.03 });
+    let currentCampusBorder = 'PH'; // Default
+
+    let markers = [];
+
+    // Date parser YYYY-MM-DD
+    function parseDate(dateStr) {
+        if (!dateStr) return null;
+        const [y, m, d] = dateStr.split('-').map(Number);
+        if (![y, m, d].every(Number.isFinite)) return null;
+        return new Date(y, m - 1, d);
+    }
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    // --- Global Virtual Events (calculated once) ---
+    const globalVirtualEvents = allEvents.filter(e => {
+        if (e.campus !== "Virtual" && (e.lat != null && e.lng != null)) return false; // not virtual
+        if (!e.date) return true; // keep events with no date
+        const d = parseDate(e.date);
+        return d >= today; // only today or future
+    });
+    const globalVirtualTotal = globalVirtualEvents.length;
+
+    // --- Virtual events panel ---
+    const virtualControl = L.control({ position: 'topright' });
+    virtualControl.onAdd = function() {
+        this._div = L.DomUtil.create('div', 'virtual-info');
+        this._div.innerHTML = `
+            <b>Virtual events</b><br>
+            Total: ${globalVirtualTotal}<br>
+            <a href="/calendar?view=virtual" class="btn btn-sm btn-outline-primary mt-2" target="_blank">Go to calendar</a>
+        `;
+        return this._div;
+    };
+    virtualControl.addTo(map);
+
+    // --- Campus border helpers ---
+    function removeCampusBorder() {
+        if (currentCampusBorder === 'PH' && map.hasLayer(PH_CAMPUS_BORDER)) map.removeLayer(PH_CAMPUS_BORDER);
+        if (currentCampusBorder === 'SR' && map.hasLayer(SR_CAMPUS_BORDER)) map.removeLayer(SR_CAMPUS_BORDER);
+        currentCampusBorder = null;
+    }
+    function addCampusBorder(id) {
+        removeCampusBorder();
+        if (id === 'PH') { PH_CAMPUS_BORDER.addTo(map); currentCampusBorder='PH'; }
+        if (id === 'SR') { SR_CAMPUS_BORDER.addTo(map); currentCampusBorder='SR'; }
+    }
+
+    // --- Main render function ---
+    function render(timeFilter, campusFilter) {
+        // Remove existing markers
+        markers.forEach(m => { try { map.removeLayer(m); } catch(e) {} });
+        markers = [];
+
+        let filtered = allEvents.slice();
+
+        // Remove past events
+        filtered = filtered.filter(e => {
+            if (!e.date) return true;
+            const d = parseDate(e.date);
+            if (!d) return true;
+            return d >= today;
+        });
+
+        // Campus filter (Virtual handled separately)
+        if (campusFilter !== 'all' && campusFilter !== 'Virtual') {
+            filtered = filtered.filter(e => e.campus === campusFilter);
+        }
+
+        // Time filter
+        filtered = filtered.filter(e => {
+            if (!e.date) return true;
+            const d = parseDate(e.date);
+            if (!d) return true;
+
+            if (timeFilter === 'today') return d.toDateString() === today.toDateString();
+
+            if (timeFilter === 'week') {
+                const start = new Date(today);
+                const day = (today.getDay() + 6) % 7; // Monday=0
+                start.setDate(today.getDate() - day);
+                start.setHours(0,0,0,0);
+                const end = new Date(start);
+                end.setDate(start.getDate() + 6);
+                end.setHours(23,59,59,999);
+                return d >= start && d <= end;
+            }
+
+            if (timeFilter === 'month') return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+
+            return true;
+        });
+
+        // Map events (have coordinates)
+        const mapEvents = filtered.filter(e => e.lat && e.lng);
+
+        // Collision offsets
+        const coordMap = {};
+        const offsets = [
+            [0.00006,0], [-0.00006,0], [0,0.00006], [0,-0.00006],
+            [0.00006,0.00006], [-0.00006,-0.00006], [0.00006,-0.00006], [-0.00006,0.00006]
+        ];
+
+        mapEvents.forEach(e => {
+            let lat = Number(e.lat), lng = Number(e.lng);
+            const key = `${lat.toFixed(6)},${lng.toFixed(6)}`;
+            if (coordMap[key]) {
+                const idx = coordMap[key] % offsets.length;
+                lat += offsets[idx][0]; lng += offsets[idx][1];
+                coordMap[key]++;
+            } else { coordMap[key] = 1; }
+
+            const marker = L.marker([lat, lng])
+                .addTo(map)
+                .bindPopup(`<b>${e.name||'Event'}</b><br>${e.date||''}<br>Campus: ${e.campus||'—'}<br><a href="/event_detail/${e.id}">View Event</a>`);
+            markers.push(marker);
+        });
+
+        // Update total interested events
+        const totalText = (campusFilter === 'Virtual') ? globalVirtualTotal : filtered.length;
+        const eventCountEl = document.getElementById('event-count');
+        if(eventCountEl) eventCountEl.textContent = `Total interested events: ${totalText}`;
+
+        // Center map & show borders
+        if (campusFilter === "Pleasant Hill") {
+            map.setView(CAMPUS_COORDS["Pleasant Hill"], 17);
+            addCampusBorder('PH');
+        } else if (campusFilter === "San Ramon") {
+            map.setView(CAMPUS_COORDS["San Ramon"], 20);
+            addCampusBorder('SR');
+        } else if (campusFilter === "all") {
+            if (markers.length > 0) {
+                const fg = L.featureGroup(markers);
+                map.fitBounds(fg.getBounds().pad(0.25));
+            } else {
+                map.setView(CAMPUS_COORDS['Pleasant Hill'], 17);
+            }
+            addCampusBorder('PH');
+        } else if (campusFilter === "Virtual") {
+            map.setView(map.getCenter(), map.getZoom());
+            addCampusBorder(currentCampusBorder);
+        }
+    }
+
+    // Initial render
+    render('all', 'all');
+
+    // Event listeners
+    document.getElementById('time-filter')?.addEventListener('change', function(){
+        render(this.value, document.getElementById('campus-filter')?.value || 'all');
+    });
+    document.getElementById('campus-filter')?.addEventListener('change', function(){
+        render(document.getElementById('time-filter')?.value || 'all', this.value);
+    });
+
+    // Optional: replace campus polygon with GeoJSON
+    window.replaceCampusWithGeoJSON = function(id, geojson) {
+        if (id === 'PH' && map.hasLayer(PH_CAMPUS_BORDER)) map.removeLayer(PH_CAMPUS_BORDER);
+        if (id === 'SR' && map.hasLayer(SR_CAMPUS_BORDER)) map.removeLayer(SR_CAMPUS_BORDER);
+        const layer = L.geoJSON(geojson, { style: { color: id==='PH'?'#0066ff':'#ff6600', weight:2, fillOpacity:0.03 }});
+        if (id === 'PH') PH_CAMPUS_BORDER = layer;
+        if (id === 'SR') SR_CAMPUS_BORDER = layer;
+    };
+
+});
+</script>
+{% endblock %}
