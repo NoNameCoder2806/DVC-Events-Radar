@@ -3,10 +3,16 @@
 
 {% block page_title %}
 <div class="page-header-title-wrapper">
-    <button type="button" class="map-back-btn" onclick="history.back()">← Back</button>
+    <button type="button" class="map-back-btn" id="backBtn">← Home</button>
 
-    <span class="page-title">Events Map</span>
+    <span class="page-title">Manage Users</span>
 </div>
+
+<script>
+document.getElementById('backBtn').addEventListener('click', function() {
+    window.location.href = "{% url 'home' %}";
+});
+</script>
 {% endblock %}
 
 {% block header_spacer2 %}
