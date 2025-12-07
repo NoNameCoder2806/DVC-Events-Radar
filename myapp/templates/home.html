@@ -21,15 +21,14 @@
             <form method="get">
                 {% for field in form %}
                     <div class="border-bottom mb-2 pb-2">
-                        <div class="d-flex justify-content-between align-items-center>
+                        <div class="d-flex justify-content-between align-items-center">
                             <span class="fw-bold">{{ field.label }}</span>
-                            <button class="btn btn-sm btn-outline-secondary toggle-btn" type="button" data-toggle="collapse" data-target="#{{ field.name }}Filter">
+                            <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse" data-target="#{{ field.name }}Filter">
                             +
                             </button>
                         </div>
-                        
                         <div class="collapse mt-2" id="{{ field.name}}Filter">
-                            {{ field }}
+                            {{ field }}</p>
                         </div>
                     </div>
                 {% endfor %}

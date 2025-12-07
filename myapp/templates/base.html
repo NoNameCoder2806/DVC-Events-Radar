@@ -7,10 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %} Django App {% endblock %}</title>
     <link rel="stylesheet" href="{% static 'home.css' %}" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
 </head>
 
-<body>
+<body style="background-color:#F5FCFF">
     <div id="topNotification" style="
             position: fixed;
             top: -80px;
@@ -27,50 +28,117 @@
     </div>
 
     {% block show_header %}
-    <header class="d-flex align-items-center p-3 bg-light border-bottom" style="position: relative;">
-        <h1 class="mb-0">
-            <a href="{% url 'home' %}" style="text-decoration: none; color: inherit;">
-                DVC Events
-            </a>
-        </h1>
-        <div class="button-container" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-           display: flex; flex-direction: column; gap: 5px; align-items: center;">
-            {% if user.is_authenticated %}
-            <!-- Avatar button -->
-            <a href="{% url 'user_profile' %}">
-                {% if request.user.users.avatar_url %}
-                <img src="{{ request.user.users.avatar_url.url }}" alt="Avatar"
-                    style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid #007bff;">
-                {% else %}
-                <div style="
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 50%;
-                    background: white;
-                    color: #007bff;
-                    border: 2px solid #007bff;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-weight: bold;
-                    font-size: 18px;
-                    cursor: pointer;
-                ">
-                    {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+    <header class="dvc-header">
+        <!-- STRIPE 1: Dark blue -->
+        <div class="stripe stripe-1">
+            <div class="stripe-container d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-4">
+                    <div class="icon-wrapper">
+                        <img src="{% static 'images/megaphone.png' %}" alt="megaphone" class="filter-icon">
+                    </div>
+                    <span class="stripe-text">Let's Get Reɑdy for Spring!</span>
                 </div>
-                {% endif %}
-            </a>
+                <span class="plus-icon">+</span>
+            </div>
+        </div>
 
-            <!-- Logout button -->
-            <a href="{% url 'logout' %}" class="btn btn-danger mt-2 w-100">Logout</a>
-            {% else %}
-            <a href="{% url 'login' %}" class="btn btn-primary mb-2 w-100">Login</a>
-            <a href="{% url 'register' %}" class="btn btn-success w-100">Register</a>
-            {% endif %}
+        <!-- STRIPE 2: White -->
+        <div class="stripe stripe-2">
+            <div class="stripe-container d-flex justify-content-between align-items-center">
+                <!-- Left: College name -->
+                <div class="d-flex align-items-center college-left">
+                    <div>
+                        <img src="{% static 'images/dvc_logo.png' %}" alt="dvclogo" class="dvclogo">
+                    </div>
+                    <div class="textlogo">DIABLO VALLEY COLLEGE</div>
+                </div>
+
+                <!-- Center: Links -->
+                <div>
+                    <nav class="top-links d-flex gap-2">
+                        <a href="#">InSite</a>
+                        <span class="separator"></span>
+                        <a href="#">Cɑnvɑs</a>
+                        <span class="separator"></span>
+                        <a href="#">Directory</a>
+                        <span class="separator"></span>
+                        <a href="#">English</a>
+                    </nav>
+                </div>
+
+                <!-- Right: Purple mini-bar -->
+                <div class="purple-bar d-flex align-items-center gap-2 px-2 py-1">
+                    <a href="#">Apply Now</a>
+                    <span class="separator"></span>
+                    <a href="#">Register for Clɑsses</a>
+                    <span class="separator"></span>
+                    <a href="#">Request Info</a>
+                </div>
+
+                <div class="search-icon-wrapper">
+                    <i class="fas fa-search ms-2"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- STRIPE 3: Green -->
+        <div class="stripe stripe-3">
+            <div class="stripe-container d-flex justify-content-between align-items-center">
+                <a href="#" class="text-white">Acɑdemics</a>
+                <a href="#" class="text-white">Admissions</a>
+                <a href="#" class="text-white">Finɑncial Aid</a>
+                <a href="#" class="text-white">Student Services</a>
+                <a href="#" class="text-white">Life ɑt DVC</a>
+                <a href="#" class="text-white">About DVC</a>
+            </div>
         </div>
     </header>
     {% endblock %}
+    
+    <!-- Spacer for header -->
+    {% block header_spacer %}
+    <div style="height: 90px;"></div>
+    {% endblock %}
 
+    <!-- Page-specific header -->
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <h1 class="m-0">
+            {% block page_title %}
+                <span class="page-title">Default Title</span>
+            {% endblock %}
+        </h1>
+
+        {% block quick_access %}{% endblock %}  <!-- 🔥 NEW BLOCK HERE -->
+
+        <!-- Top-right user area -->
+        {% block user_header %}
+        <div class="user-header-container">
+            <div class="user-header d-flex flex-column align-items-center gap-3" style="width: 90px;">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'user_profile' %}" class="avatar-btn mb-2">
+                        {% if request.user.users.avatar_url %}
+                            <img src="{{ request.user.users.avatar_url.url }}" class="avatar">
+                        {% else %}
+                            <div class="avatar-placeholder avatar">
+                                {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+                            </div>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'logout' %}" class="btn btn-danger mb-2" style="background-color:#DD1426;">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary mb-2" style="background-color:#2A5491">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-success mb-2" style="background-color:#017550">Register</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endblock %}
+    </div>
+
+    {% block header_spacer2 %}
+    <div style="height: 55px;"></div>
+    {% endblock %}
+
+    <!-- Content -->
     <div class="container-fluid mt-4">
         {% block content %}{% endblock %}
     </div>
