@@ -1,29 +1,31 @@
-{% extends 'base.html' %}
+{% extends 'base_profile.html' %}
 {% block title %}DVC Events Login{% endblock %}
 {% block show_header %}{% endblock %} <!-- hides header/navbar -->
 {% block content %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'login.css' %}">
 
-<div class="login-container">
-    <h1 class="title">DVC Event Radar</h1>
-        {% if error %}
-        <p style="color:red">{{ error }}</p>
-        {% endif %}
+<div class="auth-wrapper">
+    <div class="login-container">
+        <h1 class="title">DVC Event Radar</h1>
+            {% if error %}
+            <p style="color:red">{{ error }}</p>
+            {% endif %}
 
-        <form method="POST" action="{% url 'login' %}">
-            {% csrf_token %}
-            <label for="email"><i>Student Email</i></label>
-            <input type="email" id="email" name="email" value="">
+            <form method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+                <label for="email"><i>Student Email</i></label>
+                <input type="email" id="email" name="email" value="">
 
-            <label for="password"><i>Password</i></label>
-            <input type="password" id="password" name="password" value="">
+                <label for="password"><i>Password</i></label>
+                <input type="password" id="password" name="password" value="">
 
-            <button type="submit" class="login-btn">LOGIN</button>
-        </form>
+                <button type="submit" class="login-btn">LOGIN</button>
+            </form>
 
-    <p class="register-text">
-        First-time user? <a href="{% url 'register' %}">Register</a> here
-    </p>
+        <p class="register-text">
+            First-time user? <a href="{% url 'register' %}">Register</a> here
+        </p>
+    </div>
 </div>
 {% endblock %}

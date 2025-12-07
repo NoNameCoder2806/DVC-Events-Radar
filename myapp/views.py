@@ -19,6 +19,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.conf import settings
 import os
 import json
+from datetime import date, timedelta
 
 from PIL import Image
 
@@ -35,21 +36,24 @@ def get_data():
 
 def home(request):
     query = request.GET.get('q', '')
+    
+    today = datetime.today().date()  # only future or today
     if query:
         events_data = list(Events.objects.search(query))
     else:    
-        events_data = list(Events.objects.all())
+        events_data = list(Events.objects.filter(date__gte=today))  # <- only future events
     
     form = EventFilterForm(request.GET or None)
     if form.is_valid():
         events_data = filter_events(
             events_data,
-            campus = form.cleaned_data.get('campus'),
-            days = form.cleaned_data.get('days'),
-            time_ranges = form.cleaned_data.get('time_range'),
-            event_types = form.cleaned_data.get('event_type'),
+            campus=form.cleaned_data.get('campus'),
+            days=form.cleaned_data.get('days'),
+            time_ranges=form.cleaned_data.get('time_range'),
+            event_types=form.cleaned_data.get('event_type'),
         )
             
+    # Sort by date and start_time
     events_data.sort(key=lambda e: (e.date, e.start_time_obj or datetime.min.time()))
 
     user_role = None
@@ -65,7 +69,7 @@ def home(request):
             user_favorites = []
 
     # ===== PAGINATION =====
-    paginator = Paginator(events_data, 10)  # 10 events per page
+    paginator = Paginator(events_data, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -75,7 +79,7 @@ def home(request):
         'user_favorites': user_favorites,
         'user_id': request.user.id if request.user.is_authenticated else None,
         'user_name': request.user.username if request.user.is_authenticated else None,
-        'user_role' : user_role, 
+        'user_role': user_role, 
         'search_query': query, 
     })
 
@@ -97,29 +101,49 @@ def calendar_view(request):
         except Users.DoesNotExist:
             pass
 
-    # if request.user.is_authenticated:
-    #     try:
-    #         user_obj = Users.objects.get(user=request.user)
-    #         # Get only favorite events for this user
-    #         favorite_events = Favorites.objects.filter(user_ID=user_obj).select_related('event_ID')
-    #         for fav in favorite_events:
-    #             try:
-    #                 event_date = datetime.datetime.strptime(fav.event_ID.date.strip(), "%Y-%m-%d")
-    #                 if event_date.month == today.month and event_date.year == today.year:
-    #                     day = event_date.day
-    #                     events_per_day[day] = events_per_day.get(day, 0) + 1
-    #             except Exception as e:
-    #                 print(f"Skipping invalid date {fav.event_ID.date}: {e}")
-    #     except Users.DoesNotExist:
-    #         pass
-
     context = {
         "events_per_day": events_per_day,  # now only includes “interested” events
     }
     return render(request, "calendar.html", context)
 
-def map(request):
-    return render(request, 'map.html')
+def event_map(request):
+    if request.user.is_authenticated:
+        try:
+            user_profile = Users.objects.get(user=request.user)
+            # Get only events the user favorited
+            interested_events = Events.objects.filter(favorites__user_ID=user_profile).distinct()
+        except Users.DoesNotExist:
+            interested_events = Events.objects.none()
+    else:
+        # Not logged in → no events
+        interested_events = Events.objects.none()
+
+    # Group events by campus
+    pleasant_hill_events = interested_events.filter(campus="Pleasant Hill")
+    san_ramon_events = interested_events.filter(campus="San Ramon")
+    virtual_events = interested_events.filter(campus="Virtual")  # ← your guarantee
+
+    # Convert all interested events to JSON for the map
+    events_for_js = []
+    for e in interested_events:
+        coords = e.coordinates
+        events_for_js.append({
+            "id": e.id,
+            "name": e.name,
+            "date": e.date.strftime("%Y-%m-%d"),
+            "building_code": e.building_code,
+            "campus": e.campus,
+            "lat": coords[0] if coords else None,
+            "lng": coords[1] if coords else None,
+        })
+
+    return render(request, "event_map.html", {
+        "events": events_for_js,
+        "count_ph": pleasant_hill_events.count(),
+        "count_sr": san_ramon_events.count(),
+        "count_virtual": virtual_events.count(),
+        "count_total": interested_events.count(),
+    })
 
 def app_login(request):
     if request.method == "POST":
@@ -345,6 +369,12 @@ def user_profile(request):
         if last_name:
             user_obj.last_name = last_name
 
+        # Update biography and links
+        biography = request.POST.get("biography", "").strip()
+        links = request.POST.get("links", "").strip()
+        profile_obj.biography = biography
+        profile_obj.links = links
+
         # Update avatar if uploaded
         if "avatar" in request.FILES:
             # Delete old avatar if it exists
@@ -353,6 +383,7 @@ def user_profile(request):
             # Save new avatar
             profile_obj.avatar_url = request.FILES["avatar"]
 
+        # Save changes
         user_obj.save()
         profile_obj.save()
         messages.success(request, "Profile updated successfully!")
