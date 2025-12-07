@@ -711,25 +711,37 @@ header.dvc-header {
 
 /* Avatar styling */
 .avatar {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #007bff;
+    margin-right: 40px;
 }
 
 .avatar-placeholder {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background: white;
-    color: #007bff;
-    border: 2px solid #007bff;
+    color: #5e35b1;
+    border: 3px solid #5e35b1;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
     font-size: 18px;
+    margin-right: 40px;
+    font-weight: 700;
+}
+
+.user-header .btn {
+    margin-right: 40px;
+    width: 80px;          /* shorter width */
+    padding: 6px 10px;    /* adjust height */
+    font-size: 14px;      /* smaller text */
+    font-weight: bold;
+    border-radius: 10%;
 }
 
 /* Make the three stripes responsive */
@@ -748,8 +760,62 @@ header.dvc-header {
     margin-top: -10px;     /* move up a bit */
 }
 
-.quick-access-wrapper a {
-    margin-right: 12px;   /* horizontal spacing */
-    margin-bottom: 8px;   /* spacing if they wrap */
-    display: inline-block;
+.quick-access-buttons a {
+    margin-right: 20px !important;
+    margin-left: 20px !important;
+}
+
+.quick-access-buttons .qa-btn {
+    min-width: 140px !important;  /* 🔥 All buttons same width */
+    text-align: center;
+    padding: 12px 15px;
+    margin-left: 12px;  /* spacing between buttons */
+    margin-right: 12px;
+    font-weight: 600;
+}
+
+.qa-btn {
+    text-decoration: none;  /* remove underline */
+    padding: 15px 15px;
+    font-weight: 600;
+    text-align: center;
+    border: 2px solid;        /* outline color set per button */
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;           /* inherit the border color */
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+/* Specific colors */
+.btn-outline-purple {
+    border-color: #5c2d91;
+    color: #5c2d91;
+}
+.btn-outline-blue {
+    border-color: #003366;
+    color: #003366;
+}
+.btn-outline-green {
+    border-color: #0a7a33;
+    color: #0a7a33;
+}
+
+/* Hover effect: fill background and invert text color */
+.qa-btn:hover {
+    color: white !important;
+    text-decoration: none;  /* remove underline */
+}
+
+.btn-outline-purple:hover {
+    background-color: #5c2d91;
+    text-decoration: none;  /* remove underline */
+}
+.btn-outline-blue:hover {
+    background-color: #003366;
+    text-decoration: none;  /* remove underline */
+}
+.btn-outline-green:hover {
+    background-color: #0a7a33;
+    text-decoration: none;  /* remove underline */
 }

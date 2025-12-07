@@ -113,21 +113,21 @@
         <!-- Top-right user area -->
         {% block user_header %}
         <div class="user-header-container">
-            <div class="user-header d-flex align-items-center gap-2">
+            <div class="user-header d-flex flex-column align-items-center gap-3" style="width: 90px;">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'user_profile' %}">
+                    <a href="{% url 'user_profile' %}" class="avatar-btn mb-2">
                         {% if request.user.users.avatar_url %}
                             <img src="{{ request.user.users.avatar_url.url }}" class="avatar">
                         {% else %}
-                            <div class="avatar-placeholder">
+                            <div class="avatar-placeholder avatar">
                                 {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
                             </div>
                         {% endif %}
                     </a>
-                    <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">Logout</a>
+                    <a href="{% url 'logout' %}" class="btn btn-danger mb-2" style="background-color:#DD1426;">Logout</a>
                 {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Login</a>
-                    <a href="{% url 'register' %}" class="btn btn-success btn-sm">Register</a>
+                    <a href="{% url 'login' %}" class="btn btn-primary mb-2" style="background-color:#2A5491">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-success mb-2" style="background-color:#017550">Register</a>
                 {% endif %}
             </div>
         </div>
@@ -135,7 +135,7 @@
     </div>
 
     {% block header_spacer2 %}
-    <div style="height: 80px;"></div>
+    <div style="height: 55px;"></div>
     {% endblock %}
 
     <!-- Content -->

@@ -6,28 +6,28 @@
 {% endblock %}
 
 {% block quick_access %}
-<div class="d-flex flex-wrap align-items-center">
+<div class="quick-access-buttons d-flex flex-wrap align-items-center">
     {% if user_role == "superuser" %}
-    <a href="{% url 'manage_users' %}" class="btn btn-warning me-2 mb-2">
-        🔐 Manage Users
+    <a href="{% url 'manage_users' %}" class="qa-btn btn-outline-purple">
+        🔐 Users
     </a>
     {% endif %}
 
     {% if user_role == "admin" or user_role == "superuser" %}
-    <a href="{% url 'add_event' %}" class="btn btn-warning me-2 mb-2">
+    <a href="{% url 'add_event' %}" class="qa-btn btn-outline-green">
         ➕ Add Event
     </a>
 
-    <a href="{% url 'manage_events' %}" class="btn btn-warning me-2 mb-2">
-        🛠️ Manage Events
+    <a href="{% url 'manage_events' %}" class="qa-btn btn-outline-blue">
+        🛠️ Events
     </a>
     {% endif %}
 
-    <a href="{% url 'calendar' %}" class="btn btn-primary me-2 mb-2">
-        📅 Full Calendar
+    <a href="{% url 'calendar' %}" class="qa-btn btn-outline-green">
+        📅 Calendar
     </a>
-    <a href="{% url 'map' %}" class="btn btn-success me-2 mb-2">
-        🗺️ Event Map
+    <a href="{% url 'map' %}" class="qa-btn btn-outline-blue">
+        🧭 Radar
     </a>
 </div>
 {% endblock %}

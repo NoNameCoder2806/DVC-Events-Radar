@@ -107,11 +107,16 @@ def calendar_view(request):
     return render(request, "calendar.html", context)
 
 def event_map(request):
-    user = request.user
-    user_profile = Users.objects.get(user=user)
-
-    # Get only events the user favorited
-    interested_events = Events.objects.filter(favorites__user_ID=user_profile).distinct()
+    if request.user.is_authenticated:
+        try:
+            user_profile = Users.objects.get(user=request.user)
+            # Get only events the user favorited
+            interested_events = Events.objects.filter(favorites__user_ID=user_profile).distinct()
+        except Users.DoesNotExist:
+            interested_events = Events.objects.none()
+    else:
+        # Not logged in → no events
+        interested_events = Events.objects.none()
 
     # Group events by campus
     pleasant_hill_events = interested_events.filter(campus="Pleasant Hill")
