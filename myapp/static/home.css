@@ -224,57 +224,49 @@ input[type='text']{
 }
 
 .event-box {
-    color: white;
-    background-color: #202020;
+    overflow: hidden;
+    color: black;
+    background-color: white;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border-radius: 10px;
-    padding: 20px;
+    border-radius: 20px;
     height: 100%;
+    box-shadow: 0 0 10px -5px black;
 }
 
 .event-box .event-title {
-    font-size: 1.6em;
+    font-size: 1.3em;
     text-align: center;
-    padding: 25px;
 }
 
-.event-box img {
-    height: 250px;
+.event-top-box{
     width: 100%;
-    background-color: gray;
+    aspect-ratio: 1;
+    overflow: hidden;
+}
+.event-box .event-image {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 20px 20px 0 0;
+    background-size: contain;
+    background-position: center;
+    transition: transform .5s ease;
+}.event-image:hover{
+    -webkit-transform: scale(1.1);
+    -ms-transform: scale(1.1);
+    transform: scale(1.1);
 }
 
 .event-box .info-summary {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    height: 150px;
-    width: 50%;
     box-sizing: border-box;
     padding: 15px;
 }
 
-.add-fav,
-.see-details {
-    background-color: gray;
-    /* fallback color */
-    color: white;
-    /* make text visible */
-    border: none;
-    /* remove default button border */
-    padding: 15px 20px;
-    /* adjust spacing */
-    border-radius: 50px;
-    text-align: center;
-    margin: 5px;
-    cursor: pointer;
-    /* shows pointer on hover */
-    font-size: 1em;
-}
-
-.add-fav {
+.interesterd-btn {
     background-color: goldenrod !important;
     color: white !important;
     border: none !important;
@@ -290,6 +282,16 @@ input[type='text']{
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
+}
+
+.additional-buttons, .info-summary, .event-title{
+    padding: 0 15px 0 15px;
+}.additional-buttons{
+    padding-bottom: 15px;
+}.event-title{
+    padding-top: 20px;
+    font-weight: bold;
 }
 
 .event-row {
@@ -335,11 +337,28 @@ input[type='text']{
     font-weight: bold;
 }
 
-.additional-buttons button:hover {
+.additional-buttons .btn{
+    width: 90%;
+    background-color: gray;
+    /* fallback color */
+    color: white;
+    /* make text visible */
+    border: none;
+    /* remove default button border */
+    border-radius: 50px;
+    text-align: center;
+    margin: 5px;
+    cursor: pointer;
+    /* shows pointer on hover */
+    font-size: 1em;
+    transition: all .2s ease;
+}
+.additional-buttons .btn:hover {
     background-color: #555;
-    -webkit-transform: scale(1.03);
-    -ms-transform: scale(1.03);
-    transform: scale(1.03);
+    -webkit-transform: scale(1.1);
+    -ms-transform: scale(1.1);
+    transform: scale(1.1);
+    width: 82%;
 }
 
 /* Pagination wrapper */
