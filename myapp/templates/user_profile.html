@@ -1,6 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'base_profile.html' %}
 {% block title %}My Profile{% endblock %}
-
+{% block show_header %}{% endblock %} <!-- hides header/navbar -->
 {% block content %}
 <style>
     .profile-page {
@@ -43,26 +43,18 @@
         background: linear-gradient(90deg, #2e7d32 0%, #5e35b1 100%);
     }
 
-    .right-section {
-        flex: 1;
-        padding-left: 20px;
-    }
-
     .left-section {
         flex: 0 0 200px;
-        display: flex;            /* make it a flex container */
-        flex-direction: column;   /* stack items vertically */
-        align-items: center;      /* center horizontally */
         padding-top: 60px;
-        justify-content: center;
-        min-height: 100%;
+    }
+
+    .right-section {
+        flex: 1;
     }
 
     .avatar-section {
-        display: flex;
-        flex-direction: column;
-        align-items: center;      /* center avatar + button horizontally */
-        width: 100%;              /* optional: take full width of left-section */
+        text-align: left;
+        margin-bottom: 30px;
     }
 
     .avatar-circle {
@@ -241,6 +233,25 @@
         transform: translateY(0);
     }
 
+    .container-fluid.mt-4 {
+        position: relative;
+        top: -40px;   /* moves content up by 50px */
+    }
+
+    .container-fluid {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        flex: 1;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh; /* full viewport height */
+        overflow-y: hidden;
+    }
+
+
     @media (max-width: 768px) {
         .profile-header {
             flex-direction: column;
@@ -304,7 +315,7 @@
                     <h3 class="info-section-title">Links</h3>
                     <p class="info-text">
                         {% if user_obj.users.links %}
-                            {{ user_obj.users.links|linebreaks|urlize }}
+                            {{ user_obj.users.links|linebreaks }}
                         {% else %}
                             No links have been added
                         {% endif %}

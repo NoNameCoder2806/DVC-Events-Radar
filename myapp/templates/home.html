@@ -1,7 +1,36 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block page_title %}EVENTS{% endblock %}
+{% block page_title %}
+    <span class="page-title">Events</span>
+{% endblock %}
+
+{% block quick_access %}
+<div class="d-flex flex-wrap align-items-center">
+    {% if user_role == "superuser" %}
+    <a href="{% url 'manage_users' %}" class="btn btn-warning me-2 mb-2">
+        🔐 Manage Users
+    </a>
+    {% endif %}
+
+    {% if user_role == "admin" or user_role == "superuser" %}
+    <a href="{% url 'add_event' %}" class="btn btn-warning me-2 mb-2">
+        ➕ Add Event
+    </a>
+
+    <a href="{% url 'manage_events' %}" class="btn btn-warning me-2 mb-2">
+        🛠️ Manage Events
+    </a>
+    {% endif %}
+
+    <a href="{% url 'calendar' %}" class="btn btn-primary me-2 mb-2">
+        📅 Full Calendar
+    </a>
+    <a href="{% url 'map' %}" class="btn btn-success me-2 mb-2">
+        🗺️ Event Map
+    </a>
+</div>
+{% endblock %}
 
 {% block content %}
 <!-- Top slide-down alert -->
@@ -15,8 +44,11 @@
 
 <div class="container-fluid">
     <div class="row">
+        <!-- ⬅️ Left Spacer -->
+        <div class="col-12 col-md-1" style="max-width: 85px;"><!-- Empty column for spacing --></div>
+
         <!-- 🧭 Left Column -->
-        <div class="col-12 col-md-2">
+        <div class="col-12 col-md-2 pe-4">
             <h5 class="mb-3 filter-title">Filters</h5>
 
             <form id="filterForm" onsubmit="return false;">
@@ -55,8 +87,10 @@
             </form>
         </div>
 
+        <div class="col-12 col-md-1" style="max-width: 85px;"><!-- empty spacer --></div>
+
         <!-- 🎟️ Middle Column -->
-        <div class="col-12 col-md-8">
+        <div class="col-12 col-md-8 ps-4">
             <!-- Short Description -->
             <div style="width: 100%;">
                 <p style="font-weight: bold; font-style: italic; color: #003366; background-color: white; padding: 5px; margin: 0 0 15px 0; font-size: 125%;">
@@ -117,34 +151,8 @@
             </div>
         </div>
 
-         <!-- 📅 Right Column -->
-        <div class="col-12 col-md-2">
-            <div class="p-3 bg-light border rounded d-flex flex-column align-items-center">
-                <h5>Quick Access</h5>
-                <!-- Manage Users Button -->
-                {% if user_role == "superuser" %}
-                <a href="{% url 'manage_users' %}" class="btn btn-warning mb-2 w-100">
-                    🔐 Manage Users
-                </a>
-                {% endif %}
-
-                <!-- Add Event Button -->
-                {% if user_role == "admin" or user_role == "superuser" %}
-                <a href="{% url 'add_event' %}" class="btn btn-warning mb-2 w-100">
-                    ➕ Add Event
-                </a>
-
-                <!-- Manage Events Button -->
-                <a href="{% url 'manage_events' %}" class="btn btn-warning mb-2 w-100">
-                    🛠️ Manage Events
-                </a>
-                {% endif %}
-
-                <!-- Quick Access Buttons -->
-                <a href="{% url 'calendar' %}" class="btn btn-primary mb-2 w-100">📅 Full Calendar</a>
-                <a href="{% url 'map' %}" class="btn btn-success w-100">🗺️ Event Map</a>
-            </div>
-        </div>
+        <!-- ⬅️ Right Spacer -->
+        <div class="col-12 col-md-1"><!-- Empty column for spacing --></div>
     </div>
 </div>
 {% endblock %}

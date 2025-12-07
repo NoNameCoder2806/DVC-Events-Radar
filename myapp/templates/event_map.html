@@ -52,6 +52,9 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
+<link rel=”stylesheet” type=”text/css” href=”leaflet/leaflet.css”/>
+<script type='text/javascript' src=”leaflet/leaflet.js”></script>
+
 <style>
 .virtual-info {
     background: rgba(255,255,255,0.95);
@@ -62,7 +65,7 @@
 }
 
 .map-container {
-    height: 700px;       /* map height */
+    height: 575px;       /* map height */
     width: 100%;
     margin-bottom: 50px; /* space below */
 }
@@ -73,8 +76,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const allEvents = JSON.parse(document.getElementById('event-data').textContent || '[]');
 
     const map = L.map('map').setView([37.9680, -122.0720], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
+    L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
         maxZoom: 19,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
         attribution: '© OpenStreetMap'
     }).addTo(map);
 

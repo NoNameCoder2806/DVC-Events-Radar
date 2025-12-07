@@ -93,38 +93,50 @@
             </div>
         </div>
     </header>
-
-    <!-- Top-right user area
-    <div class="user-header-container">
-        {% block user_header %}
-        <div class="user-header d-flex align-items-center gap-2">
-            {% if user.is_authenticated %}
-                <a href="{% url 'user_profile' %}">
-                    {% if request.user.users.avatar_url %}
-                        <img src="{{ request.user.users.avatar_url.url }}" class="avatar">
-                    {% else %}
-                        <div class="avatar-placeholder">
-                            {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
-                        </div>
-                    {% endif %}
-                </a>
-                <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">Logout</a>
-            {% else %}
-                <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Login</a>
-                <a href="{% url 'register' %}" class="btn btn-success btn-sm">Register</a>
-            {% endif %}
-        </div>
-        {% endblock %}
-    </div> -->
     {% endblock %}
     
     <!-- Spacer for header -->
-    <div style="height: 125px;"></div>
+    {% block header_spacer %}
+    <div style="height: 90px;"></div>
+    {% endblock %}
 
     <!-- Page-specific header -->
-    <div class="page-header">
-        <h1>{% block page_title %}Default Title{% endblock %}</h1>
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <h1 class="m-0">
+            {% block page_title %}
+                <span class="page-title">Default Title</span>
+            {% endblock %}
+        </h1>
+
+        {% block quick_access %}{% endblock %}  <!-- 🔥 NEW BLOCK HERE -->
+
+        <!-- Top-right user area -->
+        {% block user_header %}
+        <div class="user-header-container">
+            <div class="user-header d-flex align-items-center gap-2">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'user_profile' %}">
+                        {% if request.user.users.avatar_url %}
+                            <img src="{{ request.user.users.avatar_url.url }}" class="avatar">
+                        {% else %}
+                            <div class="avatar-placeholder">
+                                {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+                            </div>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-success btn-sm">Register</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endblock %}
     </div>
+
+    {% block header_spacer2 %}
+    <div style="height: 80px;"></div>
+    {% endblock %}
 
     <!-- Content -->
     <div class="container-fluid mt-4">

@@ -122,11 +122,18 @@ body {
     border-color:black;
 }
 
-header {
+/* header {
     height: 20vh;
     color: var(--green);
     background-color: white;
     position: relative;
+} */
+
+header {
+    color: var(--green);
+    background-color: white;
+    position: relative;
+    height: auto; /* <-- important */
 }
 
 header h1 {
@@ -729,4 +736,20 @@ header.dvc-header {
 @media(max-width: 768px) {
     .stripe-2, .stripe-3 { flex-direction: column; align-items: flex-start; gap: 5px; }
     .purple-bar { width: 100%; justify-content: space-around; margin-top: 5px; }
+}
+
+.page-title {
+    font-family: 'Arial Black', Arial, sans-serif;
+    margin-left: 115px; /* space after the title */
+    display: inline-block; /* ensure spacing works with buttons next to it */
+    font-weight: bold;
+    color: #017550;   /* green color */
+    font-size: 63px;
+    margin-top: -10px;     /* move up a bit */
+}
+
+.quick-access-wrapper a {
+    margin-right: 12px;   /* horizontal spacing */
+    margin-bottom: 8px;   /* spacing if they wrap */
+    display: inline-block;
 }
