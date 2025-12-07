@@ -1,6 +1,14 @@
 {% extends 'base.html' %}
 {% block title %}Manage Users{% endblock %}
 
+{% block page_title %}
+<div class="page-header-title-wrapper">
+    <button type="button" class="user-back-btn" onclick="history.back()">← Back</button>
+
+    <span class="page-title">Manage Users</span>
+</div>
+{% endblock %}
+
 {% block content %}
 <div id="topNotification" style="
     position: fixed;
@@ -19,15 +27,6 @@
 
 <div class="d-flex justify-content-center mt-5">
     <div class="w-75">
-
-        <!-- Top bar with back button -->
-        <div class="d-flex align-items-center mb-4 position-relative">
-            <div class="position-absolute" style="left: 0;">
-                <a href="{% url 'home' %}" class="btn btn-secondary">&larr; Back</a>
-            </div>
-            <h2 class="mx-auto text-center">Manage Users</h2>
-        </div>
-
         <!-- Users table -->
         <table class="table table-striped">
             <thead>
@@ -111,6 +110,48 @@
         </div>
     </div>
 </div>
+
+<style>
+/* Title */
+.page-header-title-wrapper {
+    position: relative;
+    width: 100%;
+    height: 80px;
+}
+
+.page-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(calc(-50% - 15%));
+    font-weight: bold;
+    font-size: 63px;
+    color: #017550;
+    white-space: nowrap;
+}
+
+/* Back button */
+.user-back-btn {
+    position: absolute;
+    top: 16%;
+    left: 0;
+    margin-left: 10%;
+    padding: 12px 20px;
+    background: white;          /* white by default */
+    color: #0a7a33;             /* green border/text */
+    border: 2px solid #0a7a33; 
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.user-back-btn:hover {
+    background-color: #0a7a33; /* fill green on hover */
+    color: white;               /* text turns white */
+    transform: translateY(-1px);
+}
+</style>
 
 <!-- Bootstrap 5 JS Bundle (needs to be BEFORE your script) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -202,5 +243,4 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
-
 {% endblock %}

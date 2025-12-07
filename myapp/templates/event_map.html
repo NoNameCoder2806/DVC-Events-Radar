@@ -2,12 +2,11 @@
 {% block title %}Event Map{% endblock %}
 
 {% block page_title %}
-    <div class="position-relative mb-3 text-center">
-        <button type="button" class="map-back-btn" onclick="history.back()">
-            ← Back
-        </button>
-        <span class="page-title" style="text-align: center !important;">Event Map</span>
-    </div>
+<div class="page-header-title-wrapper">
+    <button type="button" class="map-back-btn" onclick="history.back()">← Back</button>
+
+    <span class="page-title">Events Map</span>
+</div>
 {% endblock %}
 
 {% block header_spacer2 %}
@@ -82,21 +81,28 @@
 }
 
 /* Title */
+.page-header-title-wrapper {
+    position: relative;
+    width: 100%;
+    height: 80px;
+}
+
 .page-title {
-    display: inline-block;
-    margin-left: 580px;  /* tweak this number until it visually looks centered */
+    position: absolute;
+    left: 50%;
+    transform: translateX(calc(-50% - 20%));
     font-weight: bold;
     font-size: 63px;
     color: #017550;
-    margin-top: -10px;
+    white-space: nowrap;
 }
 
 /* Back button */
 .map-back-btn {
     position: absolute;
-    top: 10%;
+    top: 16%;
     left: 0;
-    margin-left: 13%;
+    margin-left: 10%;
     padding: 12px 20px;
     background: white;          /* white by default */
     color: #0a7a33;             /* green border/text */
