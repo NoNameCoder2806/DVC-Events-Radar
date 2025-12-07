@@ -86,7 +86,6 @@ document.getElementById('backBtn').addEventListener('click', function() {
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title">Delete Event</h5>
                 <button type="button" class="close" data-dismiss="modal">
@@ -290,7 +289,7 @@ body {
 }
 
 .modal-header {
-    background-color: #173F6C;  /* green to match the DVC theme */
+    background-color: #173F6C;  /* blue to match the DVC theme */
     font-weight: bold;                      /* make header text bold */
     color: white;                           /* text color */
 }
@@ -312,6 +311,16 @@ body {
     min-height: 45px;       /* optional: uniform height */
     font-weight: bold;
     font-size: 18px;
+    outline: none !important;
+    box-shadow: none !important; /* removes the default Bootstrap focus shadow */
+}
+
+/* Optional: also remove for table buttons */
+.edit-event-btn:focus,
+.delete-event-btn:focus,
+.event-back-btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 /* Delete button */
@@ -418,8 +427,11 @@ document.querySelectorAll(".delete-event-btn").forEach(btn => {
         }
 
         modalName.style.color = mainColor;
-        modalHeader.style.setProperty("background-color", mainColor, "important");
-        cancelBtn.style.borderColor = mainColor;
+
+        const red = "#DD1426";
+        modalHeader.style.setProperty("background-color", red, "important");        cancelBtn.style.borderColor = mainColor;
+        
+        // Cancel button hover
         cancelBtn.style.color = mainColor;
         cancelBtn.onmouseenter = () => {
             cancelBtn.style.backgroundColor = mainColor;
