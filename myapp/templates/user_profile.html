@@ -46,6 +46,7 @@
     .left-section {
         flex: 0 0 200px;
         padding-top: 60px;
+        position: relative; /* needed for absolute positioning of back button */
     }
 
     .right-section {
@@ -53,8 +54,13 @@
     }
 
     .avatar-section {
+        display:flex;
+        flex-direction: column;
+        transform: translateX(-9px);
+        align-items: center; /* centers horizontally */
         text-align: left;
         margin-bottom: 30px;
+        margin-top: 30px; /* <-- Add this to move avatar down */
     }
 
     .avatar-circle {
@@ -251,6 +257,27 @@
         overflow-y: hidden;
     }
 
+    .back-btn {
+        position: absolute;
+        top: 0;       
+        left: 0;      
+        padding: 10px 15px;       /* make it bigger */
+        background: white;         /* white by default */
+        color: #5e35b1;            /* purple border & text */
+        font-weight: 600;
+        border: 2px solid #5e35b1; /* outline */
+        border-radius: 8px;
+        text-decoration: none !important;
+        font-size: 1em;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .back-btn:hover {
+        background-color: #5e35b1; /* fill with purple on hover */
+        color: white;              /* text becomes white */
+        transform: translateY(-1px);
+    }
 
     @media (max-width: 768px) {
         .profile-header {
@@ -268,6 +295,7 @@
     <div class="profile-layout">
         <div class="profile-header">
             <div class="left-section">
+                <a href="{% url 'home' %}" class="back-btn">← Back</a>  <!-- <-- Add this -->
                 <div class="avatar-section">
                     <div class="avatar-circle">
                         {% if user_obj.users.avatar_url %}
