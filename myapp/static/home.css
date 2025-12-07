@@ -41,6 +41,13 @@ body {
     background-color: var(--purple) !important;
 }
 
+.collapse {
+    overflow: hidden;       /* essential for collapse */
+    transition: height 0.35s ease;
+    display: block;          /* allow JS to control height */
+    height: 0;               /* start closed */
+}
+
 /* The container */
 .form-check {
     display: flex !important;
@@ -818,4 +825,13 @@ header.dvc-header {
 .btn-outline-green:hover {
     background-color: #0a7a33;
     text-decoration: none;  /* remove underline */
+}
+
+.filter-content {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.35s ease;
+}
+.filter-content.show {
+    height: auto; /* handled in JS via scrollHeight */
 }

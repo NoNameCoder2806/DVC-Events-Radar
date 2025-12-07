@@ -58,7 +58,6 @@
                             <span class="fw-bold filter-category">{{ field.label }}</span>
                             <button class="btn btn-sm btn-outline-secondary toggle-btn" 
                                     type="button" 
-                                    data-toggle="collapse"
                                     data-target="#{{ field.name }}Filter" 
                                     aria-expanded="false" 
                                     aria-controls="{{ field.name }}Filter">
@@ -66,7 +65,7 @@
                             </button>
                         </div>
                         
-                        <div class="collapse mt-2" id="{{ field.name }}Filter">
+                        <div class="filter-content mt-2" id="{{ field.name }}Filter">
                             {% for checkbox in field %}
                                 <label class="form-check filter-checkbox-label">
                                     <input 
@@ -163,37 +162,36 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 
 <script>
-$(document).ready(function() {
-    function initializeCollapseButtons(context = document) {
-        $(context).find('.toggle-btn').each(function() {
-            var $btn = $(this);
-            var targetSelector = $btn.data('target');
-            var $target = $(targetSelector);
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const target = document.querySelector(btn.dataset.target);
+        if (!target) return;
 
-            if (!$target.length) return;
+        const isOpen = target.classList.contains('show');
 
-            // Set button text according to current state
-            $btn.text($target.hasClass('show') ? '−' : '+');
-
-            // Make sure we don't bind duplicate events
-            $target.off('shown.bs.collapse hidden.bs.collapse');
-
-            // Listen for toggle
-            $target.on('shown.bs.collapse', function() {
-                $btn.text('−');
+        if (isOpen) {
+            // Close
+            target.style.height = target.scrollHeight + 'px';
+            requestAnimationFrame(() => target.style.height = '0px');
+            target.addEventListener('transitionend', function handler() {
+                target.classList.remove('show');
+                target.style.height = '';
+                btn.textContent = '+'; // ✅ Update button here
+                target.removeEventListener('transitionend', handler);
             });
-            $target.on('hidden.bs.collapse', function() {
-                $btn.text('+');
+        } else {
+            // Open
+            target.classList.add('show');
+            const height = target.scrollHeight;
+            target.style.height = '0px';
+            requestAnimationFrame(() => target.style.height = height + 'px');
+            target.addEventListener('transitionend', function handler() {
+                target.style.height = '';
+                btn.textContent = '−'; // ✅ Update button here
+                target.removeEventListener('transitionend', handler);
             });
-        });
-    }
-
-    // Initialize on page load
-    initializeCollapseButtons();
-
-    // Re-initialize after AJAX updates if collapses are replaced
-    // For example, after applyFilters()
-    window.initializeCollapseButtons = initializeCollapseButtons; 
+        }
+    });
 });
 </script>
 
