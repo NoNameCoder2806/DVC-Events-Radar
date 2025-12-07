@@ -5,6 +5,7 @@
 }
 
 body {
+    background-color: #F5FCFF;
     --green: #017550;
     --blue: #173f6c;
     --purple: #5d2e8f;
@@ -13,7 +14,7 @@ body {
 }
 
 /* Filter button */
-.col-md-2 button{
+.col-md-3 button{
     background-color: var(--blue) !important;
     height: 30px;
     width: 30px;
@@ -29,7 +30,7 @@ body {
 }
 
 /* Hover effect make filter button larger and purple */
-.col-md-2 button:hover{
+.col-md-3 button:hover{
     background-color: var(--purple) !important;
     -webkit-transform: scale(1.2);
     -ms-transform: scale(1.2);
@@ -37,7 +38,7 @@ body {
 }
 
 /* Activated filter */
-.col-md-2 button:not(.collapsed){
+.col-md-3 button:not(.collapsed){
     background-color: var(--purple) !important;
 }
 
@@ -424,12 +425,14 @@ input[type='text']{
 
 /* Filters main title */
 .filter-title {
+    margin-left: 5%;
+    margin-top: 20px;
     font-size: 200%;
     color: #003366; /* dark blue */
     font-weight: bold;
     border-bottom: 2px solid #003366; /* small line under text */
-    padding-bottom: 5px;     /* space between text and line */
-    display: inline-block;   /* line width matches text */
+    display: inline-block;
+    margin-bottom: 25px !important;
 }
 
 /* Each category label */
@@ -451,13 +454,19 @@ input[type='text']{
 }
 
 .filter-block {
-    margin-bottom: 1.5rem; /* space between blocks */
+    margin-left: 5%;
+    margin-bottom: 1rem; /* space between blocks */
     border-bottom: 1px solid #dee2e6; /* keep the border if you want */
     padding-bottom: 0.5rem; /* optional */
 }
 
+.filter-box {
+    background: white;
+    border-radius: 30px;
+    max-width: 300px;       /* fills the column */
+}
+
 /* Base File */
-/* Universal stripe container for consistent spacing */
 .stripe-container {
     width: 100%;
     max-width: 1300px; /* or whatever max width you want */
@@ -773,6 +782,7 @@ header.dvc-header {
 }
 
 .quick-access-buttons .qa-btn {
+    background-color: white;
     min-width: 140px !important;  /* 🔥 All buttons same width */
     text-align: center;
     padding: 12px 15px;

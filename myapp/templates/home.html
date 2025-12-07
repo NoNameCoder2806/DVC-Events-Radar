@@ -45,57 +45,72 @@
 <div class="container-fluid">
     <div class="row">
         <!-- ⬅️ Left Spacer -->
-        <div class="col-12 col-md-1" style="max-width: 85px;"><!-- Empty column for spacing --></div>
+        <div class="col-12 col-md-1" style="max-width: 100px;"><!-- Empty column for spacing --></div>
 
         <!-- 🧭 Left Column -->
-        <div class="col-12 col-md-2 pe-4">
-            <h5 class="mb-3 filter-title">Filters</h5>
+        <div class="col-12 col-md-3 pe-4">
+            <!-- White Box Wrapper -->
+            <div class="filter-box p-3">
+                <h5 class="filter-title">Filters</h5>
 
-            <form id="filterForm" onsubmit="return false;">
-                {% for field in form %}
-                    <div class="filter-block">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="fw-bold filter-category">{{ field.label }}</span>
-                            <button class="btn btn-sm btn-outline-secondary toggle-btn" 
-                                    type="button" 
-                                    data-target="#{{ field.name }}Filter" 
-                                    aria-expanded="false" 
-                                    aria-controls="{{ field.name }}Filter">
-                                +
-                            </button>
+                <form id="filterForm" onsubmit="return false;">
+                    {% for field in form %}
+                        <div class="filter-block">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold filter-category">{{ field.label }}</span>
+                                <button class="btn btn-sm btn-outline-secondary toggle-btn" 
+                                        type="button" 
+                                        data-target="#{{ field.name }}Filter" 
+                                        aria-expanded="false" 
+                                        aria-controls="{{ field.name }}Filter"
+                                        style="margin-right:5%;">
+                                    +
+                                </button>
+                            </div>
+                            
+                            <div class="filter-content mt-2" id="{{ field.name }}Filter">
+                                {% for checkbox in field %}
+                                    <label class="form-check filter-checkbox-label">
+                                        <input 
+                                            type="checkbox"
+                                            name="{{ field.name }}"
+                                            value="{{ checkbox.data.value }}"
+                                            id="{{ checkbox.id_for_label }}"
+                                            class="filter-checkbox"
+                                            {% if checkbox.data.selected %}checked{% endif %}
+                                        >
+                                        {{ checkbox.choice_label }}
+                                        <span class="checkmark"></span>
+                                    </label>
+                                {% endfor %}
+                            </div>
                         </div>
-                        
-                        <div class="filter-content mt-2" id="{{ field.name }}Filter">
-                            {% for checkbox in field %}
-                                <label class="form-check filter-checkbox-label">
-                                    <input 
-                                        type="checkbox"
-                                        name="{{ field.name }}"
-                                        value="{{ checkbox.data.value }}"
-                                        id="{{ checkbox.id_for_label }}"
-                                        class="filter-checkbox"
-                                        {% if checkbox.data.selected %}checked{% endif %}
-                                    >
-                                    {{ checkbox.choice_label }}
-                                    <span class="checkmark"></span>
-                                </label>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endfor %}
-            </form>
+                    {% endfor %}
+                </form>
+            </div>
         </div>
 
-        <div class="col-12 col-md-1" style="max-width: 85px;"><!-- empty spacer --></div>
+        <div class="col-12 col-md-1" style="max-width: 55px;"><!-- empty spacer --></div>
 
         <!-- 🎟️ Middle Column -->
-        <div class="col-12 col-md-8 ps-4">
+        <div class="col-12 col-md-7 ps-4">
             <!-- Short Description -->
             <div style="width: 100%;">
-                <p style="font-weight: bold; font-style: italic; color: #003366; background-color: white; padding: 5px; margin: 0 0 15px 0; font-size: 125%;">
-                    Diablo Valley College (DVC) hosts a diverse range of events that cater to the interests and needs of its vibrant student community. 
-                    From academic workshops and career fairs to guest speaker sessions, DVC offers numerous opportunities for students to engage, learn, and connect. 
-                    The college regularly features performances, art exhibits, and athletic events, ensuring there's always something exciting happening on campus.
+                <p style="margin: 0 0 15px 0;">
+                    <span style="
+                        font-weight: bold;
+                        font-style: italic;
+                        color: #003366;
+                        background-color: white;
+                        padding: 5px;
+                        font-size: 125%;
+                        border-radius: 6px;      /* optional: looks cleaner */
+                        line-height: 2;   /* increase line spacing */
+                    ">
+                        Diablo Valley College (DVC) hosts a diverse range of events that cater to the interests and needs of its vibrant student community. 
+                        From academic workshops and career fairs to guest speaker sessions, DVC offers numerous opportunities for students to engage, learn, and connect. 
+                        The college regularly features performances, art exhibits, and athletic events, ensuring there's always something exciting happening on campus.
+                    </span>
                 </p>
             </div>
 

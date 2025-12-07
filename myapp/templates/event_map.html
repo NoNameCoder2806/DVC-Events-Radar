@@ -16,14 +16,28 @@
 
 {% block content %}
 <div class="container mt-4">
-    <p>Scroll around to explore events.</p>
+    <div style="width: 100%;">
+        <p style="margin: 0 0 15px 0;">
+            <span style="
+                font-weight: bold;
+                font-style: italic;
+                color: #003366;
+                background-color: white;
+                padding: 5px;
+                font-size: 125%;
+                border-radius: 6px;      /* optional: looks cleaner */
+            ">
+                Scroll and zoom to explore the events you marked around the campus.
+            </span>
+        </p>
+    </div>
 
     <!-- Filters -->
-    <div class="mb-3 d-flex gap-4 align-items-end">
+    <div class="mb-3 d-flex gap-4 align-items-end filter-container">
         <!-- Time filter -->
-        <div>
-            <label for="time-filter" class="form-label">Show events:</label>
-            <select id="time-filter" class="form-select" style="width: 200px;">
+        <div class="filter-group">
+            <label for="time-filter" class="form-label">Show events of:</label>
+            <select id="time-filter" class="form-select filter-select" style="width: 200px;">
                 <option value="all" selected>All time</option>
                 <option value="today">Today</option>
                 <option value="week">This Week</option>
@@ -32,9 +46,9 @@
         </div>
 
         <!-- Campus filter -->
-        <div>
+        <div class="filter-group">
             <label for="campus-filter" class="form-label">Campus:</label>
-            <select id="campus-filter" class="form-select" style="width: 200px;">
+            <select id="campus-filter" class="form-select filter-select" style="width: 200px;">
                 <option value="all" selected>All campuses</option>
                 <option value="Pleasant Hill">Pleasant Hill</option>
                 <option value="San Ramon">San Ramon</option>
@@ -60,14 +74,6 @@
 <script type='text/javascript' src=”leaflet/leaflet.js”></script>
 
 <style>
-.virtual-info {
-    background: rgba(255,255,255,0.95);
-    padding: 8px 12px;
-    border-radius: 6px;
-    box-shadow: 0 0 6px rgba(0,0,0,0.3);
-    font-size: 14px;
-}
-
 .map-container {
     height: 575px;       /* map height */
     width: 110%;
@@ -107,6 +113,80 @@
     color: white;               /* text turns white */
     transform: translateY(-1px);
 }
+
+/* Filters */
+/* Make the filter labels bolder and colored */
+.filter-group label {
+    font-weight: 600;        /* slightly heavier */
+    color: #003366;          /* green, or any color you want */
+    font-size: 105%;         /* optional: slightly bigger */
+}
+
+/* Optional: make the select text match the label style */
+.filter-select {
+    font-weight: 500;        /* a bit bold */
+    color: #003366;          /* darker green text */
+}
+
+.filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+#event-count {
+    font-weight: 600;
+    font-size: 16px;
+    color: white;
+    background-color: #0a7a33;
+    padding: 8px 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.virtual-info {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 12px 16px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    font-size: 14px;
+    color: black;
+    font-weight: 600;
+    line-height: 1.4;
+    min-width: 150px;
+    text-align: center;
+}
+
+.virtual-info b {
+    color: #017550; /* make the title green */
+    font-size: 15px;
+}
+
+.virtual-info a.btn {
+    background-color: white;   /* default button background */
+    color: #173F6C;            /* default text color */
+    border: 2px solid #173F6C; /* optional: border to match text */
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+/* Hover effect for the button only */
+.virtual-info a.btn:hover {
+    background-color: #173F6C; /* fill dark blue */
+    color: white;               /* text turns white */
+    font-weight: 700;           /* bold text */
+    text-decoration: none;
+}
 </style>
 
 <script>
@@ -115,166 +195,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const map = L.map('map').setView([37.9680, -122.0720], 15);
 
-    // Google map version
+    // Google Maps tiles
     L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
         maxZoom: 19,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
         attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // The map version with all the labels
-    // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    //     maxZoom: 19,
-    //     attribution: '© OpenStreetMap'
-    // }).addTo(map);
-
     const CAMPUS_COORDS = {
         "Pleasant Hill": [37.96869136039808, -122.07115448710432],
-        "San Ramon":     [37.75485204390859, -121.91025560942018],
-        "Virtual":       [37.96869136039808, -122.07115448710432],
-        "all":           [37.96869136039808, -122.07115448710432]
+        "San Ramon": [37.75485204390859, -121.91025560942018],
+        "Virtual": [37.96869136039808, -122.07115448710432],
+        "all": [37.96869136039808, -122.07115448710432]
     };
 
-    // Pleasant Hill Campus Border
-    const PH_CAMPUS_BORDER = L.polygon([
-        [37.97134836217194,-122.07288373236469],
-        [37.97146123776105,-122.06687321337103],
-        [37.97107724396159,-122.06707124344571],
-        [37.97097286924392,-122.06713777791725],
-        [37.97086791663591,-122.06717049775352],
-        [37.970691197517084,-122.06717850877236],
-        [37.96974825548429,-122.06717086674271],
-        [37.96958033403706,-122.06717067894337],
-        [37.96940136830274,-122.06714390886646],
-        [37.969226769009566,-122.06706563233384],
-        [37.96884830727919,-122.06683971676803],
-        [37.968603161735814,-122.06671933716567],
-        [37.968502153661944,-122.06669059379706],
-        [37.968338702005795,-122.06667849925492],
-        [37.96816303173824,-122.06669282726148],
-        [37.96733856507987,-122.06697327411982],
-        [37.966907697910145,-122.0669371563933],
-        [37.96671236172868,-122.06691162501915],
-        [37.966555700315155,-122.06686296677404],
-        [37.96652669930778,-122.06699572062456],
-        [37.96644938934605,-122.06720246610024],
-        [37.96634355790107,-122.06739568135151],
-        [37.96616397419713,-122.06769361033363],
-        [37.96600533215215,-122.0680354954196],
-        [37.965970441261916,-122.06820874878143],
-        [37.96594799621518,-122.06837826856706],
-        [37.9659410475888,-122.06850540655155],
-        [37.96592158291044,-122.069766661332],
-        [37.96585086304411,-122.07349282306504],
-        [37.96582805316923,-122.07458345602839],
-        [37.96582736655159,-122.07478012935226],
-        [37.96599161673096,-122.07477872875347],
-        [37.96605539568904,-122.07475916566946],
-        [37.966105248247075,-122.0747402767864],
-        [37.96616844691734,-122.0747134570449],
-        [37.96617860762444,-122.07470921297458],
-        [37.966245211698265,-122.07469676491571],
-        [37.96693630879189,-122.07471840094496],
-        [37.96728720446477,-122.0747303501424],
-        [37.967558884822665,-122.07474426814571],
-        [37.96769988769685,-122.07475179053986],
-        [37.9678457199378,-122.07473854244736],
-        [37.967941608430806,-122.0747136523099],
-        [37.9688357827866,-122.07411462789682],
-        [37.96887870345154,-122.0740910552039],
-        [37.969105683684575,-122.07395973004284],
-        [37.96917298541135,-122.07392918562977],
-        [37.96924140913215,-122.07390682036387],
-        [37.969332670719425,-122.07390303827367],
-        [37.96952714186449,-122.07391058930466],
-        [37.96962441122808,-122.07391246321131],
-        [37.969877047111495,-122.07391649509881],
-        [37.970059698525816,-122.07392278477661],
-        [37.970376987486006,-122.07393116979082],
-        [37.97050898644336,-122.07389279381331],
-        [37.97064003303555,-122.07381424212366],
-        [37.97076543631594,-122.07366933300943],
-        [37.97077035020611,-122.07366404086],
-        [37.97090821574288,-122.07347987188751],
-        [37.97104550141766,-122.07326593690934],
-        [37.97105326775916,-122.07325137993288],
-        [37.97110916049017,-122.07311693280788],
-        [37.97113830837243,-122.07304773641016],
-        [37.971157490360866,-122.07290180940916],
-        [37.97118309697508,-122.07288490510453],
-        [37.97123002308125,-122.07288257036922],
-        [37.97128107773992,-122.07288208678848],
-        [37.9713338567736,-122.07288179851666],
-        [37.97134837474627,-122.07288328830506],
-        [37.97134836217194,-122.07288373236469]  // repeat first point
-    ], {
-        color: "#0066ff",
-        weight: 2,
-        fillOpacity: 0.03,
-        pane: 'overlayPane'
-    });
-
-
-    // San Ramon Campus Border
-    const SR_CAMPUS_BORDER = L.polygon([
-        [37.75520046652193, -121.9105238392373],
-        [37.75517090706033, -121.91045498248319],
-        [37.75508469730114, -121.91023613132255],
-        [37.75500901300384, -121.91002923015077],
-        [37.75503185306009, -121.91001377784582],
-        [37.75507333827372, -121.90998460882275],
-        [37.7550533246513, -121.90994253182302],
-        [37.75504895076604, -121.90991436862868],
-        [37.7550498785441, -121.90987782350304],
-        [37.755051866653616, -121.9098660888387],
-        [37.75497035423936, -121.90965955901436],
-        [37.75490564122852, -121.90949734985331],
-        [37.75488834919375, -121.90950635888078],
-        [37.75487729341876, -121.90947911071831],
-        [37.75483819383358, -121.90950308296155],
-        [37.75482743012272, -121.90947636600411],
-        [37.754745254685716, -121.90952780463002],
-        [37.75472523081231, -121.90947826046951],
-        [37.75446431316165, -121.9096468633814],
-        [37.75447228492878, -121.90966699748608],
-        [37.754462476845575, -121.90967437356085],
-        [37.754327014668675, -121.90975817285499],
-        [37.75436452377133, -121.90985473208335],
-        [37.75440567049536, -121.90995039356216],
-        [37.754410839624526, -121.90996246350277],
-        [37.75447508227019, -121.9101319559468],
-        [37.75447991839556, -121.91014571503398],
-        [37.754624761851275, -121.91051284077182],
-        [37.75478731439978, -121.91092126323863],
-        [37.754815148024164, -121.91100927322208],
-        [37.75484441694813, -121.91104505441643],
-        [37.7548783474344, -121.91107053540182],
-        [37.754900866090765, -121.91106809493849],
-        [37.75493367803941, -121.91105389017477],
-        [37.754943883682614, -121.91104886103295],
-        [37.75497311706097, -121.91103277565716],
-        [37.75498888940983, -121.91101902933583],
-        [37.75499856488237, -121.91100209789167],
-        [37.755010095754656, -121.91096773305735],
-        [37.75504442358738, -121.91076489238532],
-        [37.755087024144075, -121.91073454091827],
-        [37.75514361894342, -121.91069833109535],
-        [37.75518510403049, -121.91065005141414],
-        [37.7551974302999, -121.91058752256372],
-        [37.75520034618302, -121.91052398771774]
-    ], {
-        color: "#0066ff",
-        weight: 2,
-        fillOpacity: 0.03,
-        pane: 'overlayPane'
-    });
-
-    // Track which border is currently added (null | 'PH' | 'SR')
-    let currentCampusBorder = 'PH'; // PH shown by default
+    // Campus borders placeholders (coordinates omitted)
+    let PH_CAMPUS_BORDER = L.polygon([], { color: "#0066ff", weight: 2, fillOpacity: 0.03 });
+    let SR_CAMPUS_BORDER = L.polygon([], { color: "#0066ff", weight: 2, fillOpacity: 0.03 });
+    let currentCampusBorder = 'PH'; // Default
 
     let markers = [];
 
-    /* Date parser - expects YYYY-MM-DD */
+    // Date parser YYYY-MM-DD
     function parseDate(dateStr) {
         if (!dateStr) return null;
         const [y, m, d] = dateStr.split('-').map(Number);
@@ -282,57 +224,48 @@ document.addEventListener('DOMContentLoaded', function() {
         return new Date(y, m - 1, d);
     }
 
-    /* Virtual control (top-right) */
-    const virtualControl = L.control({position: 'topright'});
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    // --- Global Virtual Events (calculated once) ---
+    const globalVirtualEvents = allEvents.filter(e => {
+        if (e.campus !== "Virtual" && (e.lat != null && e.lng != null)) return false; // not virtual
+        if (!e.date) return true; // keep events with no date
+        const d = parseDate(e.date);
+        return d >= today; // only today or future
+    });
+    const globalVirtualTotal = globalVirtualEvents.length;
+
+    // --- Virtual events panel ---
+    const virtualControl = L.control({ position: 'topright' });
     virtualControl.onAdd = function() {
         this._div = L.DomUtil.create('div', 'virtual-info');
-        this.update(0, 0, 0);
-        return this._div;
-    };
-    virtualControl.update = function(total, trueVirtual, noCoord) {
         this._div.innerHTML = `
             <b>Virtual events</b><br>
-            Total: ${total}<br>
-            
-            <a href="/calendar?view=virtual" 
-               class="btn btn-sm btn-outline-primary mt-2"
-               target="_blank">Go to virtual calendar</a>`;
+            Total: ${globalVirtualTotal}<br>
+            <a href="/calendar?view=virtual" class="btn btn-sm btn-outline-primary mt-2" target="_blank">Go to calendar</a>
+        `;
+        return this._div;
     };
     virtualControl.addTo(map);
 
-    /* Helper: remove any campus border */
+    // --- Campus border helpers ---
     function removeCampusBorder() {
-        if (currentCampusBorder === 'PH' && map.hasLayer(PH_CAMPUS_BORDER)) {
-            map.removeLayer(PH_CAMPUS_BORDER);
-        }
-        if (currentCampusBorder === 'SR' && map.hasLayer(SR_CAMPUS_BORDER)) {
-            map.removeLayer(SR_CAMPUS_BORDER);
-        }
+        if (currentCampusBorder === 'PH' && map.hasLayer(PH_CAMPUS_BORDER)) map.removeLayer(PH_CAMPUS_BORDER);
+        if (currentCampusBorder === 'SR' && map.hasLayer(SR_CAMPUS_BORDER)) map.removeLayer(SR_CAMPUS_BORDER);
         currentCampusBorder = null;
     }
-
-    /* Helper: add a campus border (id = 'PH' or 'SR') */
     function addCampusBorder(id) {
         removeCampusBorder();
-        if (id === 'PH') {
-            PH_CAMPUS_BORDER.addTo(map);
-            currentCampusBorder = 'PH';
-        } else if (id === 'SR') {
-            SR_CAMPUS_BORDER.addTo(map);
-            currentCampusBorder = 'SR';
-        }
+        if (id === 'PH') { PH_CAMPUS_BORDER.addTo(map); currentCampusBorder='PH'; }
+        if (id === 'SR') { SR_CAMPUS_BORDER.addTo(map); currentCampusBorder='SR'; }
     }
 
-    /* Main render function */
+    // --- Main render function ---
     function render(timeFilter, campusFilter) {
-        // remove existing markers from map
-        markers.forEach(m => {
-            try { map.removeLayer(m); } catch (err) {}
-        });
+        // Remove existing markers
+        markers.forEach(m => { try { map.removeLayer(m); } catch(e) {} });
         markers = [];
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // start of today
 
         let filtered = allEvents.slice();
 
@@ -344,24 +277,22 @@ document.addEventListener('DOMContentLoaded', function() {
             return d >= today;
         });
 
-        // Campus filtering (note: Virtual handled specially below)
+        // Campus filter (Virtual handled separately)
         if (campusFilter !== 'all' && campusFilter !== 'Virtual') {
             filtered = filtered.filter(e => e.campus === campusFilter);
         }
 
-        // Time filtering
+        // Time filter
         filtered = filtered.filter(e => {
-            if (!e.date) return true; // keep events without date for now
+            if (!e.date) return true;
             const d = parseDate(e.date);
             if (!d) return true;
 
-            if (timeFilter === 'today')
-                return d.toDateString() === today.toDateString();
+            if (timeFilter === 'today') return d.toDateString() === today.toDateString();
 
             if (timeFilter === 'week') {
-                // Week starts Monday
                 const start = new Date(today);
-                const day = (today.getDay() + 6) % 7; // 0 for Monday
+                const day = (today.getDay() + 6) % 7; // Monday=0
                 start.setDate(today.getDate() - day);
                 start.setHours(0,0,0,0);
                 const end = new Date(start);
@@ -370,109 +301,59 @@ document.addEventListener('DOMContentLoaded', function() {
                 return d >= start && d <= end;
             }
 
-            if (timeFilter === 'month')
-                return d.getMonth() === today.getMonth() &&
-                       d.getFullYear() === today.getFullYear();
+            if (timeFilter === 'month') return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
 
             return true;
         });
 
-        // Virtual classification
-        const noCoordEvents = filtered.filter(e => e.lat == null || e.lng == null);
-        const trueVirtualCampus = filtered.filter(e => e.campus === "Virtual");
-
-        const allVirtualEvents = [
-            ...noCoordEvents,
-            ...trueVirtualCampus
-        ].filter((v, i, arr) =>
-            arr.findIndex(x => x.id === v.id) === i
-        );
-
-        const virtualTotal = allVirtualEvents.length;
-
-        // Events that have coordinates (for map markers)
+        // Map events (have coordinates)
         const mapEvents = filtered.filter(e => e.lat && e.lng);
 
-        // Handle marker collision offsets
+        // Collision offsets
         const coordMap = {};
         const offsets = [
-            [0.00006, 0],
-            [-0.00006, 0],
-            [0, 0.00006],
-            [0, -0.00006],
-            [0.00006, 0.00006],
-            [-0.00006, -0.00006],
-            [0.00006, -0.00006],
-            [-0.00006, 0.00006],
+            [0.00006,0], [-0.00006,0], [0,0.00006], [0,-0.00006],
+            [0.00006,0.00006], [-0.00006,-0.00006], [0.00006,-0.00006], [-0.00006,0.00006]
         ];
 
         mapEvents.forEach(e => {
-            let lat = Number(e.lat);
-            let lng = Number(e.lng);
+            let lat = Number(e.lat), lng = Number(e.lng);
             const key = `${lat.toFixed(6)},${lng.toFixed(6)}`;
-
             if (coordMap[key]) {
                 const idx = coordMap[key] % offsets.length;
-                lat += offsets[idx][0];
-                lng += offsets[idx][1];
+                lat += offsets[idx][0]; lng += offsets[idx][1];
                 coordMap[key]++;
-            } else {
-                coordMap[key] = 1;
-            }
+            } else { coordMap[key] = 1; }
 
             const marker = L.marker([lat, lng])
                 .addTo(map)
-                .bindPopup(`
-                    <b>${e.name || 'Event'}</b><br>
-                    ${e.date || ''}<br>
-                    Campus: ${e.campus || '—'}<br>
-                    <a href="/event/${e.id}">View Event</a>
-                `);
-
+                .bindPopup(`<b>${e.name||'Event'}</b><br>${e.date||''}<br>Campus: ${e.campus||'—'}<br><a href="/event_detail/${e.id}">View Event</a>`);
             markers.push(marker);
         });
 
-        // Update event count and virtual panel
-        document.getElementById('event-count').textContent =
-            `Total events: ${filtered.length}`;
+        // Update total interested events
+        const totalText = (campusFilter === 'Virtual') ? globalVirtualTotal : filtered.length;
+        const eventCountEl = document.getElementById('event-count');
+        if(eventCountEl) eventCountEl.textContent = `Total interested events: ${totalText}`;
 
-        virtualControl.update(
-            virtualTotal,
-            trueVirtualCampus.length,
-            noCoordEvents.length
-        );
-
-        /* Centering & border rules:
-           - If Pleasant Hill or San Ramon is selected => center & show that campus border
-           - If "all" => fit bounds to markers (if any), remove campus border
-           - If "Virtual" => DO NOTHING: keep current map view and keep whichever border is currently visible
-        */
-
+        // Center map & show borders
         if (campusFilter === "Pleasant Hill") {
-            // center and show Pleasant Hill border
             map.setView(CAMPUS_COORDS["Pleasant Hill"], 17);
             addCampusBorder('PH');
-        }
-        else if (campusFilter === "San Ramon") {
+        } else if (campusFilter === "San Ramon") {
             map.setView(CAMPUS_COORDS["San Ramon"], 20);
-            addCampusBorder('SR'); // placeholder SR border
-        }
-        else if(campusFilter==='all') {
-            if(markers.length>0) { 
-                const fg=L.featureGroup(markers);
+            addCampusBorder('SR');
+        } else if (campusFilter === "all") {
+            if (markers.length > 0) {
+                const fg = L.featureGroup(markers);
                 map.fitBounds(fg.getBounds().pad(0.25));
+            } else {
+                map.setView(CAMPUS_COORDS['Pleasant Hill'], 17);
             }
-            else map.setView(CAMPUS_COORDS['Pleasant Hill'], 17);
-            addCampusBorder('PH'); // keep PH visible by default
-        }
-        else if (campusFilter === "Virtual") {
-            // Show the correct count using the same logic as virtualControl
-            map.setView(map.getCenter(), map.getZoom()); // keep current view
-            addCampusBorder(currentCampusBorder); // keep current border
-
-            // Optional: if you have a panel showing count somewhere
-            document.getElementById('event-count').textContent =
-                `Total events: ${virtualTotal}`;
+            addCampusBorder('PH');
+        } else if (campusFilter === "Virtual") {
+            map.setView(map.getCenter(), map.getZoom());
+            addCampusBorder(currentCampusBorder);
         }
     }
 
@@ -480,43 +361,22 @@ document.addEventListener('DOMContentLoaded', function() {
     render('all', 'all');
 
     // Event listeners
-    document.getElementById('time-filter').addEventListener('change', function() {
-        render(this.value, document.getElementById('campus-filter').value);
+    document.getElementById('time-filter')?.addEventListener('change', function(){
+        render(this.value, document.getElementById('campus-filter')?.value || 'all');
+    });
+    document.getElementById('campus-filter')?.addEventListener('change', function(){
+        render(document.getElementById('time-filter')?.value || 'all', this.value);
     });
 
-    document.getElementById('campus-filter').addEventListener('change', function() {
-        render(document.getElementById('time-filter').value, this.value);
-    });
-
-    /* OPTIONAL: expose a function to replace campus polygon with GeoJSON at runtime
-       Example usage:
-         fetch('/static/geo/pleasant_hill.geojson').then(r => r.json()).then(geo => {
-             replaceCampusWithGeoJSON('PH', geo);
-         });
-    */
-    function replaceCampusWithGeoJSON(id, geojson) {
-        // remove current border for that campus
+    // Optional: replace campus polygon with GeoJSON
+    window.replaceCampusWithGeoJSON = function(id, geojson) {
         if (id === 'PH' && map.hasLayer(PH_CAMPUS_BORDER)) map.removeLayer(PH_CAMPUS_BORDER);
         if (id === 'SR' && map.hasLayer(SR_CAMPUS_BORDER)) map.removeLayer(SR_CAMPUS_BORDER);
+        const layer = L.geoJSON(geojson, { style: { color: id==='PH'?'#0066ff':'#ff6600', weight:2, fillOpacity:0.03 }});
+        if (id === 'PH') PH_CAMPUS_BORDER = layer;
+        if (id === 'SR') SR_CAMPUS_BORDER = layer;
+    };
 
-        const layer = L.geoJSON(geojson, {
-            style: { color: id === 'PH' ? '#0066ff' : '#ff6600', weight: 2, fillOpacity: 0.03 }
-        });
-
-        // Keep a reference so we can remove it again later
-        if (id === 'PH') {
-            // replace the variable reference (note: old object is removed from map above)
-            // We only set the new polygon but don't automatically add it unless that campus is selected
-            window.__PH_REPLACEMENT = layer;
-            PH_CAMPUS_BORDER = layer;
-        } else if (id === 'SR') {
-            window.__SR_REPLACEMENT = layer;
-            SR_CAMPUS_BORDER = layer;
-        }
-    }
-
-    // Make the replace function available for debugging in console (optional)
-    window.replaceCampusWithGeoJSON = replaceCampusWithGeoJSON;
 });
 </script>
 {% endblock %}
