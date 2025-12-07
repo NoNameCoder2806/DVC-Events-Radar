@@ -1,19 +1,21 @@
 {% extends 'base.html' %}
 {% block title %}Event Map{% endblock %}
 
-{% block header_spacer2 %}{% endblock %}
+{% block page_title %}
+    <div class="position-relative mb-3 text-center">
+        <button type="button" class="map-back-btn" onclick="history.back()">
+            ← Back
+        </button>
+        <span class="page-title" style="text-align: center !important;">Event Map</span>
+    </div>
+{% endblock %}
+
+{% block header_spacer2 %}
+<div style="height: 30px;"></div>
+{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <!-- Header -->
-    <div class="d-flex align-items-center mb-3">
-        <button type="button" class="btn btn-outline-secondary me-auto" onclick="history.back()">
-            ← Back
-        </button>
-        <h2 class="text-center flex-grow-1 m-0">Event Map</h2>
-        <div style="width: 75px;"></div>
-    </div>
-
     <p>Scroll around to explore events.</p>
 
     <!-- Filters -->
@@ -68,8 +70,42 @@
 
 .map-container {
     height: 575px;       /* map height */
-    width: 100%;
+    width: 110%;
+    transform: translateX(-5%);
     margin-bottom: 50px; /* space below */
+}
+
+/* Title */
+.page-title {
+    display: inline-block;
+    margin-left: 580px;  /* tweak this number until it visually looks centered */
+    font-weight: bold;
+    font-size: 63px;
+    color: #017550;
+    margin-top: -10px;
+}
+
+/* Back button */
+.map-back-btn {
+    position: absolute;
+    top: 10%;
+    left: 0;
+    margin-left: 13%;
+    padding: 12px 20px;
+    background: white;          /* white by default */
+    color: #0a7a33;             /* green border/text */
+    border: 2px solid #0a7a33; 
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.map-back-btn:hover {
+    background-color: #0a7a33; /* fill green on hover */
+    color: white;               /* text turns white */
+    transform: translateY(-1px);
 }
 </style>
 
@@ -79,11 +115,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const map = L.map('map').setView([37.9680, -122.0720], 15);
 
+    // Google map version
     L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
         maxZoom: 19,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
         attribution: '© OpenStreetMap'
     }).addTo(map);
+
+    // The map version with all the labels
+    // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    //     maxZoom: 19,
+    //     attribution: '© OpenStreetMap'
+    // }).addTo(map);
 
     const CAMPUS_COORDS = {
         "Pleasant Hill": [37.96869136039808, -122.07115448710432],
