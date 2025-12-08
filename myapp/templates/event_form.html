@@ -55,15 +55,10 @@ document.getElementById('backBtn').addEventListener('click', function() {
 
             <div class="form-group">
                 <label for="id_description">{{ form.description.label }}</label>
-                <div class="mb-2">
-                    <button type="button" class="btn btn-sm btn-secondary" onclick="wrapText('<strong>', '</strong>')">B</button>
-                    <button type="button" class="btn btn-sm btn-secondary" onclick="wrapText('<em>', '</em>')">I</button>
-                    <button type="button" class="btn btn-sm btn-secondary" onclick="wrapText('<u>', '</u>')">U</button>
-                </div>
-                {{ form.description }}
-                <div class="form-text">
-                    Use the buttons above to format text. You can also use basic HTML tags for links: <code>&lt;a href="URL"&gt;Link&lt;/a&gt;</code>.
-                </div>
+                <!-- Quill editor container -->
+                <div id="description-editor" style="height: 200px; background: white;"></div>
+                <!-- Hidden input to submit HTML to Django -->
+                <input type="hidden" name="description" id="id_description">
                 {{ form.description.errors }}
             </div>
 
@@ -124,14 +119,6 @@ document.getElementById('backBtn').addEventListener('click', function() {
                 {{ form.event_type }}
                 {{ form.event_type.errors }}
             </div>
-
-            <!-- <div class="form-group">
-                <label for="id_image">{{ form.image.label }}</label>
-                <div class="file-input-wrapper">
-                    {{ form.image }}
-                </div>
-                {{ form.image.errors }}
-            </div> -->
 
             <div class="form-group">
                 <label for="id_image">{{ form.image.label }}</label>
@@ -372,7 +359,29 @@ document.getElementById('backBtn').addEventListener('click', function() {
     color: white;
     transform: translateY(-2px);
 }
+
+#description-editor {
+    border: 2px solid #e0e0e0;
+    border-radius: 0 0 20px 20px;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.ql-toolbar.ql-snow {
+    border-radius: 20px 20px 0 0;
+    border: 2px solid #e0e0e0;
+    border-bottom: none;
+}
+
+.ql-container.ql-snow {
+    border-radius: 0 0 20px 20px;
+    border: 2px solid #e0e0e0;
+    border-top: none;
+}
 </style>
+
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
 {% endblock %}
 
 {% block scripts %}
@@ -414,16 +423,22 @@ function showTopMessage(text, type = "info") {
 </script>
 
 <script>
-function wrapText(openTag, closeTag) {
-    const textarea = document.getElementById("id_description"); // Django default id
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = textarea.value.substring(start, end);
-    textarea.value = textarea.value.substring(0, start) + openTag + selectedText + closeTag + textarea.value.substring(end);
-    textarea.focus();
-    textarea.selectionStart = start + openTag.length;
-    textarea.selectionEnd = end + openTag.length;
-}
+var quill = new Quill('#description-editor', {
+    theme: 'snow',
+    placeholder: 'Enter event description...',
+    modules: {
+        toolbar: [
+            ['bold', 'italic', 'underline'],
+            ['link', 'code-block', { 'list': 'bullet' }]
+        ]
+    }
+});
+
+// Sync content with hidden input for Django submission
+var form = document.querySelector('form');
+form.onsubmit = function() {
+    document.querySelector('#id_description').value = quill.root.innerHTML;
+};
 </script>
 
 {% for message in messages %}

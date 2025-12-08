@@ -88,14 +88,11 @@ class EventForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        from datetime import datetime
 
-        # Combine start time fields
         start_h = cleaned_data.get('start_hour')
         start_m = cleaned_data.get('start_minute')
         start_p = cleaned_data.get('start_period')
 
-        # Combine end time fields
         end_h = cleaned_data.get('end_hour')
         end_m = cleaned_data.get('end_minute')
         end_p = cleaned_data.get('end_period')
@@ -110,8 +107,30 @@ class EventForm(forms.ModelForm):
                     raise forms.ValidationError("Start time must be before end time")
             except ValueError:
                 raise forms.ValidationError("Invalid time format")
-
+        
         return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        cleaned_data = self.cleaned_data
+
+        # Combine start and end times into model fields
+        start_h = cleaned_data.get('start_hour')
+        start_m = cleaned_data.get('start_minute')
+        start_p = cleaned_data.get('start_period')
+
+        end_h = cleaned_data.get('end_hour')
+        end_m = cleaned_data.get('end_minute')
+        end_p = cleaned_data.get('end_period')
+
+        if start_h and start_m and start_p:
+            instance.start_time = f"{start_h}:{start_m} {start_p}"
+        if end_h and end_m and end_p:
+            instance.end_time = f"{end_h}:{end_m} {end_p}"
+
+        if commit:
+            instance.save()
+        return instance
         
 class EventFilterForm(forms.Form):
     CAMPUS_CHOICES = [('Pleasant Hill', 'Pleasant Hill'),('San Ramon', 'San Ramon'),('Virtual', 'Virtual')]
