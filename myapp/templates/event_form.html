@@ -130,7 +130,13 @@ document.getElementById('backBtn').addEventListener('click', function() {
                 {{ form.image.errors }}
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">Create Event</button>
+            <button type="submit" class="btn btn-primary w-100">
+                {% if page_title == "Add Event" %}
+                    Create Event
+                {% else %}
+                    Save Changes
+                {% endif %}
+            </button>
         </form>
 
         <!-- Bottom Cancel/Home Button -->
