@@ -525,6 +525,24 @@ def populate_default_data(sender, **kwargs):
                 "event_type": "",
                 "image_filename": "30.jpg",
             },
+
+
+            # Event information demonstration
+        #     {
+        #         "name": "DVC Piano Recital",
+        #         "date": "2025-12-11",              # YYYY-MM-DD
+        #         "start_time": "2:30 PM",        # HH:MM AM/PM
+        #         "end_time": "4:00 PM",          # HH:MM AM/PM
+        #         "location": "Music - M | 101",          # The description
+        #         "building_code": "M",     # The building code
+        #         "campus": "Pleasant Hill",            # Pleasant Hill / San Ramon / Virtual
+        #         "description": """
+        # <p>Experience the incredible talent of our piano students in an evening of powerful solos and breathtaking collaborations.</p>
+        # """,
+        #         "event_type": "Career & Academic",        # "Sports", "Clubs", "Career & Academic", or "Free Food"
+        #         "image_filename": "31.jpg",    # Start at 31.jpg, then 32.jpg
+        #     },
+            
         ]
 
         for ev in event_data:

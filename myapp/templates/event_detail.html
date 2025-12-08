@@ -1,44 +1,403 @@
-{% extends 'home.html' %}
+{% extends 'base.html' %}
+{% load static %}
 {% block title %}{{ event.title }}{% endblock %}
 
+{% block page_title %}
+<div class="page-header-title-wrapper">
+    <button type="button" class="detail-back-btn" id="backBtn">← Back</button>
+
+    <span class="page-title">Event Details</span>
+</div>
+
+<script>
+document.getElementById('backBtn').addEventListener('click', function() {
+    history.back();
+});
+</script>
+{% endblock %}
+
+{% block header_spacer2 %}
+<div style="height: 70px;"></div>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <a href="{% url 'home' %}" class="btn btn-secondary mb-3">← Back</a>
+<div class="card-wrapper">
 
-    <div class="card shadow">
-        <div class="card-body">
+    <!-- =======================
+         SECTION 1 (Details Box)
+    ======================== -->
+    <div class="card shadow section-card p-4 mb-4">
 
-            <h2 class="card-title">{{ event.title }}</h2>
+        <div class="row align-items-center">
+            <!-- LEFT (70%) -->
+            <div class="col-md-8">
 
-            {% if event.image %}
-                <img src="{{ event.image.url }}" class="img-fluid mb-3" alt="Event Image">
-            {% endif %}
+                <!-- Row 1: Title -->
+                <h2 class="event-title">{{ event.name }}</h2>
 
-            <h5>Details</h5>
-            <ul>
-                <li><strong>Date:</strong> {{ event.date }}</li>
-                <li><strong>Time:</strong> {{ event.start_time }} - {{ event.end_time }}</li>
-                <li><strong>Location:</strong> {{ event.location }}</li>
-            </ul>
+                <!-- Row 2: Date + Time -->
+                <div class="d-flex flex-wrap mb-3">
+                    <div class="me-4 d-flex align-items-center">
+                        <img src="{% static 'images/clock.png' %}" alt="Campus Icon" 
+                            style="width: 30px; height: 30px; margin-right: 6px;">
+                        <span class="mx-1">{{ event.date }}</span>
+                        <!-- <span style="
+                            display: inline-block;
+                            width: 1px;
+                            height: 18px;
+                            background-color: #999;
+                            margin: 0 12px;
+                        "></span> -->
+                        <span class="separator"></span>
+                        <span class="mx-1">{{ event.start_time }} - {{ event.end_time }}</span>
+                    </div>
+                </div>
 
-            <h5>Description</h5>
-            <div>{{ event.description|safe }}</div>
+                <!-- Row 3: Campus + Location -->
+                <div class="d-flex flex-wrap mb-3">
+                    <div class="me-4 d-flex align-items-center">
+                        <img src="{% static 'images/map-marker.png' %}" alt="Campus Icon" 
+                            style="width: 30px; height: 30px; margin-right: 6px;">
+                        <span class="mx-1">{{ event.campus }}</span>
+                        <!-- <span style="
+                            display: inline-block;
+                            width: 1px;
+                            height: 18px;
+                            background-color: #999;
+                            margin: 0 12px;
+                        "></span> -->
+                        <span class="separator"></span>
+                        <span class="mx-1">{{ event.location }}</span>
+                    </div>
+                </div>
 
-            {% if user.is_authenticated %}
-                <button type="button" class="btn btn-primary interested-btn" data-event-id="{{ event.id }}">
-                    {% if event.id in user_favorites %}Unmark ⭐{% else %}Mark as Interested ⭐{% endif %}
-                </button>
-                <div id="favorite-message"></div>
-            {% else %}
-                <p class="text-muted">Login to mark interest.</p>
-            {% endif %}
+                <!-- Row 4: Event Type -->
+                <div class="d-flex flex-wrap mb-3">
+                    <div class="me-4 d-flex align-items-center">
+                        <img src="{% static 'images/checklist.png' %}" alt="Campus Icon" 
+                            style="width: 30px; height: 30px; margin-right: 6px;">
+                        <span class="mx-1">Event Type</span>
+                        <!-- <span style="
+                            display: inline-block;
+                            width: 1px;
+                            height: 18px;
+                            background-color: #999;
+                            margin: 0 12px;
+                        "></span> -->
+                        <span class="separator"></span>
+                        <span class="mx-1">{{ event.event_type }}</span>
+                    </div>
+                </div>
+
+                <!-- Buttons container -->
+                <div class="mt-5 d-flex align-items-center">
+                    {% if user.is_authenticated %}
+                        <button type="button" class="btn btn-interest" data-event-id="{{ event.id }}">
+                            {% if event.id in user_favorites %}Unmark{% else %}Mark Interest ⭐{% endif %}
+                        </button>
+                    {% endif %}
+
+                    <!-- See Details button (always visible) -->
+                    <button type="button" class="btn btn-details" id="seeDetailsBtn">
+                        See Details 📋
+                    </button>
+                </div>
+
+                <!-- Log in message (below buttons) -->
+                <div id="favorite-message" class="mt-2">
+                    {% if not user.is_authenticated %}
+                        <p class="text-muted mt-0 mb-0">Login to mark interest.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- RIGHT (30%) -->
+            <div class="col-md-4 d-flex justify-content-center align-items-center">
+                {% if event.image %}
+                    <img src="{{ event.image.url }}" class="img-fluid event-image" alt="Event Image">
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div>
+    <!-- =======================
+         SECTION 2 (PLAIN DESCRIPTION)
+    ======================== -->
+    <div id="event-description" class="mt-4">
+        <div class="highlight-block">
+            {{ event.description|safe }}
         </div>
     </div>
 </div>
 
+<style>
+html {
+    scroll-behavior: smooth;
+}
+
+/* Title */
+.page-header-title-wrapper {
+    position: relative;
+    width: 100%;
+    height: 80px;
+}
+
+.page-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(calc(-50% - 15%));
+    font-weight: bold;
+    font-size: 63px;
+    color: #017550;
+    white-space: nowrap;
+}
+
+/* Back button */
+.detail-back-btn {
+    position: absolute;
+    top: 16%;
+    left: 0;
+    margin-left: 10%;
+    padding: 12px 20px;
+    background: white;          /* white by default */
+    color: #0a7a33;             /* green border/text */
+    border: 2px solid #0a7a33; 
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.detail-back-btn:hover {
+    background-color: #0a7a33; /* fill green on hover */
+    color: white;               /* text turns white */
+    transform: translateY(-1px);
+}
+
+.card-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;   /* horizontally center */
+}
+
+.col-md-8 {
+    padding-left: 7%;
+    padding-top: 3%;     /* pushes content down */
+}
+
+/* Section Card */
+.section-card {
+    border-radius: 20px;
+    background: white;
+    width: 82%;
+    margin: 0 !important;
+    justify-content: center;   /* horizontally center */
+}
+
+/* Event Title */
+.event-title {
+    font-family: 'Arial Black', Arial, sans-serif;
+    font-size: 40px;
+    display: inline-block; /* ensure spacing works with buttons next to it */
+    color: #017550;
+    margin-top: -20px;   /* pulls it upward */
+    margin-bottom: 50px; /* still keeps spacing below */
+}
+
+.row.align-items-center .d-flex.align-items-center span.mx-1 {
+    font-size: 17px;          /* bigger font */
+    font-weight: 500;         /* medium weight for readability */
+}
+
+/* Separator line */
+.separator {
+    display: inline-block;
+    width: 0;               /* no width, just a border */
+    border-left: 1px solid #999;
+    height: 1em;            /* matches font size dynamically */
+    margin: 0 12px;
+}
+
+.btn-interest, .btn-details {
+    width: 200px;            /* same fixed width for both */
+    font-size: 1.1rem;
+    padding: 6px 0;          /* vertical padding only to keep width fixed */
+    border-radius: 25px;
+    font-weight: 600;
+    background-color: white; /* default background */
+    border: 2px solid;       /* border color set individually */
+    color: inherit;          /* will be overridden individually */
+    transition: 0.2s ease-in-out;
+    text-align: center;
+    margin-left: 5px;
+    margin-right: 5px;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Mark Interest button: white -> green hover */
+.btn-interest {
+    border-color: #0a7a33;
+    color: #0a7a33;
+}
+
+.btn-interest:hover {
+    background-color: #0a7a33;
+    color: white;
+    border-color: #0a7a33;
+}
+
+/* See Details button: white -> dark blue hover */
+.btn-details {
+    border-color: #173f6c;
+    color: #173f6c;           /* dark blue text by default */
+}
+
+.btn-details:hover {
+    background-color: #173f6c; /* dark blue fill */
+    color: white;
+    border-color: #173f6c;
+}
+
+#favorite-message {
+    min-height: 1.5em; /* enough for one line of text */
+}
+
+/* Event Image */
+.event-image {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+/* Event description text */
+#event-description {
+    padding-top: 20px;   /* space above */
+    padding-bottom: 60px; /* space below */
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+#event-description.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#event-description div {
+    font-family: 'Arial', sans-serif; /* clean font */
+    font-weight: 300;                 /* thin/light text */
+    font-size: 20px;                  /* readable size */
+    line-height: 1.5;                 /* spacing between lines */
+    padding-left: 15px;               /* left padding */
+    padding-right: 15px;              /* right padding */
+    max-width: 800px;                 /* optional: limit width for large screens */
+    margin: 0 auto;                   /* center block horizontally */
+}
+
+/* Preserve bold/strong */
+#event-description div b,
+#event-description div strong {
+    font-weight: 600;           /* bold text */
+    color: #173f6c;             /* keep same color */
+}
+
+/* Preserve italics/em */
+#event-description div em,
+#event-description div i {
+    font-style: italic;
+}
+
+/* Links */
+#event-description div a {
+    color: black;               /* default text black */
+    text-decoration: underline; /* underline */
+    transition: background-color 0.2s ease, color 0.2s ease;
+    padding: 0 2px;            /* optional small padding for hover effect */
+}
+
+#event-description div a:hover {
+    background-color: #D3BFDD;  /* highlight on hover */
+    color: black;               /* keep text black */
+    text-decoration: underline;      /* optional: remove underline on hover */
+    text-decoration-color: #5D2E8F;  /* change underline color on hover */
+    border-radius: 3px;         /* optional: slight rounding for highlight */
+}
+
+/* Inner block to animate only the text content */
+.highlight-block {
+    max-width: 800px;       /* optional: same as before */
+    margin: 0 auto;         /* center it */
+    padding: 15px;          /* optional padding */
+    font-family: 'Arial', sans-serif;
+    font-weight: 300;
+    font-size: 20px;
+    line-height: 1.5;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+/* Animation */
+@keyframes highlightZoom {
+    0% {
+        transform: scale(1);
+        box-shadow: none;
+        border-radius: 25px; /* starting radius */
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px #173f6c;
+        background-color: #E1F4FB; /* Soft yellow highlight */
+        border-radius: 25px; /* softer, more rounded corners */
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: none;
+        border-radius: 25px; /* starting radius */
+    }
+}
+
+.highlight-block.highlighted {
+    animation: highlightZoom 1s ease-in-out forwards;
+}
+</style>
+
+<script>
+// See Details button: scroll + highlight effect
+document.addEventListener('DOMContentLoaded', () => {
+    const seeDetailsBtn = document.getElementById('seeDetailsBtn');
+    const descriptionBlock = document.querySelector('#event-description .highlight-block');
+
+    if (seeDetailsBtn && descriptionBlock) {
+        seeDetailsBtn.addEventListener('click', () => {
+            // Smooth scroll to description
+            const headerOffset = 80; // adjust for fixed header
+            const elementPosition = descriptionBlock.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+
+            // Trigger highlight + zoom effect
+            descriptionBlock.classList.remove('highlighted'); // reset if clicked multiple times
+            void descriptionBlock.offsetWidth; // force reflow to restart animation
+            descriptionBlock.classList.add('highlighted');
+        });
+    }
+});
+</script>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const button = document.querySelector('.interested-btn');
+    const button = document.querySelector('.btn-interest');
     const messageDiv = document.getElementById('favorite-message');
     
     if (button) {
@@ -61,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 messageDiv.textContent = 'Added to your interested events!';
                 messageDiv.className = 'text-success mt-2';
             } else if (data.status === 'removed') {
-                button.textContent = 'Mark as Interested ⭐';
+                button.textContent = 'Mark Interest ⭐';
                 messageDiv.textContent = 'Removed from your interested events.';
                 messageDiv.className = 'text-warning mt-2';
             } else if (data.status === 'error') {
