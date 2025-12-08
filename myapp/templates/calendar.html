@@ -91,7 +91,7 @@ document.getElementById('backBtn').addEventListener('click', function() {
         <div id="calendar"></div>
 
         <div class="d-flex justify-content-between mt-3">
-            <button id="prevMonth" class="btn btn-outline-primary btn-sm">Previous</button>
+            <button id="prevMonth" class="btn btn-outline-primary btn-sm">Prev</button>
             <button id="nextMonth" class="btn btn-outline-primary btn-sm">Next</button>
         </div>
     </div>
@@ -194,6 +194,15 @@ document.getElementById('backBtn').addEventListener('click', function() {
     color: var(--dvc-green);
     font-weight: 700;
     letter-spacing: 0.02em;
+}
+
+/* Month title */
+#calendar h4 {
+    color: #173f6c;      /* dark blue */
+    font-weight: 700;     /* bold */
+    font-size: 30px;      /* optional: make slightly bigger */
+    text-align: center;   /* keep it centered */
+    margin-bottom: 15px;  /* spacing below */
 }
 
 /* Legend strip */
@@ -444,6 +453,42 @@ document.getElementById('backBtn').addEventListener('click', function() {
 .event-tooltip-extra-dot-academic { background-color: #20c997; }
 .event-tooltip-extra-dot-food     { background-color: #ffc107; }
 .event-tooltip-extra-dot-general  { background-color: #6f42c1; }
+
+/* Base button style */
+#prevMonth, #nextMonth {
+    width: 100px;            /* same size */
+    padding: 10px 0;         /* vertical padding */
+    font-weight: 700;        /* bold text */
+    border-radius: 12px;     /* soft edges */
+    font-size: 18px;         /* bigger font */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;      /* center text */
+}
+
+/* Previous Button (Dark Blue) */
+#prevMonth {
+    border: 2px solid #173f6c; /* dark blue border */
+    color: #173f6c;            /* dark blue text */
+    background: transparent;
+}
+
+#prevMonth:hover {
+    background-color: #173f6c; /* fill dark blue */
+    color: white;               /* text white on hover */
+}
+
+/* Next Button (Green) */
+#nextMonth {
+    border: 2px solid #017550; /* green border */
+    color: #017550;            /* green text */
+    background: transparent;
+}
+
+#nextMonth:hover {
+    background-color: #017550; /* fill green */
+    color: white;               /* text white on hover */
+}
 </style>
 
 <script>
