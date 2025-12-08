@@ -3,14 +3,14 @@
 
 {% block page_title %}
 <div class="page-header-title-wrapper">
-    <button type="button" class="event-back-btn" id="backBtn">← Home</button>
+    <button type="button" class="event-back-btn" id="backBtn">← Back</button>
 
     <span class="page-title">Manage Events</span>
 </div>
 
 <script>
 document.getElementById('backBtn').addEventListener('click', function() {
-    window.location.href = "{% url 'home' %}";
+    history.back();
 });
 </script>
 {% endblock %}
