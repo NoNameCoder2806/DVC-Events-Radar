@@ -85,28 +85,75 @@ def home(request):
         'user_name': request.user.username if request.user.is_authenticated else None,
         'user_role': user_role,
     })
+# views.py
+from datetime import datetime
 
 def calendar_view(request):
-    today = datetime.today()
-    events_per_day = {}  # key = day of month, value = count of favorite events
+    """
+    Build { 'YYYY-MM-DD': [ ...events... ] } for FAVORITED events
+    that have not finished yet (end time in the future).
+    """
+    events_by_day = {}
+    now = datetime.now()  # use local server time
 
     if request.user.is_authenticated:
         try:
             user_obj = Users.objects.get(user=request.user)
-            favorite_events = Favorites.objects.filter(user_ID=user_obj).select_related('event_ID')
-            for fav in favorite_events:
-                try:
-                    event_date = datetime.strptime(fav.event_ID.date.strip(), "%Y-%m-%d")
-                    day_key = event_date.strftime("%Y-%m-%d")  # YYYY-MM-DD
-                    events_per_day[day_key] = events_per_day.get(day_key, 0) + 1
-                except Exception as e:
-                    print(f"Skipping invalid date {fav.event_ID.date}: {e}")
         except Users.DoesNotExist:
-            pass
+            user_obj = None
 
-    context = {
-        "events_per_day": events_per_day,  # now only includes “interested” events
-    }
+        if user_obj:
+            favorites = (
+                Favorites.objects
+                .filter(user_ID=user_obj)
+                .select_related('event_ID')
+            )
+
+            for fav in favorites:
+                event = fav.event_ID
+
+                # --- Parse date ---
+                raw_date = (event.date or "").strip()
+                if not raw_date:
+                    continue
+                try:
+                    event_date = datetime.strptime(raw_date, "%Y-%m-%d").date()
+                except ValueError:
+                    # Skip malformed date strings
+                    continue
+
+                # --- Parse end time, default = end of day ---
+                end_str = (event.end_time or "").strip()
+                end_time = None
+                if end_str:
+                    for fmt in ("%I:%M %p", "%H:%M"):  # e.g. "2:30 PM" or "14:30"
+                        try:
+                            end_time = datetime.strptime(end_str, fmt).time()
+                            break
+                        except ValueError:
+                            continue
+                if end_time is None:
+                    # if we can't parse, assume it ends at the end of the day
+                    end_time = datetime.max.time().replace(microsecond=0)
+
+                event_end_dt = datetime.combine(event_date, end_time)
+
+                # --- Hide pins for events that already finished ---
+                if event_end_dt < now:
+                    continue
+
+                day_key = event_date.strftime("%Y-%m-%d")
+                events_by_day.setdefault(day_key, []).append({
+                    "id": event.id,
+                    "name": event.name,
+                    "event_type": event.event_type,
+                    "campus": event.campus,
+                    "start_time": event.start_time,
+                    "end_time": event.end_time,
+                    "location": event.location,
+                })
+
+    context = {"events_by_day": events_by_day}
     return render(request, "calendar.html", context)
 
 def map(request):

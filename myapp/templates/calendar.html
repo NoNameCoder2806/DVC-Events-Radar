@@ -1,53 +1,192 @@
 {% extends 'base.html' %}
-{% block title %}Calendar{% endblock %}
+{% block title %}Event Calendar{% endblock %}
+
+{% block show_header %}{% endblock %}
 
 {% block content %}
+<div class="calendar-page d-flex justify-content-center align-items-start">
+    <div class="calendar-card">
 
-<!-- 🔥 Floating top notification -->
-<div id="topNotification"
-     style="
-        position: fixed;
-        top: -80px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #333;
-        color: white;
-        padding: 15px 25px;
-        border-radius: 8px;
-        z-index: 9999;
-        transition: top 0.5s ease, opacity 0.5s ease;
-        opacity: 0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-     ">
-</div>
-
-<div class="d-flex justify-content-center mt-5">
-    <div class="w-75">
-
-        <!-- Top bar with Back button -->
-        <div class="d-flex align-items-center mb-4 position-relative">
-            <div class="position-absolute" style="left: 0;">
-                <a href="{% url 'home' %}" class="btn btn-secondary">&larr; Back</a>
-            </div>
-            <h2 class="mx-auto text-center">Event Calendar</h2>
+        <!-- Page header -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm">&larr; Back</a>
+            <h1 class="flex-grow-1 text-center mb-0 calendar-title">Event Calendar</h1>
+            <div style="width: 88px;"></div> <!-- spacer -->
         </div>
 
-        <!-- Inject JSON from Django -->
-        {{ events_per_day|json_script:"events-per-day" }}
+        <!-- Top controls: legend + campus selector -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+            <div class="calendar-legend-strip">
+                <div class="legend-group">
+                    <span class="legend-label">Event type:</span>
+                    <span class="legend-token">
+                        <span class="legend-dot legend-dot-sports"></span> Sports
+                    </span>
+                    <span class="legend-token">
+                        <span class="legend-dot legend-dot-clubs"></span> Clubs
+                    </span>
+                    <span class="legend-token">
+                        <span class="legend-dot legend-dot-academic"></span> Career &amp; Academic
+                    </span>
+                    <span class="legend-token">
+                        <span class="legend-dot legend-dot-food"></span> Free Food
+                    </span>
+                    <span class="legend-token">
+                        <span class="legend-dot legend-dot-general"></span> General / Other
+                    </span>
+                </div>
+                <div class="legend-group mt-1">
+                    <span class="legend-label">Campus:</span>
+                    <span class="legend-token">
+                        <span class="legend-shape legend-shape-ph"></span> Pleasant Hill
+                    </span>
+                    <span class="legend-token">
+                        <span class="legend-shape legend-shape-sr"></span> San Ramon
+                    </span>
+                    <span class="legend-token">
+                        <span class="legend-shape legend-shape-virtual"></span> Virtual
+                    </span>
+                </div>
+            </div>
 
-        <div id="calendar" class="calendar"></div>
+            <div class="mt-2 mt-sm-0">
+                <select id="campusSelect" class="form-control form-control-sm">
+    <option value="All">All campuses</option>
+    <option value="Pleasant Hill Campus">Pleasant Hill Campus</option>
+    <option value="San Ramon Campus">San Ramon Campus</option>
+    <option value="Virtual Events">Virtual Events</option>
+                </select>
+            </div>
+        </div>
 
-        <div class="d-flex justify-content-between mt-2">
-            <button id="prevMonth" class="btn btn-outline-primary">Previous</button>
-            <button id="nextMonth" class="btn btn-outline-primary">Next</button>
+        <!-- Events data -->
+        {{ events_by_day|json_script:"events-by-day" }}
+
+        <div id="calendar"></div>
+
+        <div class="d-flex justify-content-between mt-3">
+            <button id="prevMonth" class="btn btn-outline-primary btn-sm">Previous</button>
+            <button id="nextMonth" class="btn btn-outline-primary btn-sm">Next</button>
         </div>
     </div>
 </div>
 
+<!-- Floating tooltip for pins and "+N" -->
+<div id="eventTooltip" class="event-tooltip"></div>
+
 <style>
+    :root {
+        --dvc-green: #017550;
+        --dvc-blue: #173f6c;
+        --dvc-purple: #5d2e8f;
+        --dvc-offwhite: #f5fcff;
+    }
+
+    .calendar-page {
+        width: 100%;
+        min-height: calc(100vh - 40px);
+        padding: 40px 0;
+        background: radial-gradient(circle at top left, #e6f4ff, var(--dvc-offwhite) 45%, #f5ecff 90%);
+    }
+
+    .calendar-card {
+        position: relative;
+        width: 100%;
+        max-width: 1200px;
+        background: #ffffff;
+        border-radius: 28px;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.10);
+        padding: 32px 40px 26px;
+        overflow: hidden;
+    }
+
+    .calendar-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        background: linear-gradient(90deg, var(--dvc-green), var(--dvc-purple));
+    }
+
+    .calendar-title {
+        color: var(--dvc-green);
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+
+    /* Legend strip */
+
+    .calendar-legend-strip {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 0.8rem;
+        color: #495057;
+    }
+
+    .legend-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .legend-label {
+        font-weight: 600;
+        color: #6c757d;
+        margin-right: 4px;
+    }
+
+    .legend-token {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #f8f9fa;
+    }
+
+    .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        display: inline-block;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    }
+
+    .legend-dot-sports   { background-color: #0d6efd; }
+    .legend-dot-clubs    { background-color: #198754; }
+    .legend-dot-academic { background-color: #20c997; }
+    .legend-dot-food     { background-color: #ffc107; }
+    .legend-dot-general  { background-color: #6f42c1; }
+
+    .legend-shape {
+        width: 14px;
+        height: 14px;
+        background-color: #adb5bd;
+        display: inline-block;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    }
+
+    .legend-shape-ph {
+        border-radius: 999px;
+    }
+    .legend-shape-sr {
+        border-radius: 3px;
+    }
+    .legend-shape-virtual {
+        width: 18px;
+        height: 10px;
+        border-radius: 999px;
+    }
+
+    /* Calendar layout */
+
     #calendar h4 {
         text-align: center;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
 
     #calendar table {
@@ -58,9 +197,18 @@
     #calendar th,
     #calendar td {
         width: 14.28%;
-        padding: 10px;
+        padding: 10px 8px;
+        text-align: left;
+        vertical-align: top;
+        border: 1px solid #e5e7eb;
+        font-size: 0.9rem;
+    }
+
+    #calendar th {
         text-align: center;
-        border: 1px solid #dee2e6;
+        font-weight: 600;
+        background-color: #f8f9fa;
+        color: #495057;
     }
 
     #calendar td.empty {
@@ -68,23 +216,169 @@
     }
 
     #calendar td.today {
-        background-color: #d4edda;
-        color: #155724;
-        font-weight: bold;
+        background-color: #e8f7ed;
+        border-color: #28a745;
     }
 
-    #calendar td.event-day {
-        background-color: #fff3cd;
-        color: #856404;
-        font-weight: bold;
+    .day-inner {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        min-height: 70px;
+        gap: 4px;
     }
+
+    .day-number {
+        font-weight: 600;
+        font-size: 0.95rem;
+        flex: 0 0 auto;
+    }
+
+    .pins {
+        margin-left: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        align-items: flex-end;
+        flex: 0 0 auto;
+    }
+
+    /* Pins */
+
+    .pin {
+        position: relative;
+        width: 16px;
+        height: 16px;
+        border-radius: 999px;
+        border: none;
+        padding: 0;
+        background-color: #6c757d;
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+        outline: none;
+        transform: scale(1);
+        transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+    }
+
+    .pin::before {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        right: 2px;
+        bottom: 2px;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 30%,
+            rgba(255,255,255,0.9),
+            transparent 65%);
+        pointer-events: none;
+    }
+
+    .pin-campus-ph { border-radius: 999px; }
+    .pin-campus-sr { border-radius: 3px; }
+    .pin-campus-virtual {
+        border-radius: 999px;
+        width: 18px;
+        height: 10px;
+    }
+
+    .pin-sports   { background-color: #0d6efd; }
+    .pin-clubs    { background-color: #198754; }
+    .pin-academic { background-color: #20c997; }
+    .pin-food     { background-color: #ffc107; }
+    .pin-general  { background-color: #6f42c1; }
+
+    .pin-active {
+        transform: scale(1.25);
+        box-shadow:
+            0 0 0 2px #fff,
+            0 0 0 3px #343a40,
+            0 2px 5px rgba(0, 0, 0, 0.6);
+    }
+
+    .pin-more-btn {
+        border: none;
+        background: transparent;
+        padding: 0;
+        margin-top: 2px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+    }
+
+    .pin-more-btn:hover {
+        text-decoration: underline;
+    }
+
+    /* Tooltip */
+
+    .event-tooltip {
+        position: absolute;
+        min-width: 220px;
+        max-width: 280px;
+        background-color: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 8px 10px;
+        font-size: 0.85rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        z-index: 1050;
+        display: none;
+        opacity: 0;
+        transform: translateY(8px) scale(0.95);
+        transform-origin: top left;
+        transition: opacity 0.18s ease-out, transform 0.18s ease-out;
+    }
+
+    .event-tooltip.visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    .event-tooltip strong {
+        font-size: 0.9rem;
+    }
+
+    .event-tooltip-header {
+        margin-bottom: 4px;
+    }
+
+    .event-tooltip-meta {
+        color: #555;
+    }
+
+    .event-tooltip-extra-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 4px;
+    }
+
+    .event-tooltip-extra-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    }
+
+    .event-tooltip-extra-dot-sports   { background-color: #0d6efd; }
+    .event-tooltip-extra-dot-clubs    { background-color: #198754; }
+    .event-tooltip-extra-dot-academic { background-color: #20c997; }
+    .event-tooltip-extra-dot-food     { background-color: #ffc107; }
+    .event-tooltip-extra-dot-general  { background-color: #6f42c1; }
 </style>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    const eventsPerDay = JSON.parse(document.getElementById("events-per-day").textContent);
+    const eventsByDay = JSON.parse(
+        document.getElementById("events-by-day").textContent
+    );
 
     const calendarDiv = document.getElementById("calendar");
+    const tooltip = document.getElementById("eventTooltip");
+    const campusSelect = document.getElementById("campusSelect");
+
     const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
     const weekDays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 
@@ -93,11 +387,223 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentYear = today.getFullYear();
     const todayDate = today.getDate();
 
+    let activeCampus = "All";
+
+    campusSelect.addEventListener("change", () => {
+        activeCampus = campusSelect.value;
+        buildCalendar(currentMonth, currentYear);
+    });
+
     function pad(num) {
-        return num.toString().padStart(2, '0');
+        return num.toString().padStart(2, "0");
+    }
+
+    function escapeAttr(str) {
+        return String(str || "")
+            .replace(/&/g, "&amp;")
+            .replace(/"/g, "&quot;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+    }
+
+    function normalizeCampus(str) {
+        return String(str || "").toLowerCase().trim();
+    }
+    
+    function campusMatches(evCampus, selected) {
+    if (selected === "All") return true;
+
+    const evNorm  = normalizeCampus(evCampus);   // e.g. "pleasant hill, virtual"
+    const selNorm = normalizeCampus(selected);   // e.g. "pleasant hill campus" or "virtual events"
+
+    if (!evNorm || !selNorm) return false;
+
+    // Special handling by campus keyword
+    if (selNorm.includes("pleasant hill")) {
+        // match any event whose campus string mentions "pleasant hill"
+        return evNorm.includes("pleasant hill");
+    }
+
+    if (selNorm.includes("san ramon")) {
+        return evNorm.includes("san ramon");
+    }
+
+    if (selNorm.includes("virtual")) {
+        return evNorm.includes("virtual");
+    }
+
+    // Fallback: generic substring match
+    return evNorm.includes(selNorm) || selNorm.includes(evNorm);
+    }
+
+    function typeToClass(eventType) {
+        switch (eventType) {
+            case "Sports":
+                return "pin-sports";
+            case "Clubs":
+                return "pin-clubs";
+            case "Career & Academic":
+                return "pin-academic";
+            case "Free Food":
+                return "pin-food";
+            case "General":
+                return "pin-general";
+            default:
+                return "pin-general";
+        }
+    }
+
+    function campusToClass(campus) {
+    const c = normalizeCampus(campus);
+
+    if (c.includes("san ramon")) {
+        return "pin-campus-sr";        // square
+    }
+    if (c.includes("virtual")) {
+        return "pin-campus-virtual";   // pill
+    }
+    if (c.includes("pleasant hill")) {
+        return "pin-campus-ph";        // circle
+    }
+    // fallback
+    return "pin-campus-ph";
+    }
+
+    function typeToExtraDotClass(eventType) {
+        switch (eventType) {
+            case "Sports":
+                return "event-tooltip-extra-dot-sports";
+            case "Clubs":
+                return "event-tooltip-extra-dot-clubs";
+            case "Career & Academic":
+                return "event-tooltip-extra-dot-academic";
+            case "Free Food":
+                return "event-tooltip-extra-dot-food";
+            case "General":
+                return "event-tooltip-extra-dot-general";
+            default:
+                return "event-tooltip-extra-dot-general";
+        }
+    }
+
+    let activePin = null;
+
+    function hideTooltip() {
+        tooltip.classList.remove("visible");
+        if (activePin) {
+            activePin.classList.remove("pin-active");
+            activePin = null;
+        }
+        setTimeout(() => {
+            tooltip.style.display = "none";
+        }, 200);
+    }
+
+    function showTooltipAt(targetElement, innerHtml) {
+        tooltip.innerHTML = innerHtml;
+
+        if (activePin && activePin !== targetElement && activePin.classList) {
+            activePin.classList.remove("pin-active");
+        }
+
+        activePin = targetElement;
+        if (activePin && activePin.classList.contains("pin")) {
+            activePin.classList.add("pin-active");
+        }
+
+        const rect = targetElement.getBoundingClientRect();
+        const scrollX = window.scrollX || window.pageXOffset;
+        const scrollY = window.scrollY || window.pageYOffset;
+
+        const top = scrollY + rect.bottom + 6;
+        const left = scrollX + rect.left;
+
+        tooltip.style.top = top + "px";
+        tooltip.style.left = left + "px";
+        tooltip.style.display = "block";
+
+        requestAnimationFrame(() => {
+            tooltip.classList.add("visible");
+        });
+    }
+
+    function attachPinListeners(maxPins) {
+        const pins = calendarDiv.querySelectorAll(".pin");
+        pins.forEach(pin => {
+            pin.addEventListener("click", (e) => {
+                e.stopPropagation();
+
+                if (activePin === pin) {
+                    hideTooltip();
+                    return;
+                }
+
+                const name = pin.dataset.name || "";
+                const type = pin.dataset.type || "";
+                const campus = pin.dataset.campus || "";
+                const start = pin.dataset.start || "";
+                const end = pin.dataset.end || "";
+                const location = pin.dataset.location || "";
+
+                const html = `
+                    <div class="event-tooltip-header">
+                        <strong>${escapeAttr(name)}</strong>
+                    </div>
+                    <div class="event-tooltip-meta">
+                        ${type ? escapeAttr(type) : ""}${campus ? " · " + escapeAttr(campus) : ""}
+                    </div>
+                    <div class="event-tooltip-meta">
+                        ${start || end ? escapeAttr(start) + (end ? " - " + escapeAttr(end) : "") : ""}
+                    </div>
+                    <div class="event-tooltip-meta">
+                        ${location ? escapeAttr(location) : ""}
+                    </div>
+                `;
+                showTooltipAt(pin, html);
+            });
+        });
+
+        const moreButtons = calendarDiv.querySelectorAll(".pin-more-btn");
+        moreButtons.forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+
+                const dayKey = btn.dataset.day;
+                const allEvents = eventsByDay[dayKey] || [];
+                const filteredEvents = allEvents.filter(ev =>
+                    campusMatches(ev.campus, activeCampus)
+                );
+                const extraEvents = filteredEvents.slice(maxPins);
+
+                if (!extraEvents.length) {
+                    hideTooltip();
+                    return;
+                }
+
+                let inner = `
+                    <div class="event-tooltip-header">
+                        <strong>${extraEvents.length} more event${extraEvents.length > 1 ? "s" : ""}</strong>
+                    </div>
+                `;
+
+                extraEvents.forEach(ev => {
+                    const dotClass = typeToExtraDotClass(ev.event_type);
+                    inner += `
+                        <div class="event-tooltip-extra-item">
+                            <span class="event-tooltip-extra-dot ${dotClass}"></span>
+                            <span>${escapeAttr(ev.name)}</span>
+                        </div>
+                    `;
+                });
+
+                showTooltipAt(btn, inner);
+            });
+        });
     }
 
     function buildCalendar(month, year) {
+        hideTooltip();
+
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
@@ -106,24 +612,96 @@ document.addEventListener("DOMContentLoaded", () => {
         weekDays.forEach(d => html += `<th>${d}</th>`);
         html += `</tr><tr>`;
 
-        for (let i = 0; i < firstDay; i++) html += `<td class="empty"></td>`;
+        for (let i = 0; i < firstDay; i++) {
+            html += `<td class="empty"></td>`;
+        }
+
+        const maxPins = 6;
 
         for (let day = 1; day <= daysInMonth; day++) {
             let classes = "";
             if (day === todayDate && month === today.getMonth() && year === today.getFullYear()) {
                 classes += " today";
             }
-            const dayKey = `${year}-${pad(month+1)}-${pad(day)}`;
-            if (eventsPerDay[dayKey]) classes += " event-day";
 
-            html += `<td class="${classes.trim()}">${day}</td>`;
-            if ((day + firstDay) % 7 === 0) html += `</tr><tr>`;
+            const dayKey = `${year}-${pad(month + 1)}-${pad(day)}`;
+            const events = eventsByDay[dayKey] || [];
+
+            const filteredEvents = events.filter(ev =>
+                campusMatches(ev.campus, activeCampus)
+            );
+
+            const visibleEvents = filteredEvents.slice(0, maxPins);
+            const extraEvents = filteredEvents.slice(maxPins);
+
+            let pinsHtml = "";
+
+            visibleEvents.forEach(ev => {
+                const typeClass = typeToClass(ev.event_type);
+                const campusClass = campusToClass(ev.campus);
+                pinsHtml += `
+                    <button type="button"
+                            class="pin ${typeClass} ${campusClass}"
+                            title="${escapeAttr(ev.name)}"
+                            data-name="${escapeAttr(ev.name)}"
+                            data-type="${escapeAttr(ev.event_type)}"
+                            data-campus="${escapeAttr(ev.campus)}"
+                            data-start="${escapeAttr(ev.start_time)}"
+                            data-end="${escapeAttr(ev.end_time)}"
+                            data-location="${escapeAttr(ev.location)}">
+                    </button>
+                `;
+            });
+
+            if (extraEvents.length > 0) {
+                pinsHtml += `
+                    <button type="button"
+                            class="pin-more-btn"
+                            data-day="${dayKey}">
+                        +${extraEvents.length}
+                    </button>
+                `;
+            }
+
+            html += `
+                <td class="${classes.trim()}">
+                    <div class="day-inner">
+                        <div class="day-number">${day}</div>
+                        <div class="pins">
+                            ${pinsHtml}
+                        </div>
+                    </div>
+                </td>
+            `;
+
+            if ((day + firstDay) % 7 === 0) {
+                html += `</tr><tr>`;
+            }
         }
 
+        // trailing empties for last row
         const remaining = (7 - (daysInMonth + firstDay) % 7) % 7;
-        for (let i = 0; i < remaining; i++) html += `<td class="empty"></td>`;
-        html += `</tr></table>`;
+        for (let i = 0; i < remaining; i++) {
+            html += `<td class="empty"></td>`;
+        }
+        html += `</tr>`;
+
+        // ensure exactly 6 rows for consistent height
+        const totalSlots = firstDay + daysInMonth;
+        const rowsUsed = Math.ceil(totalSlots / 7);
+        const extraRows = 6 - rowsUsed;
+        for (let r = 0; r < extraRows; r++) {
+            html += `<tr>`;
+            for (let c = 0; c < 7; c++) {
+                html += `<td class="empty"></td>`;
+            }
+            html += `</tr>`;
+        }
+
+        html += `</table>`;
+
         calendarDiv.innerHTML = html;
+        attachPinListeners(maxPins);
     }
 
     buildCalendar(currentMonth, currentYear);
@@ -144,6 +722,14 @@ document.addEventListener("DOMContentLoaded", () => {
             currentYear++;
         }
         buildCalendar(currentMonth, currentYear);
+    });
+
+    document.addEventListener("click", () => {
+        hideTooltip();
+    });
+
+    tooltip.addEventListener("click", (e) => {
+        e.stopPropagation();
     });
 });
 </script>

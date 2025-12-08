@@ -298,12 +298,6 @@ input[type='text']{
     color: white !important;
 }
 
-#calendar td.favorite {
-    background-color: #fff3cd; /* light yellow */
-    color: #856404; /* dark yellow text */
-    font-weight: bold;
-}
-
 .additional-buttons button:hover {
     background-color: #555;
     -webkit-transform: scale(1.03);
