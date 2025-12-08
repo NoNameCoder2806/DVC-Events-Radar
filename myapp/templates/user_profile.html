@@ -1,301 +1,265 @@
 {% extends 'base_profile.html' %}
 {% block title %}My Profile{% endblock %}
-{% block show_header %}{% endblock %} <!-- hides header/navbar -->
+{% block show_header %}{% endblock %}
+
 {% block content %}
 <style>
-    .profile-page {
-        background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-        min-height: 100vh;
-        padding: 40px 20px;
-    }
+/* Full viewport gradient background */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
+}
 
-    .profile-title {
-        font-size: 2em;
-        margin-bottom: 30px;
-        font-weight: 700;
-        color: #2e7d32;
-    }
+.profile-page {
+    min-height: 100vh;
+    width: 100%;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
 
-    .profile-layout {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
+.profile-layout {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: transparent;
+}
 
+/* Profile card */
+.profile-header {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    padding: 48px;
+    position: relative;
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.profile-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #2e7d32 0%, #5e35b1 100%);
+}
+
+.left-section {
+    flex: 0 0 200px;
+    padding-top: 60px;
+    position: relative;
+}
+
+.right-section {
+    flex: 1;
+}
+
+/* Avatar */
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 30px 0;
+    transform: translate(-5%, 10%);
+}
+
+.avatar-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+    border: 3px solid #5e35b1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-weight: 700;
+    color: #5e35b1;
+    background: white;
+}
+
+.avatar-circle img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.edit-picture-btn {
+    padding: 8px 16px;
+    background: #e0e0e0;
+    color: #333;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+.edit-picture-btn:hover {
+    background: #d0d0d0;
+}
+
+/* Profile title */
+.profile-title {
+    font-size: 2em;
+    margin-bottom: 30px;
+    font-weight: 700;
+    color: #2e7d32;
+}
+
+/* Edit link */
+.edit-profile-link {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.edit-profile-link:hover {
+    color: #5e35b1;
+}
+
+/* Info sections */
+.info-section-title {
+    font-size: 1.3em;
+    color: #333;
+    font-weight: 600;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.info-text {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+.info-text a {
+    color: #5e35b1;
+    text-decoration: none;
+}
+.info-text a:hover {
+    text-decoration: underline;
+}
+
+/* Form styles */
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.95em;
+    font-weight: normal;
+    color: #1e6b8f;
+    margin-bottom: 8px;
+    font-style: italic;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 16px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 50px;
+    font-size: 1em;
+    outline: none;
+    transition: all 0.3s ease;
+    background: white;
+}
+.form-group textarea {
+    border-radius: 20px;
+    min-height: 100px;
+    resize: vertical;
+}
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+    border-color: #5e35b1;
+    box-shadow: 0 0 0 3px rgba(94, 53, 177, 0.1);
+}
+
+/* Buttons */
+.save-btn {
+    padding: 16px 32px;
+    background: #5e35b1;
+    color: white;
+    border-radius: 50px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+.save-btn:hover {
+    background: #4527a0;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(94, 53, 177, 0.3);
+}
+
+.change-password-btn {
+    display: inline-block;
+    padding: 16px 32px;
+    background: #ffc107;
+    color: #333;               /* keep text color */
+    border-radius: 50px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    margin-top: 20px;
+    text-decoration: none;     /* remove underline */
+    transition: all 0.3s ease;
+}
+
+.change-password-btn:hover {
+    background: #ffb300;
+    color: #333;               /* keep same text color on hover */
+    text-decoration: none;     /* prevent underline on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3);
+}
+
+/* Back button */
+.back-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 10px 15px;
+    background: white;
+    color: #5e35b1;
+    border: 2px solid #5e35b1;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.back-btn:hover {
+    background: #5e35b1;
+    color: white;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
     .profile-header {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        padding: 48px;
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        gap: 30px;
-        align-items: flex-start;
+        flex-direction: column;
     }
-
-    .profile-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 6px;
-        background: linear-gradient(90deg, #2e7d32 0%, #5e35b1 100%);
-    }
-
     .left-section {
-        flex: 0 0 200px;
-        padding-top: 60px;
-        position: relative; /* needed for absolute positioning of back button */
+        padding-top: 20px;
     }
-
-    .right-section {
-        flex: 1;
-    }
-
-    .avatar-section {
-        display:flex;
-        flex-direction: column;
-        transform: translateX(-9px);
-        align-items: center; /* centers horizontally */
-        text-align: left;
-        margin-bottom: 30px;
-        margin-top: 30px; /* <-- Add this to move avatar down */
-    }
-
-    .avatar-circle {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        margin-bottom: 15px;
-        border: 3px solid #5e35b1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 48px;
-        font-weight: 700;
-        color: #5e35b1;
-        background: white;
-    }
-
-    .avatar-circle img {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .edit-picture-btn {
-        display: inline-block;
-        padding: 8px 16px;
-        background: #e0e0e0;
-        color: #333;
-        border-radius: 4px;
-        text-decoration: none;
-        font-size: 0.9em;
-        cursor: pointer;
-        border: none;
-    }
-
-    .edit-picture-btn:hover {
-        background: #d0d0d0;
-    }
-
-    .info-display h2 {
-        font-size: 1.8em;
-        color: #2e7d32;
-        font-weight: 700;
-        margin-bottom: 20px;
-    }
-
-    .info-section-title {
-        font-size: 1.3em;
-        color: #333;
-        font-weight: 600;
-        margin-top: 30px;
-        margin-bottom: 15px;
-    }
-
-    .info-text {
-        color: #666;
-        line-height: 1.6;
-        margin-bottom: 20px;
-    }
-
-    .info-text a {
-        color: #5e35b1;
-        text-decoration: none;
-    }
-
-    .info-text a:hover {
-        text-decoration: underline;
-    }
-
-    .edit-profile-link {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        color: #666;
-        text-decoration: none;
-        font-size: 0.9em;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .edit-profile-link:hover {
-        color: #5e35b1;
-    }
-
-    .form-group {
-        margin-bottom: 24px;
-    }
-
-    .form-group label {
-        display: block;
-        font-size: 0.95em;
-        font-weight: normal;
-        color: #1e6b8f;
-        margin-bottom: 8px;
-        font-style: italic;
-    }
-
-    .form-group input[type="text"],
-    .form-group textarea,
-    .form-group input[type="file"] {
-        width: 100%;
-        padding: 16px 20px;
-        border: 2px solid #e0e0e0;
-        border-radius: 50px;
-        font-size: 1em;
-        outline: none;
-        transition: all 0.3s ease;
-        background: white;
-        font-family: inherit;
-    }
-
-    .form-group textarea {
-        border-radius: 20px;
-        min-height: 100px;
-        resize: vertical;
-    }
-
-    .form-group input[type="text"]:focus,
-    .form-group textarea:focus {
-        border-color: #5e35b1;
-        box-shadow: 0 0 0 3px rgba(94, 53, 177, 0.1);
-    }
-
-    .save-btn {
-        padding: 16px 32px;
-        background: #5e35b1;
-        color: white;
-        border: none;
-        border-radius: 50px;
-        font-size: 1.1em;
-        font-weight: 600;
-        letter-spacing: 1px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-transform: uppercase;
-    }
-
-    .save-btn:hover {
-        background: #4527a0;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(94, 53, 177, 0.3);
-    }
-
-    .save-btn:active {
-        transform: translateY(0);
-    }
-
-    .change-password-btn {
-        display: inline-block;
-        padding: 16px 32px;
-        background: #ffc107;
-        color: #333;
-        border: none;
-        border-radius: 50px;
-        font-size: 1.1em;
-        font-weight: 600;
-        letter-spacing: 1px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-transform: uppercase;
-        text-decoration: none;
-        margin-top: 20px;
-    }
-
-    .change-password-btn:hover {
-        background: #ffb300;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(255, 193, 7, 0.3);
-        color: #333;
-        text-decoration: none;
-    }
-
-    .change-password-btn:active {
-        transform: translateY(0);
-    }
-
-    .container-fluid.mt-4 {
-        position: relative;
-        top: -40px;   /* moves content up by 50px */
-    }
-
-    .container-fluid {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        flex: 1;
-    }
-
-    body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh; /* full viewport height */
-        overflow-y: hidden;
-    }
-
-    .back-btn {
-        position: absolute;
-        top: 0;       
-        left: 0;      
-        padding: 10px 15px;       /* make it bigger */
-        background: white;         /* white by default */
-        color: #5e35b1;            /* purple border & text */
-        font-weight: 600;
-        border: 2px solid #5e35b1; /* outline */
-        border-radius: 8px;
-        text-decoration: none !important;
-        font-size: 1em;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-
-    .back-btn:hover {
-        background-color: #5e35b1; /* fill with purple on hover */
-        color: white;              /* text becomes white */
-        transform: translateY(-1px);
-    }
-
-    @media (max-width: 768px) {
-        .profile-header {
-            flex-direction: column;
-        }
-        
-        .left-section {
-            flex: 1;
-            padding-top: 0;
-        }
-    }
+}
 </style>
 
 <div class="profile-page">
     <div class="profile-layout">
         <div class="profile-header">
             <div class="left-section">
-                <a href="{% url 'home' %}" class="back-btn">← Back</a>  <!-- <-- Add this -->
+                <a href="{% url 'home' %}" class="back-btn">← Back</a>
                 <div class="avatar-section">
                     <div class="avatar-circle">
                         {% if user_obj.users.avatar_url %}
@@ -311,88 +275,82 @@
                     </form>
                 </div>
             </div>
-
             <div class="right-section">
                 <h1 class="profile-title">User Profile</h1>
-                
                 <a href="#" class="edit-profile-link" onclick="toggleEditMode(); return false;">
                     <span>✏️</span> Edit Profile
                 </a>
 
-            <!-- Display Mode -->
-            <div id="displayMode">
-                <div class="info-display">
-                    <h2>{{ user_obj.first_name }} {{ user_obj.last_name }}</h2>
-                    
-                    <h3 class="info-section-title">Contact</h3>
-                    <p class="info-text">
-                        <strong>Username:</strong> {{ user_obj.username }}<br>
-                        <strong>DVC ID:</strong> {{ user_obj.users.DVC_ID }}<br>
-                        <strong>Role:</strong> {{ user_obj.users.role|capfirst }}
-                    </p>
+                <!-- Display Mode -->
+                <div id="displayMode">
+                    <div class="info-display">
+                        <h2>{{ user_obj.first_name }} {{ user_obj.last_name }}</h2>
 
-                    <h3 class="info-section-title">Biography</h3>
-                    <p class="info-text">
-                        {% if user_obj.users.biography %}
-                            {{ user_obj.users.biography }}
-                        {% else %}
-                            No biography has been added
-                        {% endif %}
-                    </p>
+                        <h3 class="info-section-title">Contact</h3>
+                        <p class="info-text">
+                            <strong>Username:</strong> {{ user_obj.username }}<br>
+                            <strong>DVC ID:</strong> {{ user_obj.users.DVC_ID }}<br>
+                            <strong>Role:</strong> {{ user_obj.users.role|capfirst }}
+                        </p>
 
-                    <h3 class="info-section-title">Links</h3>
-                    <p class="info-text">
-                        {% if user_obj.users.links %}
-                            {{ user_obj.users.links|linebreaks }}
-                        {% else %}
-                            No links have been added
-                        {% endif %}
-                    </p>
+                        <h3 class="info-section-title">Biography</h3>
+                        <p class="info-text">
+                            {% if user_obj.users.biography %}
+                                {{ user_obj.users.biography }}
+                            {% else %}
+                                No biography has been added
+                            {% endif %}
+                        </p>
 
-                    <a href="{% url 'password_change' %}" class="change-password-btn">Change Password</a>
+                        <h3 class="info-section-title">Links</h3>
+                        <p class="info-text">
+                            {% if user_obj.users.links %}
+                                {{ user_obj.users.links|linebreaks }}
+                            {% else %}
+                                No links have been added
+                            {% endif %}
+                        </p>
+
+                        <a href="{% url 'password_change' %}" class="change-password-btn">Change Password</a>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Edit Mode (Hidden by default) -->
-            <div id="editMode" style="display: none;">
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
+                <!-- Edit Mode -->
+                <div id="editMode" style="display: none;">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="first_name">First Name:</label>
+                            <input type="text" name="first_name" id="first_name" value="{{ user_obj.first_name }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="last_name">Last Name:</label>
+                            <input type="text" name="last_name" id="last_name" value="{{ user_obj.last_name }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="biography">Biography:</label>
+                            <textarea name="biography" id="biography" placeholder="Tell us about yourself...">{{ user_obj.users.biography|default:"" }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="links">Links:</label>
+                            <textarea name="links" id="links" placeholder="Add your social media links, website, etc. (one per line)">{{ user_obj.users.links|default:"" }}</textarea>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="first_name">First Name:</label>
-                        <input type="text" name="first_name" id="first_name" value="{{ user_obj.first_name }}">
-                    </div>
+                        <button type="submit" class="save-btn">Save Changes</button>
+                        <button type="button" class="save-btn" onclick="toggleEditMode()" style="background: #999; margin-left: 10px;">Cancel</button>
+                    </form>
+                </div>
 
-                    <div class="form-group">
-                        <label for="last_name">Last Name:</label>
-                        <input type="text" name="last_name" id="last_name" value="{{ user_obj.last_name }}">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="biography">Biography:</label>
-                        <textarea name="biography" id="biography" placeholder="Tell us about yourself...">{{ user_obj.users.biography|default:"" }}</textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="links">Links:</label>
-                        <textarea name="links" id="links" placeholder="Add your social media links, website, etc. (one per line)">{{ user_obj.users.links|default:"" }}</textarea>
-                    </div>
-
-                    <button type="submit" class="save-btn">Save Changes</button>
-                    <button type="button" class="save-btn" onclick="toggleEditMode()" style="background: #999; margin-left: 10px;">Cancel</button>
-                </form>
             </div>
         </div>
     </div>
-</div>
 </div>
 
 <script>
 function toggleEditMode() {
     const displayMode = document.getElementById('displayMode');
     const editMode = document.getElementById('editMode');
-    
-    if (displayMode.style.display === 'none') {
+    if(displayMode.style.display === 'none') {
         displayMode.style.display = 'block';
         editMode.style.display = 'none';
     } else {
@@ -401,45 +359,4 @@ function toggleEditMode() {
     }
 }
 </script>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-function showTopMessage(text, type = "info") {
-    const box = document.getElementById("topNotification");
-
-    const colors = {
-        success: "#28a745",
-        error: "#dc3545",
-        warning: "#ffc107",
-        info: "#17a2b8"
-    };
-    box.textContent = text;
-    box.style.background = colors[type] || colors.info;
-
-    box.style.transition = "none";
-    box.style.top = "-80px";
-    box.style.opacity = "0";
-    void box.offsetWidth;
-
-    box.style.transition = "top 0.5s ease, opacity 0.5s ease";
-
-    setTimeout(() => {
-        box.style.top = "20px";
-        box.style.opacity = "1";
-    }, 50);
-
-    setTimeout(() => {
-        box.style.top = "-80px";
-        box.style.opacity = "0";
-    }, 2600);
-}
-</script>
-
-{% for message in messages %}
-<script>
-showTopMessage("{{ message|escapejs }}", "{{ message.tags }}");
-</script>
-{% endfor %}
 {% endblock %}
