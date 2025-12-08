@@ -84,26 +84,46 @@ def home(request):
     })
 
 def calendar_view(request):
-    today = datetime.today()
-    events_per_day = {}  # key = day of month, value = count of favorite events
+    """
+    Render calendar with favorite events per day for the logged-in user.
+    Sends full event objects (name, type, campus, start/end times, location)
+    so JS can generate pins.
+    """
+    events_per_day = {}  # key = YYYY-MM-DD, value = list of events
 
     if request.user.is_authenticated:
         try:
             user_obj = Users.objects.get(user=request.user)
             favorite_events = Favorites.objects.filter(user_ID=user_obj).select_related('event_ID')
+
             for fav in favorite_events:
-                try:
-                    event_date = datetime.datetime.strptime(fav.event_ID.date.strip(), "%Y-%m-%d")
-                    day_key = event_date.strftime("%Y-%m-%d")  # YYYY-MM-DD
-                    events_per_day[day_key] = events_per_day.get(day_key, 0) + 1
-                except Exception as e:
-                    print(f"Skipping invalid date {fav.event_ID.date}: {e}")
+                event = fav.event_ID
+                event_date = event.date
+                if not event_date:
+                    continue  # skip if date is None
+
+                day_key = event_date.strftime("%Y-%m-%d")
+
+                if day_key not in events_per_day:
+                    events_per_day[day_key] = []
+
+                # Add full event info for JS
+                events_per_day[day_key].append({
+                    "name": event.name,
+                    "event_type": getattr(event, "event_type", "General"),
+                    "campus": getattr(event, "campus", ""),
+                    "start_time": getattr(event, "start_time", ""),
+                    "end_time": getattr(event, "end_time", ""),
+                    "location": getattr(event, "location", "")
+                })
+
         except Users.DoesNotExist:
             pass
 
     context = {
-        "events_per_day": events_per_day,  # now only includes “interested” events
+        "events_by_day": events_per_day,  # matches JS variable name
     }
+
     return render(request, "calendar.html", context)
 
 def event_map(request):
