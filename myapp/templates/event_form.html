@@ -1,8 +1,29 @@
 {% extends 'base.html' %}
 {% block title %}{{ page_title }}{% endblock %}
 
-{% block content %}
+{% block page_title %}
+<div class="page-header-title-wrapper">
+    {% if page_title == "Add Event" %}
+        <button type="button" class="map-back-btn" id="backBtn">← Home</button>
+    {% else %}
+        <button type="button" class="map-back-btn" id="backBtn">← Back</button>
+    {% endif %}
 
+    <span class="page-title">{{ page_title }}</span>
+</div>
+
+<script>
+document.getElementById('backBtn').addEventListener('click', function() {
+    window.location.href = "{% url 'home' %}";
+});
+</script>
+{% endblock %}
+
+{% block header_spacer2 %}
+<div style="height: 30px;"></div>
+{% endblock %}
+
+{% block content %}
 <!-- 🔥 Floating top notification -->
 <div id="topNotification"
      style="
@@ -23,15 +44,6 @@
 
 <div class="d-flex justify-content-center mt-5">
     <div class="w-75">
-
-        <!-- Top bar with Back button -->
-        <div class="d-flex align-items-center mb-4 position-relative">
-            <div class="position-absolute" style="left: 0;">
-                <a href="{% url 'home' %}" class="btn btn-secondary">&larr; Back</a>
-            </div>
-            <h2 class="mx-auto text-center">{{ page_title }}</h2>
-        </div>
-
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
@@ -125,6 +137,49 @@
     </div>
 </div>
 
+<style>
+/* Title */
+.page-header-title-wrapper {
+    position: relative;
+    width: 100%;
+    height: 80px;
+}
+
+.page-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(calc(-50% - 22%));
+    font-weight: bold;
+    font-size: 63px;
+    color: #017550;
+    white-space: nowrap;
+}
+
+/* Back button */
+.map-back-btn {
+    position: absolute;
+    top: 16%;
+    left: 0;
+    margin-left: 10%;
+    padding: 12px 20px;
+    background: white;          /* white by default */
+    color: #0a7a33;             /* green border/text */
+    border: 2px solid #0a7a33; 
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.map-back-btn:hover {
+    background-color: #0a7a33; /* fill green on hover */
+    color: white;               /* text turns white */
+    transform: translateY(-1px);
+}
+</style>
 {% endblock %}
 
 {% block scripts %}
