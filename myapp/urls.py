@@ -7,8 +7,9 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path("", views.home, name='home'),
+    # path("calendar/", views.calendar, name='calendar'),
     path('calendar/', views.calendar_view, name='calendar'),  # use calendar_view
-    path("map/", views.map, name="map"),
+    path("event_map/", views.event_map, name="map"),
     path("login/", views.app_login, name="login"),
     path("logout/", views.app_logout, name="logout"),
     path("register/", views.register, name="register"),
@@ -23,8 +24,6 @@ urlpatterns = [
     path("manage-users/delete/<int:user_id>/", views.delete_user, name="delete_user"),
     path("profile/", views.user_profile, name="user_profile")
 ]
-
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += [
     path('password_change/', auth_views.PasswordChangeView.as_view(

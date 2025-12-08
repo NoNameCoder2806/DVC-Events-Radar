@@ -1,0 +1,121 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %} Django App {% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'home.css' %}" type="text/css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+</head>
+
+<body>
+    <div id="topNotification" style="
+            position: fixed;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            z-index: 9999;
+            transition: top 0.4s ease-in-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        ">
+    </div>
+
+    {% block show_header %}
+    <header class="d-flex align-items-center p-3 bg-light border-bottom" style="position: relative;">
+        <h1 class="mb-0">
+            <a href="{% url 'home' %}" style="text-decoration: none; color: inherit;">
+                DVC Events
+            </a>
+        </h1>
+        <div class="button-container" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+           display: flex; flex-direction: column; gap: 5px; align-items: center;">
+            {% if user.is_authenticated %}
+            <!-- Avatar button -->
+            <a href="{% url 'user_profile' %}">
+                {% if request.user.users.avatar_url %}
+                <img src="{{ request.user.users.avatar_url.url }}" alt="Avatar"
+                    style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid #007bff;">
+                {% else %}
+                <div style="
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    background: white;
+                    color: #007bff;
+                    border: 2px solid #007bff;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                    font-size: 18px;
+                    cursor: pointer;
+                ">
+                    {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
+                </div>
+                {% endif %}
+            </a>
+
+            <!-- Logout button -->
+            <a href="{% url 'logout' %}" class="btn btn-danger mt-2 w-100">Logout</a>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn btn-primary mb-2 w-100">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-success w-100">Register</a>
+            {% endif %}
+        </div>
+    </header>
+    {% endblock %}
+
+    <div class="container-fluid mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- GLOBAL SCRIPTS -->
+    <script>
+        document.querySelectorAll('.toggle-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const expanded = button.getAttribute('aria-expanded') === 'true';
+                setTimeout(() => {
+                    button.textContent = expanded ? '+' : '−';
+                }, 150);
+            });
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function showTopMessage(text, type = "info") {
+            const box = document.getElementById("topNotification");
+
+            const colors = {
+                success: "#28a745",
+                error: "#dc3545",
+                warning: "#ffc107",
+                info: "#17a2b8"
+            };
+
+            box.style.background = colors[type] || colors.info;
+            box.innerText = text;
+
+            // Slide down
+            box.style.top = "20px";
+
+            // Auto-hide
+            setTimeout(() => {
+                box.style.top = "-80px";
+            }, 2500);
+        }
+    </script>
+
+    <!-- 🔥 IMPORTANT: child templates insert their JS here -->
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

@@ -1,6 +1,37 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block page_title %}
+    <span class="page-title">Events</span>
+{% endblock %}
+
+{% block quick_access %}
+<div class="quick-access-buttons d-flex flex-wrap align-items-center">
+    {% if user_role == "superuser" %}
+    <a href="{% url 'manage_users' %}" class="qa-btn btn-outline-purple">
+        🔐 Users
+    </a>
+    {% endif %}
+
+    {% if user_role == "admin" or user_role == "superuser" %}
+    <a href="{% url 'add_event' %}" class="qa-btn btn-outline-green">
+        ➕ Add Event
+    </a>
+
+    <a href="{% url 'manage_events' %}" class="qa-btn btn-outline-blue">
+        🛠️ Events
+    </a>
+    {% endif %}
+
+    <a href="{% url 'calendar' %}" class="qa-btn btn-outline-green">
+        📅 Calendar
+    </a>
+    <a href="{% url 'map' %}" class="qa-btn btn-outline-blue">
+        🗺️ Map
+    </a>
+</div>
+{% endblock %}
+
 {% block content %}
 <!-- Top slide-down alert -->
 <div id="top-alert" class="alert" role="alert" style="position: fixed; top: -60px; left: 50%; transform: translateX(-50%);
@@ -11,198 +42,173 @@
     </button>
 </div>
 
-<div class="container-fluid mt-4">
+<div class="container-fluid">
     <div class="row">
+        <!-- ⬅️ Left Spacer -->
+        <div class="col-12 col-md-1" style="max-width: 100px;"><!-- Empty column for spacing --></div>
+
         <!-- 🧭 Left Column -->
-        <div class="col-12 col-md-2">
-            <h5 class="mb-3">Filters</h5>
-            <!-- 📍 Location -->
-            <div class="border-bottom mb-2 pb-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-bold">Location</span>
-                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
-                        data-target="#locationFilter" aria-expanded="false" aria-controls="locationFilter">
-                        +
-                    </button>
-                </div>
-                <div class="collapse mt-2" id="locationFilter">
-                    <label class="form-check" for="onCampus">Pleasant Hill Campus<input type="checkbox" id="onCampus"><span class="checkmark"></span></label>
-                    <label class="form-check" for="offCampus">San Ramon Campus<input type="checkbox" id="offCampus"><span class="checkmark"></span></label>
-                    <label class="form-check" for="virtual">Virtual<input type="checkbox" id="virtual"><span class="checkmark"></span></label>
-                </div>
-            </div>
+        <div class="col-12 col-md-3 pe-4">
+            <!-- White Box Wrapper -->
+            <div class="filter-box p-3">
+                <h5 class="filter-title">Filters</h5>
 
-            <!-- 📅 Select Days -->
-            <div class="border-bottom mb-2 pb-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-bold">Select Days</span>
-                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
-                        data-target="#daysFilter" aria-expanded="false" aria-controls="daysFilter">
-                        +
-                    </button>
-                </div>
-                <div class="collapse mt-2" id="daysFilter">
-                      <label class="form-check" for="monday"><input class="form-check-input" type="checkbox" id="monday">Monday<span class="checkmark"></span></label>
-                      <label class="form-check" for="tuesday"><input class="form-check-input" type="checkbox" id="tuesday">Tuesday<span class="checkmark"></span></label>
-                      <label class="form-check" for="wednesday"><input class="form-check-input" type="checkbox" id="wednesday">Wednesday<span class="checkmark"></span></label>
-                      <label class="form-check" for="thursday"><input class="form-check-input" type="checkbox" id="thursday">Thursday<span class="checkmark"></span></label>
-                      <label class="form-check" for="friday"><input class="form-check-input" type="checkbox" id="friday">Friday<span class="checkmark"></span></label>
-                  </div>
+                <form id="filterForm" onsubmit="return false;">
+                    {% for field in form %}
+                        <div class="filter-block">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold filter-category">{{ field.label }}</span>
+                                <button class="btn btn-sm btn-outline-secondary toggle-btn" 
+                                        type="button" 
+                                        data-target="#{{ field.name }}Filter" 
+                                        aria-expanded="false" 
+                                        aria-controls="{{ field.name }}Filter"
+                                        style="margin-right:5%;">
+                                    +
+                                </button>
+                            </div>
+                            
+                            <div class="filter-content mt-2" id="{{ field.name }}Filter">
+                                {% for checkbox in field %}
+                                    <label class="form-check filter-checkbox-label">
+                                        <input 
+                                            type="checkbox"
+                                            name="{{ field.name }}"
+                                            value="{{ checkbox.data.value }}"
+                                            id="{{ checkbox.id_for_label }}"
+                                            class="filter-checkbox"
+                                            {% if checkbox.data.selected %}checked{% endif %}
+                                        >
+                                        {{ checkbox.choice_label }}
+                                        <span class="checkmark"></span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </form>
             </div>
-
-            <!-- 🕒 Time Range -->
-            <div class="border-bottom mb-2 pb-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-bold">Select Time Range</span>
-                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
-                        data-target="#timeFilter" aria-expanded="false" aria-controls="timeFilter">
-                        +
-                    </button>
-                </div>
-                <div class="collapse mt-2" id="timeFilter">
-                    <label class="form-check" for="morning"><input class="form-check-input" type="checkbox" id="morning">Morning<br>(8am–12pm)<span class="checkmark"></span></label>
-                    <label class="form-check" for="afternoon"><input class="form-check-input" type="checkbox" id="afternoon">Afternoon<br>(12pm–5pm)<span class="checkmark"></span></label>
-                    <label class="form-check" for="evening"><input class="form-check-input" type="checkbox" id="evening">Evening<br>(5pm–9pm)<span class="checkmark"></span></label>            
-                </div>
-            </div>
-
-            <!-- 🎟️ Event Type -->
-            <div class="border-bottom mb-2 pb-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-bold">Event Type</span>
-                    <button class="btn btn-sm btn-outline-secondary toggle-btn collapsed" type="button" data-toggle="collapse"
-                        data-target="#typeFilter" aria-expanded="false" aria-controls="typeFilter">
-                        +
-                    </button>
-                </div>
-                <div class="collapse mt-2" id="typeFilter">
-                    <label class="form-check" for="sports"><input class="form-check-input" type="checkbox" id="sports">Sports<span class="checkmark"></span></label>
-                    <label class="form-check" for="music"><input class="form-check-input" type="checkbox" id="music">Clubs<span class="checkmark"></span></label>
-                    <label class="form-check" for="clubs">Career & Academic<input class="form-check-input" type="checkbox" id="clubs"><span class="checkmark"></span></label>
-                    <label class="form-check" for="academic"><input class="form-check-input" type="checkbox" id="academic">Free Food<span class="checkmark"></span></label>
-                </div>
-            </div>
-
-            <!-- Apply Button -->
-            <!-- <button class="btn btn-primary w-100 mt-2">Apply Filters</button> -->
         </div>
 
+        <div class="col-12 col-md-1" style="max-width: 55px;"><!-- empty spacer --></div>
+
         <!-- 🎟️ Middle Column -->
-        <div class="col-12 col-md-8">
+        <div class="col-12 col-md-7 ps-4">
             <!-- Short Description -->
-            <div>
-                <p class="page-description">Add the Events page description here</p>
+            <div style="width: 100%;">
+                <p style="margin: 0 0 15px 0;">
+                    <span style="
+                        font-weight: bold;
+                        font-style: italic;
+                        color: #003366;
+                        background-color: white;
+                        padding: 5px;
+                        font-size: 125%;
+                        border-radius: 6px;      /* optional: looks cleaner */
+                        line-height: 2;   /* increase line spacing */
+                    ">
+                        Diablo Valley College (DVC) hosts a diverse range of events that cater to the interests and needs of its vibrant student community. 
+                        From academic workshops and career fairs to guest speaker sessions, DVC offers numerous opportunities for students to engage, learn, and connect. 
+                        The college regularly features performances, art exhibits, and athletic events, ensuring there's always something exciting happening on campus.
+                    </span>
+                </p>
             </div>
 
             <!-- The Events Search Bar-->
-            <div class="p-3 bg-white border rounded">
-                <h3>Event Search</h3>
-                <div id="searchbar">
-                    <input id="search-input" type="text" class="form-control mb-3" placeholder="Search for events...">
-                    <div id="search-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 24 24" style="fill:#FFFFFF;"><path d="M 10 2 C 5.5965257 2 2 5.5965291 2 10 C 2 14.403471 5.5965257 18 10 18 C 11.752132 18 13.370523 17.422074 14.691406 16.458984 L 20.224609 21.992188 L 21.992188 20.224609 L 16.458984 14.691406 C 17.422074 13.370523 18 11.75213 18 10 C 18 5.5965291 14.403474 2 10 2 z M 10 4.5 C 13.052375 4.5 15.5 6.947627 15.5 10 C 15.5 13.052373 13.052375 15.5 10 15.5 C 6.9476251 15.5 4.5 13.052373 4.5 10 C 4.5 6.947627 6.9476251 4.5 10 4.5 z"></path></svg></div>
-                </div>
-                
-                <!-- The Events Search Bar-->
-                <div class="p-3 bg-white border rounded">
-                    <!-- ✅ New Bootstrap row for event grid -->
-                    <div class="row">
-                        {% for event in events_data %}
-                        <div class="col-md-6  mb-4">
-                            {% include 'partials/event_card.html' with event=event %} 
+            <div class="p-3 bg-white border rounded mb-3">
+                <!-- Search form (functional with icon) -->
+                <form method="get" action="{% url 'home' %}" class="d-flex align-items-center mb-3 w-100">
+                    <div id="searchbar" class="w-100">
+                        <input type="text" placeholder="Search Events">
+                        <div id="search-icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="48" height="48" viewBox="0 0 24 24" style="fill:#FFFFFF;">
+                                <path d="M 10 2 C 5.5965257 2 2 5.5965291 2 10 C 2 14.403471 5.5965257 18 10 18 C 11.752132 18 13.370523 17.422074 14.691406 16.458984 L 20.224609 21.992188 L 21.992188 20.224609 L 16.458984 14.691406 C 17.422074 13.370523 18 11.75213 18 10 C 18 5.5965291 14.403474 2 10 2 z M 10 4.5 C 13.052375 4.5 15.5 6.947627 15.5 10 C 15.5 13.052373 13.052375 15.5 10 15.5 C 6.9476251 15.5 4.5 13.052373 4.5 10 C 4.5 6.947627 6.9476251 4.5 10 4.5 z"></path>
+                            </svg>
                         </div>
-                        {% endfor %} 
                     </div>
+                </form>
+
+                <!-- ✅ Events grid -->
+                <div id="events-grid" class="row">
+                    {% for event in events_data %}
+                    <div class="col-md-6 mb-4">
+                        {% include 'partials/event_card.html' with event=event user_favorites=user_favorites %}
+                    </div>
+                    {% endfor %}
                 </div>
 
                 <!-- Pagination Controls -->
-                <nav aria-label="Event pagination">
-                    <ul class="pagination justify-content-center mt-4">
-                        {% if events_data.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ events_data.previous_page_number }}">&#8592;
-                                Previous</a>
-                        </li>
-                        {% else %}
-                        <li class="page-item disabled">
-                            <span class="page-link">&#8592; Previous</span>
-                        </li>
-                        {% endif %}
+                <div id="pagination" class="text-center mt-4">
+                    <!-- Previous arrow -->
+                    {% if events_data.has_previous %}
+                        <a href="?page={{ events_data.previous_page_number }}" class="pagination-arrow">&lt;</a>
+                    {% else %}
+                        <span class="pagination-arrow disabled">&lt;</span>
+                    {% endif %}
 
-                        {% for num in events_data.paginator.page_range %}
+                    <!-- Page numbers -->
+                    {% for num in events_data.paginator.page_range %}
                         {% if events_data.number == num %}
-                        <li class="page-item active">
-                            <span class="page-link">{{ num }}</span>
-                        </li>
+                            <span class="pagination-number active">{{ num }}</span>
                         {% else %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                        </li>
+                            <a href="?page={{ num }}" class="pagination-number">{{ num }}</a>
                         {% endif %}
-                        {% endfor %}
+                    {% endfor %}
 
-                        {% if events_data.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ events_data.next_page_number }}">Next &#8594;</a>
-                        </li>
-                        {% else %}
-                        <li class="page-item disabled">
-                            <span class="page-link">Next &#8594;</span>
-                        </li>
-                        {% endif %}
-                    </ul>
-                </nav>
+                    <!-- Next arrow -->
+                    {% if events_data.has_next %}
+                        <a href="?page={{ events_data.next_page_number }}" class="pagination-arrow">&gt;</a>
+                    {% else %}
+                        <span class="pagination-arrow disabled">&gt;</span>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
-        <!-- 📅 Right Column -->
-        <div class="col-12 col-md-2">
-            <div class="p-3 bg-light border rounded d-flex flex-column align-items-center">
-                <h5>Quick Access</h5>
-                <!-- Manage Users Button -->
-                {% if user_role == "superuser" %}
-                <a href="{% url 'manage_users' %}" class="btn btn-warning mb-2 w-100">
-                    🔐 Manage Users
-                </a>
-                {% endif %}
-
-                <!-- Add Event Button -->
-                {% if user_role == "admin" or user_role == "superuser" %}
-                <a href="{% url 'add_event' %}" class="btn btn-warning mb-2 w-100">
-                    ➕ Add Event
-                </a>
-
-                <!-- Manage Events Button -->
-                <a href="{% url 'manage_events' %}" class="btn btn-warning mb-2 w-100">
-                    🛠️ Manage Events
-                </a>
-                {% endif %}
-
-                <!-- Quick Access Buttons -->
-                <a href="{% url 'calendar' %}" class="btn btn-primary mb-2 w-100">📅 Full Calendar</a>
-                <a href="{% url 'map' %}" class="btn btn-success w-100">🗺️ Event Map</a>
-            </div>
-        </div>
+        <!-- ⬅️ Right Spacer -->
+        <div class="col-12 col-md-1"><!-- Empty column for spacing --></div>
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <!-- Scripts -->
-<script>
-    // Change + to - when the filter is expanded
-    document.querySelectorAll('.toggle-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            const target = document.querySelector(button.dataset.target);
-            const expanded = button.getAttribute('aria-expanded') === 'true';
-            setTimeout(() => {
-                button.textContent = expanded ? '+' : '−';
-            }, 150);
-        });
-    });
-</script>
-
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const target = document.querySelector(btn.dataset.target);
+        if (!target) return;
+
+        const isOpen = target.classList.contains('show');
+
+        if (isOpen) {
+            // Close
+            target.style.height = target.scrollHeight + 'px';
+            requestAnimationFrame(() => target.style.height = '0px');
+            target.addEventListener('transitionend', function handler() {
+                target.classList.remove('show');
+                target.style.height = '';
+                btn.textContent = '+'; // ✅ Update button here
+                target.removeEventListener('transitionend', handler);
+            });
+        } else {
+            // Open
+            target.classList.add('show');
+            const height = target.scrollHeight;
+            target.style.height = '0px';
+            requestAnimationFrame(() => target.style.height = height + 'px');
+            target.addEventListener('transitionend', function handler() {
+                target.style.height = '';
+                btn.textContent = '−'; // ✅ Update button here
+                target.removeEventListener('transitionend', handler);
+            });
+        }
+    });
+});
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -286,12 +292,12 @@
 </script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log("JS Loaded!");
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("JS Loaded!");
 
-        const buttons = document.querySelectorAll('.interested-btn');
-        console.log("Found buttons:", buttons.length);
-    });
+    const buttons = document.querySelectorAll('.interested-btn');
+    console.log("Found buttons:", buttons.length);
+});
 </script>
 
 <script>
@@ -328,6 +334,91 @@ function showTopMessage(text, type = "info") {
         box.style.opacity = "0";
     }, 2600);
 }
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const filterForm = document.getElementById("filterForm");
+    const searchInput = document.getElementById("search-input");
+
+    // -----------------------------
+    // Build params & fetch results
+    // -----------------------------
+    function applyFilters(page = null) {
+        const params = new URLSearchParams();
+
+        // all checked filters
+        filterForm.querySelectorAll(".filter-checkbox:checked").forEach(cb => {
+            params.append(cb.name, cb.value);
+        });
+
+        // search query
+        if (searchInput && searchInput.value.trim()) {
+            params.append("q", searchInput.value.trim());
+        }
+
+        // page number
+        if (page) params.append("page", page);
+
+        fetch("/?" + params.toString(), { headers: { "X-Requested-With": "XMLHttpRequest" } })
+            .then(r => r.text())
+            .then(html => {
+                const doc = new DOMParser().parseFromString(html, "text/html");
+
+                // update events grid
+                const newGrid = doc.querySelector("#events-grid");
+                const oldGrid = document.querySelector("#events-grid");
+                if (newGrid && oldGrid) oldGrid.innerHTML = newGrid.innerHTML;
+
+                // update pagination
+                const newPag = doc.querySelector("#pagination");
+                const oldPag = document.querySelector("#pagination");
+                if (newPag && oldPag) oldPag.innerHTML = newPag.innerHTML;
+
+                // re-bind pagination
+                bindPaginationLinks();
+            });
+    }
+
+    // -----------------------------
+    // Checkbox change listener
+    // -----------------------------
+    filterForm.addEventListener("change", e => {
+        if (e.target.classList.contains("filter-checkbox")) {
+            applyFilters();
+        }
+    });
+
+    // -----------------------------
+    // Instant search (with delay)
+    // -----------------------------
+    let typingTimer;
+    const typingDelay = 500; // ms
+
+    if (searchInput) {
+        searchInput.addEventListener("input", () => {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => applyFilters(), typingDelay);
+        });
+    }
+
+    // -----------------------------
+    // Pagination links
+    // -----------------------------
+    function bindPaginationLinks() {
+        document.querySelectorAll("#pagination a.page-link").forEach(link => {
+            link.addEventListener("click", e => {
+                e.preventDefault();
+                const page = link.getAttribute("href").split("page=")[1];
+                applyFilters(page);
+            });
+        });
+    }
+
+    // Initial bind
+    bindPaginationLinks();
+});
 </script>
 
 {% for message in messages %}

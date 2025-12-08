@@ -1,14 +1,17 @@
 <div class="event-box">
-    <p class="event-title">{{ event.name }}</p>
+    
     {% if event.image %}
-    <img src="{{ event.image.url }}" alt="Event thumbnail">
+    <a href="{% url 'event_detail' event.id %}">
+        <div class="event-top-box"><div class="event-image" style="background-image: url({{event.image.url}});"></div></div>
+    </a>
     {% else %}
     <img alt="Event thumbnail">
     {% endif %}
-
+    <p class="event-title">{{ event.name }}</p>
     <div class="info-summary">
         <p class="date">{{ event.date }}</p>
-        <p class="time">{{ event.start_time_display }} - {{ event.end_time_display }}</p>
+        <p class="time">{{ event.start_time }} - {{ event.end_time }}</p>
+        <p class="location">{{ event.location }}</p>
         <p class="campus">{{ event.campus }}</p>
     </div>
 
