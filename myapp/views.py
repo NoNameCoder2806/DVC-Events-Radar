@@ -307,18 +307,17 @@ def delete_event(request, event_id):
 
 def edit_event(request, event_id):
     event = get_object_or_404(Events, id=event_id)
-    
-    user_profile = getattr(request.user, 'users', None)    
-    
+
+    user_profile = getattr(request.user, 'users', None)
+
     if not request.user.is_authenticated or not user_profile:
         messages.error(request, "Not Authorized.")
         return redirect('home')
-        
 
-    if user_profile.role  == "user" or (user_profile.role == 'admin' and event.author_ID != user_profile):
+    if user_profile.role == "user" or (user_profile.role == 'admin' and event.author_ID != user_profile):
         messages.error(request, "You do not have permission to edit this event.")
         return redirect('home')
-    
+
     if request.method == 'POST':
         form = EventForm(request.POST, request.FILES, instance=event)
         if form.is_valid():
@@ -327,8 +326,17 @@ def edit_event(request, event_id):
             return redirect('manage_events')
     else:
         form = EventForm(instance=event)
-        
-    return render(request, "event_form.html", {'event': event, 'form': form, 'page_title': 'Edit Event', 'submit_text': 'Update event'})
+
+    return render(
+        request,
+        "event_form.html",
+        {
+            'event': event,
+            'form': form,
+            'page_title': 'Edit Event',
+            'submit_text': 'Update Event'
+        }
+    )
 
 def manage_users(request):
     all_users = User.objects.all()

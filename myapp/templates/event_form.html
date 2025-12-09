@@ -440,7 +440,13 @@ var quill = new Quill('#description-editor', {
     }
 });
 
-// Sync content with hidden input for Django submission
+// Load existing content into Quill on edit
+const existingHTML = document.getElementById('id_description').value;
+if (existingHTML.trim() !== "") {
+    quill.root.innerHTML = existingHTML;
+}
+
+// Sync to Django input on submit
 var form = document.querySelector('form');
 form.onsubmit = function() {
     document.querySelector('#id_description').value = quill.root.innerHTML;

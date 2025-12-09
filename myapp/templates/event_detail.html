@@ -93,7 +93,7 @@ document.getElementById('backBtn').addEventListener('click', function() {
                 <div class="mt-5 d-flex align-items-center">
                     {% if user.is_authenticated %}
                         <button type="button" class="btn btn-interest" data-event-id="{{ event.id }}">
-                            {% if event.id in user_favorites %}Unmark{% else %}Mark Interest ⭐{% endif %}
+                            {% if event.id in user_favorites %}Unmark ⭐{% else %}Mark Interest ⭐{% endif %}
                         </button>
                     {% endif %}
 
