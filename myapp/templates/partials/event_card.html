@@ -1,3 +1,5 @@
+{% load static %}
+
 <div class="event-box">
     
     {% if event.image %}
@@ -9,10 +11,20 @@
     {% endif %}
     <p class="event-title">{{ event.name }}</p>
     <div class="info-summary">
-        <p class="date">{{ event.date }}</p>
-        <p class="time">{{ event.start_time }} - {{ event.end_time }}</p>
-        <p class="location">{{ event.location }}</p>
-        <p class="campus">{{ event.campus }}</p>
+        <p class="date">
+            <img src="{% static 'images/calendar.png' %}" class="info-icon" style="width: 30px; height: 30px; margin-right: 6px;">
+            {{ event.date }}
+        </p>
+
+        <p class="time">
+            <img src="{% static 'images/clock.png' %}" class="info-icon" style="width: 30px; height: 30px; margin-right: 6px;">
+            {{ event.start_time }} - {{ event.end_time }}
+        </p>
+
+        <p class="campus">
+            <img src="{% static 'images/map-marker.png' %}" class="info-icon" style="width: 30px; height: 30px; margin-right: 6px;">
+            {{ event.campus }}
+        </p>
     </div>
 
     <div class="additional-buttons">

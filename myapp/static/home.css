@@ -233,11 +233,14 @@ input[type='text']{
     border-radius: 20px;
     height: 100%;
     box-shadow: 0 0 10px -5px black;
+    width: 100%;
 }
 
 .event-box .event-title {
     font-size: 1.3em;
     text-align: center;
+    margin-top: 5px;    /* space above the title */
+    margin-bottom: 15px; /* space below the title */
 }
 
 .event-top-box{
@@ -245,6 +248,7 @@ input[type='text']{
     aspect-ratio: 1;
     overflow: hidden;
 }
+
 .event-box .event-image {
     width: 100%;
     aspect-ratio: 1;
@@ -252,7 +256,9 @@ input[type='text']{
     background-size: contain;
     background-position: center;
     transition: transform .5s ease;
-}.event-image:hover{
+}
+
+.event-image:hover{
     -webkit-transform: scale(1.1);
     -ms-transform: scale(1.1);
     transform: scale(1.1);
@@ -261,9 +267,15 @@ input[type='text']{
 .event-box .info-summary {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: flex-start;
     box-sizing: border-box;
-    padding: 15px;
+    padding-left: 10%;
+    margin-top: -5px;
+    margin-bottom: 5px;
+}
+
+.event-box .info-summary p {
+    margin: 5px 0; /* 2px top and bottom, 0 left/right */
 }
 
 .interesterd-btn {
@@ -287,9 +299,13 @@ input[type='text']{
 
 .additional-buttons, .info-summary, .event-title{
     padding: 0 15px 0 15px;
-}.additional-buttons{
+}
+
+.additional-buttons{
     padding-bottom: 15px;
-}.event-title{
+}
+
+.event-title{
     padding-top: 20px;
     font-weight: bold;
 }
