@@ -377,6 +377,7 @@ def populate_default_data(sender, **kwargs):
 
             # Dec 08
             {
+                "author_ID": 2,
                 "name": "Finals Week Coffee and Snacks",
                 "date": "2025-12-08",
                 "start_time": "9:00 AM",
@@ -392,6 +393,7 @@ def populate_default_data(sender, **kwargs):
                 "image_filename": "22.jpg",
             },
             {
+                "author_ID": 3,
                 "name": "Student Equity & Success Committee",
                 "date": "2025-12-08",
                 "start_time": "2:30 PM",
@@ -410,6 +412,7 @@ def populate_default_data(sender, **kwargs):
                 "image_filename": "23.jpg",
             },
             {
+                "author_ID": 4,
                 "name": "Curriculum Committee Meeting",
                 "date": "2025-12-08",
                 "start_time": "2:30 PM",
@@ -428,6 +431,7 @@ def populate_default_data(sender, **kwargs):
 
             # Dec 09
             {
+                "author_ID": 5,
                 "name": "Finals Week Coffee and Snacks",
                 "date": "2025-12-09",
                 "start_time": "9:00 AM",
@@ -443,6 +447,7 @@ def populate_default_data(sender, **kwargs):
                 "image_filename": "25.jpg",
             },
             {
+                "author_ID": 6,
                 "name": "DVC Songwriters' Showcase",
                 "date": "2025-12-09",
                 "start_time": "7:00 PM",
@@ -460,6 +465,7 @@ def populate_default_data(sender, **kwargs):
 
             # Dec 10
             {
+                "author_ID": 7,
                 "name": "Finals Week Coffee and Snacks",
                 "date": "2025-12-10",
                 "start_time": "9:00 AM",
@@ -475,6 +481,7 @@ def populate_default_data(sender, **kwargs):
                 "image_filename": "27.jpg",
             },
             {
+                "author_ID": 2,
                 "name": "Research, Planning, and Evaluation Committee (RPEC)",
                 "date": "2025-12-10",
                 "start_time": "2:30 PM",
@@ -495,6 +502,7 @@ def populate_default_data(sender, **kwargs):
 
             # Dec 11
             {
+                "author_ID": 3,
                 "name": "Finals Week Coffee and Snacks",
                 "date": "2025-12-11",
                 "start_time": "9:00 AM",
@@ -510,6 +518,7 @@ def populate_default_data(sender, **kwargs):
                 "image_filename": "29.jpg",
             },
             {
+                "author_ID": 4,
                 "name": "Information and Instructional Technology Committee (IITC) Meeting",
                 "date": "2025-12-11",
                 "start_time": "2:00 PM",
@@ -525,29 +534,284 @@ def populate_default_data(sender, **kwargs):
                 "event_type": "",
                 "image_filename": "30.jpg",
             },
+            {
+                "author_ID": 5,
+                "name": "DVC Piano Recital",
+                "date": "2025-12-11",
+                "start_time": "2:30 PM",
+                "end_time": "4:00 PM",
+                "location": "Music - M | 101",
+                "building_code": "M",
+                "campus": "Pleasant Hill",
+                "description": """
+        <p>Enjoy an afternoon of live piano performances by DVC students as they present works they’ve studied throughout the semester. This recital highlights developing musicianship, artistry, and the diverse repertoire explored in our music program. All are welcome to attend and support our student performers.</p>
+        """,
+                "event_type": "Career & Academic",
+                "image_filename": "31.jpg",
+            },
 
+            # Dec 12
+            {
+                "author_ID": 6,
+                "name": "Scheduling Committee",
+                "date": "2025-12-12",
+                "start_time": "9:00 AM",
+                "end_time": "11:00 AM",
+                "location": "Business and World Language - BWL | 113",
+                "building_code": "BWL",
+                "campus": "Pleasant Hill",
+                "description": """
+        <p>The Scheduling Committee reviews and coordinates course offerings, room usage, and scheduling patterns to support student access and program needs across the college.</p>
+        """,
+                "event_type": "Clubs",
+                "image_filename": "32.jpg",
+            },
+            {
+                "author_ID": 7,
+                "name": "Scheduling Committee",
+                "date": "2025-12-12",
+                "start_time": "9:00 AM",
+                "end_time": "11:00 AM",
+                "location": "Virtual",
+                "building_code": "VR",
+                "campus": "Virtual",                
+                "description": """
+        <p>The Scheduling Committee reviews and coordinates course offerings, room usage, and scheduling patterns to support student access and program needs across the college. This session is held virtually for the San Ramon campus.</p>
+        """,
+                "event_type": "Clubs",
+                "image_filename": "33.jpg",
+            },
 
-            # Event information demonstration
-        #     {
-        #         "name": "DVC Piano Recital",
-        #         "date": "2025-12-11",              # YYYY-MM-DD
-        #         "start_time": "2:30 PM",        # HH:MM AM/PM
-        #         "end_time": "4:00 PM",          # HH:MM AM/PM
-        #         "location": "Music - M | 101",          # The description
-        #         "building_code": "M",     # The building code
-        #         "campus": "Pleasant Hill",            # Pleasant Hill / San Ramon / Virtual
-        #         "description": """
-        # <p>Experience the incredible talent of our piano students in an evening of powerful solos and breathtaking collaborations.</p>
-        # """,
-        #         "event_type": "Career & Academic",        # "Sports", "Clubs", "Career & Academic", or "Free Food"
-        #         "image_filename": "31.jpg",    # Start at 31.jpg, then 32.jpg
-        #     },
+            # Dec 15
+            {
+                "author_ID": 2,
+                "name": "Classified Senate Holiday Card & Gift Fundraiser",
+                "date": "2025-12-15",
+                "start_time": "10:00 AM",
+                "end_time": "5:00 PM",
+                "location": "Administration Building - AB | 217",
+                "building_code": "AB",
+                "campus": "Pleasant Hill",
+                "description": """
+        <p>Support the Classified Senate through this annual holiday card and gift fundraiser. All proceeds help fund Classified Senate programs, events, and student-support initiatives.</p>
+        """,
+                "event_type": "Clubs",
+                "image_filename": "34.jpg",
+            },
+
+            # Dec 16
+            {
+                "author_ID": 3,
+                "name": "Academic Senate Meeting",
+                "date": "2025-12-16",
+                "start_time": "2:30 PM",
+                "end_time": "4:30 PM",
+                "location": "Virtual",
+                "building_code": "VR",
+                "campus": "Virtual",
+                "description": """
+        <p>The Academic Senate meets to discuss academic and professional matters, review proposals, and advise college leadership. This meeting will be held virtually.</p>
+        """,
+                "event_type": "Clubs",
+                "image_filename": "35.jpg",
+            },
+
+            # Dec 18
+            {
+                "author_ID": 4,
+                "name": "Pre-Apprenticeship Information Session",
+                "date": "2025-12-18",
+                "start_time": "4:00 PM",
+                "end_time": "5:30 PM",
+                "location": "Virtual",
+                "building_code": "VR",
+                "campus": "Virtual",
+                "description": """
+        <p>Learn about DVC’s Pre-Apprenticeship Program, including hands-on training opportunities and pathways into apprenticeships and technical careers. This information session will be held virtually.</p>
+        """,
+                "event_type": "Career & Academic",
+                "image_filename": "36.jpg",
+            },
+
+            # Jan 07
+            {
+                "author_ID": 5,
+                "name": "Budget Committee Meeting",
+                "date": "2026-01-07",
+                "start_time": "3:00 PM",
+                "end_time": "5:00 PM",
+                "location": "Administration Building - AB | 108 (Business Services Conference Room)",
+                "building_code": "AB",
+                "campus": "Pleasant Hill",
+                "description": """
+        <p>The Budget Committee meets to review financial planning, resource allocation, and institutional budgeting processes to support transparency and strategic decision-making.</p>
+        """,
+                "event_type": "Clubs",
+                "image_filename": "37.jpg",
+            },
+
+            # Jan 11
+            {
+                "author_ID": 6,
+                "name": "Information and Instructional Technology Committee (IITC) Meeting",
+                "date": "2025-12-11",
+                "start_time": "2:00 PM",
+                "end_time": "4:00 PM",
+                "location": "Virtual",
+                "building_code": "VR",
+                "campus": "Virtual",
+                "event_type": "Clubs",
+                "image_filename": "38.jpg",
+                "description": """
+        <p>The Information and Instructional Technology Committee reviews, prioritizes, and recommends technology-focused initiatives that support equitable student success and strengthen the college's digital infrastructure.</p>
+        """,
+            },
+
+            # Jan 12
+            {
+                "author_ID": 7,
+                "name": "Trig Jam",
+                "date": "2026-01-12",
+                "start_time": "9:00 AM",
+                "end_time": "2:00 PM",
+                "location": "Math - MA | 108",
+                "building_code": "MA",
+                "campus": "Pleasant Hill",
+                "description": """
+        <p>Join the Math Department for a focused trigonometry study and support session. Students can work with tutors and faculty to prepare for upcoming exams and strengthen core trig skills.</p>
+        """,
+                "event_type": "Career & Academic",
+                "image_filename": "39.jpg",
+            },
+
+            # Jan 15
+            {
+                "author_ID": 2,
+                "name": "Trig Jam",
+                "date": "2026-01-15",
+                "start_time": "9:00 AM",
+                "end_time": "2:00 PM",
+                "location": "Math - MA | 108",
+                "building_code": "MA",
+                "campus": "Pleasant Hill",
+                "description": """
+        <p>Join the Math Department for a focused trigonometry study and support session. Students can work with tutors and faculty to prepare for upcoming exams and strengthen core trig skills.</p>
+        """,
+                "event_type": "Career & Academic",
+                "image_filename": "40.jpg",
+            },
+
+            # Jan 27
+            {
+                "author_ID": 3,
+                "name": "Academic Senate Meeting",
+                "date": "2026-01-27",
+                "start_time": "2:30 PM",
+                "end_time": "4:30 PM",
+                "location": "Virtual",
+                "building_code": "VR",
+                "campus": "Virtual",
+                "description": """
+        <p>The Academic Senate meets to discuss academic and professional matters, review proposals, and advise college leadership. This meeting will be held entirely online.</p>
+        """,
+                "event_type": "Clubs",
+                "image_filename": "41.jpg",
+            },
+
+            # Jan 30
+            {
+                "author_ID": 4,
+                "name": "Scheduling Committee",
+                "date": "2025-01-30",
+                "start_time": "9:00 AM",
+                "end_time": "11:00 AM",
+                "location": "Business and World Language - BWL | 113",
+                "building_code": "BWL",
+                "campus": "Pleasant Hill",
+                "description": """
+            <p>The Scheduling Committee reviews and coordinates course offerings, room availability, and scheduling patterns to support student access and program needs across the college.</p>
+            """,
+                "event_type": "Clubs",
+                "image_filename": "42.jpg",
+            },
+            {
+                "author_ID": 5,
+                "name": "Scheduling Committee",
+                "date": "2026-01-30",
+                "start_time": "9:00 AM",
+                "end_time": "11:00 AM",
+                "location": "Virtual",
+                "building_code": "VR",
+                "campus": "Virtual",
+                "description": """
+        <p>The Scheduling Committee reviews and coordinates course offerings, room availability, and scheduling patterns to support student access and program needs across the college. This session is held virtually.</p>
+        """,
+                "event_type": "Clubs",
+                "image_filename": "43.jpg",
+            },
+
+            # Feb 02
+            {
+                "author_ID": 6,
+                "name": "Distance Education & Digital Equity Committee",
+                "date": "2026-02-02",
+                "start_time": "12:30 PM",
+                "end_time": "2:00 PM",
+                "location": "Administration Building - AB | 217",
+                "building_code": "AB",
+                "campus": "Pleasant Hill",
+                "description": """
+        <p>The Distance Education & Digital Equity (DEDE) Committee reviews, creates, and recommends policies and practices that support equitable, high-quality distance education at DVC.</p>
+        """,
+                "event_type": "Clubs",
+                "image_filename": "44.jpg",
+            },
+            {
+                "author_ID": 7,
+                "name": "Distance Education & Digital Equity Committee",
+                "date": "2026-02-02",
+                "start_time": "12:30 PM",
+                "end_time": "2:00 PM",
+                "location": "Virtual",
+                "building_code": "VR",
+                "campus": "Virtual",
+                "description": """
+        <p>The Distance Education & Digital Equity (DEDE) Committee reviews, creates, and recommends policies and practices that support equitable, high-quality distance education at DVC. This session is held virtually.</p>
+        """,
+                "event_type": "Clubs",
+                "image_filename": "45.jpg",
+            },
+            {
+                "author_ID": 2,
+                "name": "Curriculum Committee Meeting",
+                "date": "2026-02-02",
+                "start_time": "2:30 PM",
+                "end_time": "4:00 PM",
+                "location": "Virtual",
+                "building_code": "VR",
+                "campus": "Virtual",
+                "description": """
+        <p>The Curriculum Committee reviews course and program proposals, degree and certificate requirements, and makes recommendations that shape the academic offerings of the college. This meeting will be held virtually.</p>
+        """,
+                "event_type": "Clubs",
+                "image_filename": "46.jpg",
+            }
             
         ]
 
         for ev in event_data:
+            # Get the raw ID (should always be a number or string)
+            raw_author_id = ev.get("author_ID")
+
+            try:
+                # Convert to real User instance
+                author_obj = Users.objects.get(id=raw_author_id)
+            except:
+                # fallback: use the first user, NOT the object itself
+                author_obj = Users.objects.first()
+
             event = Events.objects.create(
-                author_ID=author,
+                author_ID=author_obj,
                 name=ev["name"],
                 description=ev["description"],
                 date=ev["date"],
