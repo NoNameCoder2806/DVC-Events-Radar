@@ -10,7 +10,7 @@
 
 <script>
 document.getElementById('backBtn').addEventListener('click', function() {
-    history.back();
+    window.location.href = "{% url 'home' %}";
 });
 </script>
 {% endblock %}

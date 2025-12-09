@@ -310,20 +310,31 @@ def edit_event(request, event_id):
 
     user_profile = getattr(request.user, 'users', None)
 
+    # Authorization
     if not request.user.is_authenticated or not user_profile:
-        messages.error(request, "Not Authorized.")
-        return redirect('home')
+        messages.error(request, "Not authorized.")
+        return redirect("home")
 
-    if user_profile.role == "user" or (user_profile.role == 'admin' and event.author_ID != user_profile):
+    if user_profile.role == "user" or (
+        user_profile.role == "admin" and event.author_ID != user_profile
+    ):
         messages.error(request, "You do not have permission to edit this event.")
-        return redirect('home')
+        return redirect("home")
 
-    if request.method == 'POST':
+    # Handle POST (save)
+    if request.method == "POST":
         form = EventForm(request.POST, request.FILES, instance=event)
+
+        print("DEBUG: POST received")  # <— YOU WILL SEE THIS IN TERMINAL
+        print("DEBUG form errors:", form.errors)
+
         if form.is_valid():
             form.save()
             messages.success(request, "Event updated successfully.")
-            return redirect('manage_events')
+            return redirect("manage_events")
+
+        # If invalid, show message
+        messages.error(request, "Please correct the errors below.")
     else:
         form = EventForm(instance=event)
 
@@ -331,11 +342,11 @@ def edit_event(request, event_id):
         request,
         "event_form.html",
         {
-            'event': event,
-            'form': form,
-            'page_title': 'Edit Event',
-            'submit_text': 'Update Event'
-        }
+            "event": event,
+            "form": form,
+            "page_title": "Edit Event",
+            "submit_text": "Update Event",
+        },
     )
 
 def manage_users(request):

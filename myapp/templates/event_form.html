@@ -2,21 +2,17 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block page_title %}
-<div class="page-header-title-wrapper">
-    {% if page_title == "Add Event" %}
-        <button type="button" class="map-back-btn" id="backBtn">← Back</button>
-    {% else %}
-        <button type="button" class="map-back-btn" id="backBtn">← Back</button>
-    {% endif %}
+{% with url_name=page_title|yesno:"home,manage_events" %}
+    <div class="page-header-title-wrapper">
+        <button type="button"
+                class="map-back-btn"
+                onclick="window.location.href='{% url url_name %}'">
+            ← Back
+        </button>
 
-    <span class="page-title">{{ page_title }}</span>
-</div>
-
-<script>
-document.getElementById('backBtn').addEventListener('click', function() {
-    history.back();
-});
-</script>
+        <span class="page-title">{{ page_title }}</span>
+    </div>
+{% endwith %}
 {% endblock %}
 
 {% block header_spacer2 %}
@@ -58,7 +54,7 @@ document.getElementById('backBtn').addEventListener('click', function() {
                 <!-- Quill editor container -->
                 <div id="description-editor" style="height: 200px; background: white;"></div>
                 <!-- Hidden input to submit HTML to Django -->
-                <input type="hidden" name="description" id="id_description">
+                <input type="hidden" name="description" id="id_description" value="{{ form.description.value|safe }}">
                 {{ form.description.errors }}
             </div>
 
