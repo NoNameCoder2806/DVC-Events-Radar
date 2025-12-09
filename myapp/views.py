@@ -13,14 +13,14 @@ from datetime import datetime
 from .models import Users, Events, Favorites
 from .forms import EventForm, EventFilterForm
 from .filters import filter_events
-
+from django.urls import reverse_lazy
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt, csrf_protect 
 from django.conf import settings
 import os
 import json
 from datetime import date, timedelta
-
+from django.contrib.auth.views import PasswordChangeView
 from PIL import Image
 
 def get_data():    
@@ -410,3 +410,24 @@ def user_profile(request):
         return redirect("user_profile")
 
     return render(request, "user_profile.html", {"user_obj": user_obj})
+
+def profile_view(request):
+    user_obj = User.objects.get(id=request.user.id)
+    return render(request, 'profile.html', {'user_obj': user_obj})
+
+class CustomPasswordChangeView(PasswordChangeView):
+    template_name = 'password_change_form.html'
+    success_url = reverse_lazy('user_profile')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Your password has been successfully updated!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        # Collect all errors
+        errors = []
+        for field, field_errors in form.errors.items():
+            errors.extend(field_errors)
+        for error in errors:
+            messages.error(self.request, error)
+        return super().form_invalid(form)

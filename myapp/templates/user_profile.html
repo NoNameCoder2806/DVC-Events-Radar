@@ -3,6 +3,25 @@
 {% block show_header %}{% endblock %}
 
 {% block content %}
+<!-- 🔥 Floating top notification -->
+<div id="topNotification"
+     style="
+        position: fixed;
+        top: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        z-index: 9999;
+        transition: top 0.5s ease, opacity 0.5s ease;
+        opacity: 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        transition: top 0.5s ease, opacity 0.5s ease;
+     ">
+</div>
+
 <style>
 /* Full viewport gradient background */
 html, body {
@@ -359,4 +378,31 @@ function toggleEditMode() {
     }
 }
 </script>
+
+<script>
+function showTopNotification(msg, tag="") {
+    const notification = document.getElementById("topNotification");
+    notification.textContent = msg;
+
+    // color based on message type
+    if(tag.includes("success")) notification.style.background = "#2e7d32"; // green
+    else if(tag.includes("error")) notification.style.background = "#b71c1c"; // red
+    else notification.style.background = "#333";
+
+    // show
+    notification.style.opacity = "1";
+    notification.style.top = "20px"; // slide down
+
+    setTimeout(() => {
+        notification.style.top = "-80px"; // slide back up
+        notification.style.opacity = "0";
+    }, 3000);
+}
+</script>
+
+{% for message in messages %}
+<script>
+    showTopNotification("{{ message|escapejs }}", "{{ message.tags }}");
+</script>
+{% endfor %}
 {% endblock %}
