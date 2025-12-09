@@ -158,7 +158,7 @@ class Events(models.Model):
     event_type = models.CharField(max_length=100, choices=EVENT_TYPES)
     image = models.ImageField(
         upload_to=event_image_path,  # folder inside MEDIA_ROOT
-        default="events/default.jpg",  # optional default image
+        default="default.jpg",  # optional default image
         blank=True,
         null=True
     )

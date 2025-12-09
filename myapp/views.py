@@ -13,14 +13,14 @@ from datetime import datetime
 from .models import Users, Events, Favorites
 from .forms import EventForm, EventFilterForm
 from .filters import filter_events
-
+from django.urls import reverse_lazy
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt, csrf_protect 
 from django.conf import settings
 import os
 import json
 from datetime import date, timedelta
-
+from django.contrib.auth.views import PasswordChangeView
 from PIL import Image
 
 def get_data():    
@@ -84,26 +84,46 @@ def home(request):
     })
 
 def calendar_view(request):
-    today = datetime.today()
-    events_per_day = {}  # key = day of month, value = count of favorite events
+    """
+    Render calendar with favorite events per day for the logged-in user.
+    Sends full event objects (name, type, campus, start/end times, location)
+    so JS can generate pins.
+    """
+    events_per_day = {}  # key = YYYY-MM-DD, value = list of events
 
     if request.user.is_authenticated:
         try:
             user_obj = Users.objects.get(user=request.user)
             favorite_events = Favorites.objects.filter(user_ID=user_obj).select_related('event_ID')
+
             for fav in favorite_events:
-                try:
-                    event_date = datetime.datetime.strptime(fav.event_ID.date.strip(), "%Y-%m-%d")
-                    day_key = event_date.strftime("%Y-%m-%d")  # YYYY-MM-DD
-                    events_per_day[day_key] = events_per_day.get(day_key, 0) + 1
-                except Exception as e:
-                    print(f"Skipping invalid date {fav.event_ID.date}: {e}")
+                event = fav.event_ID
+                event_date = event.date
+                if not event_date:
+                    continue  # skip if date is None
+
+                day_key = event_date.strftime("%Y-%m-%d")
+
+                if day_key not in events_per_day:
+                    events_per_day[day_key] = []
+
+                # Add full event info for JS
+                events_per_day[day_key].append({
+                    "name": event.name,
+                    "event_type": getattr(event, "event_type", "General"),
+                    "campus": getattr(event, "campus", ""),
+                    "start_time": getattr(event, "start_time", ""),
+                    "end_time": getattr(event, "end_time", ""),
+                    "location": getattr(event, "location", "")
+                })
+
         except Users.DoesNotExist:
             pass
 
     context = {
-        "events_per_day": events_per_day,  # now only includes “interested” events
+        "events_by_day": events_per_day,  # matches JS variable name
     }
+
     return render(request, "calendar.html", context)
 
 def event_map(request):
@@ -287,28 +307,47 @@ def delete_event(request, event_id):
 
 def edit_event(request, event_id):
     event = get_object_or_404(Events, id=event_id)
-    
-    user_profile = getattr(request.user, 'users', None)    
-    
-    if not request.user.is_authenticated or not user_profile:
-        messages.error(request, "Not Authorized.")
-        return redirect('home')
-        
 
-    if user_profile.role  == "user" or (user_profile.role == 'admin' and event.author_ID != user_profile):
+    user_profile = getattr(request.user, 'users', None)
+
+    # Authorization
+    if not request.user.is_authenticated or not user_profile:
+        messages.error(request, "Not authorized.")
+        return redirect("home")
+
+    if user_profile.role == "user" or (
+        user_profile.role == "admin" and event.author_ID != user_profile
+    ):
         messages.error(request, "You do not have permission to edit this event.")
-        return redirect('home')
-    
-    if request.method == 'POST':
+        return redirect("home")
+
+    # Handle POST (save)
+    if request.method == "POST":
         form = EventForm(request.POST, request.FILES, instance=event)
+
+        print("DEBUG: POST received")  # <— YOU WILL SEE THIS IN TERMINAL
+        print("DEBUG form errors:", form.errors)
+
         if form.is_valid():
             form.save()
             messages.success(request, "Event updated successfully.")
-            return redirect('manage_events')
+            return redirect("manage_events")
+
+        # If invalid, show message
+        messages.error(request, "Please correct the errors below.")
     else:
         form = EventForm(instance=event)
-        
-    return render(request, "event_form.html", {'event': event, 'form': form, 'page_title': 'Edit Event', 'submit_text': 'Update event'})
+
+    return render(
+        request,
+        "event_form.html",
+        {
+            "event": event,
+            "form": form,
+            "page_title": "Edit Event",
+            "submit_text": "Update Event",
+        },
+    )
 
 def manage_users(request):
     all_users = User.objects.all()
@@ -390,3 +429,24 @@ def user_profile(request):
         return redirect("user_profile")
 
     return render(request, "user_profile.html", {"user_obj": user_obj})
+
+def profile_view(request):
+    user_obj = User.objects.get(id=request.user.id)
+    return render(request, 'profile.html', {'user_obj': user_obj})
+
+class CustomPasswordChangeView(PasswordChangeView):
+    template_name = 'password_change_form.html'
+    success_url = reverse_lazy('user_profile')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Your password has been successfully updated!")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        # Collect all errors
+        errors = []
+        for field, field_errors in form.errors.items():
+            errors.extend(field_errors)
+        for error in errors:
+            messages.error(self.request, error)
+        return super().form_invalid(form)

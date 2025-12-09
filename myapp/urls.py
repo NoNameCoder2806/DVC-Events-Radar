@@ -1,9 +1,8 @@
 from django.urls import path
 from . import views
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
+from django.urls import reverse_lazy
+from .views import CustomPasswordChangeView
 
 urlpatterns = [
     path("", views.home, name='home'),
@@ -22,16 +21,7 @@ urlpatterns = [
     path("manage-users/", views.manage_users, name="manage_users"),
     path("manage-users/change-role/<int:user_id>/", views.change_user_role, name="change_user_role"),
     path("manage-users/delete/<int:user_id>/", views.delete_user, name="delete_user"),
-    path("profile/", views.user_profile, name="user_profile")
-]
+    path("profile/", views.user_profile, name="user_profile"),
 
-urlpatterns += [
-    path('password_change/', auth_views.PasswordChangeView.as_view(
-        template_name='registration/password_change_form.html',
-        success_url='/profile/'  # redirect here after password change
-    ), name='password_change'),
-
-    path('password_change/done/', auth_views.PasswordChangeDoneView.as_view(
-        template_name='registration/password_change_done.html'
-    ), name='password_change_done'),
+    path('password_change/', CustomPasswordChangeView.as_view(), name='password_change')
 ]

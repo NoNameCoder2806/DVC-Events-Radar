@@ -1,8 +1,25 @@
 {% extends 'base.html' %}
 {% block title %}{{ page_title }}{% endblock %}
 
-{% block content %}
+{% block page_title %}
+{% with url_name=page_title|yesno:"home,manage_events" %}
+    <div class="page-header-title-wrapper">
+        <button type="button"
+                class="map-back-btn"
+                onclick="window.location.href='{% url url_name %}'">
+            ← Back
+        </button>
 
+        <span class="page-title">{{ page_title }}</span>
+    </div>
+{% endwith %}
+{% endblock %}
+
+{% block header_spacer2 %}
+<div style="height: 30px;"></div>
+{% endblock %}
+
+{% block content %}
 <!-- 🔥 Floating top notification -->
 <div id="topNotification"
      style="
@@ -23,99 +40,99 @@
 
 <div class="d-flex justify-content-center mt-5">
     <div class="w-75">
-
-        <!-- Top bar with Back button -->
-        <div class="d-flex align-items-center mb-4 position-relative">
-            <div class="position-absolute" style="left: 0;">
-                <a href="{% url 'home' %}" class="btn btn-secondary">&larr; Back</a>
-            </div>
-            <h2 class="mx-auto text-center">{{ page_title }}</h2>
-        </div>
-
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
-            <div class="mb-3">
-                <label class="form-label fs-5">{{ form.name.label }}</label>
+            <div class="form-group">
+                <label for="id_name">{{ form.name.label }}</label>
                 {{ form.name }}
                 {{ form.name.errors }}
             </div>
 
-            <div class="mb-3">
-                {{ form.description.label_tag }}
-
-                <!-- Mini toolbar -->
-                <div class="mb-2">
-                    <button type="button" class="btn btn-sm btn-secondary" onclick="wrapText('<strong>', '</strong>')">B</button>
-                    <button type="button" class="btn btn-sm btn-secondary" onclick="wrapText('<em>', '</em>')">I</button>
-                    <button type="button" class="btn btn-sm btn-secondary" onclick="wrapText('<u>', '</u>')">U</button>
-                </div>
-
-                {{ form.description }}
-
-                <div class="form-text">
-                    Use the buttons above to format text. You can also use basic HTML tags for links: <code>&lt;a href="URL"&gt;Link&lt;/a&gt;</code>.
-                </div>
+            <div class="form-group">
+                <label for="id_description">{{ form.description.label }}</label>
+                <!-- Quill editor container -->
+                <div id="description-editor" style="height: 200px; background: white;"></div>
+                <!-- Hidden input to submit HTML to Django -->
+                <input type="hidden" name="description" id="id_description" value="{{ form.description.value|safe }}">
                 {{ form.description.errors }}
             </div>
 
-            <div class="mb-3">
-                <label class="form-label fs-5">{{ form.date.label }}</label>
+            <div class="form-group">
+                <label for="id_name">{{ form.date.label }}</label>
                 {{ form.date }}
                 {{ form.date.errors }}
             </div>
 
             <!-- Start Time -->
-            <div class="mb-3">
-                <label class="form-label fs-5">Start Time</label>
-                <div class="d-flex gap-2">
+            <div class="form-group">
+                <label for="id_name">Start Time</label>
+                <div class="d-flex time-group">
                     {{ form.start_hour }}
                     {{ form.start_minute }}
                     {{ form.start_period }}
                 </div>
+
                 {% if form.start_hour.errors %}<div class="text-danger">{{ form.start_hour.errors }}</div>{% endif %}
                 {% if form.start_minute.errors %}<div class="text-danger">{{ form.start_minute.errors }}</div>{% endif %}
                 {% if form.start_period.errors %}<div class="text-danger">{{ form.start_period.errors }}</div>{% endif %}
             </div>
 
             <!-- End Time -->
-            <div class="mb-3">
-                <label class="form-label fs-5">End Time</label>
-                <div class="d-flex gap-2">
+            <div class="form-group">
+                <label for="id_name">End Time</label>
+                <div class="d-flex time-group">
                     {{ form.end_hour }}
                     {{ form.end_minute }}
                     {{ form.end_period }}
                 </div>
+
                 {% if form.end_hour.errors %}<div class="text-danger">{{ form.end_hour.errors }}</div>{% endif %}
                 {% if form.end_minute.errors %}<div class="text-danger">{{ form.end_minute.errors }}</div>{% endif %}
                 {% if form.end_period.errors %}<div class="text-danger">{{ form.end_period.errors }}</div>{% endif %}
             </div>
 
-            <div class="mb-3">
-                <label class="form-label fs-5">{{ form.location.label }}</label>
+            <div class="form-group">
+                <label for="id_location">Location / Building</label>
                 {{ form.location }}
                 {{ form.location.errors }}
             </div>
 
-            <div class="mb-3">
-                <label class="form-label fs-5">{{ form.campus.label }}</label>
+            <div class="form-group">
+                <label for="id_location">Location / Building Code</label>
+                {{ form.building_code }}
+                {{ form.building_code.errors }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_name">{{ form.campus.label }}</label>
                 {{ form.campus }}
                 {{ form.campus.errors }}
             </div>
 
-            <div class="mb-3">
-                <label class="form-label fs-5">{{ form.event_type.label }}</label>
+            <div class="form-group">
+                <label for="id_name">{{ form.event_type.label }}</label>
                 {{ form.event_type }}
                 {{ form.event_type.errors }}
             </div>
 
-            <div class="mb-3">
-                <label class="form-label fs-5">{{ form.image.label }}</label>
-                {{ form.image }}
+            <div class="form-group">
+                <label for="id_image">{{ form.image.label }}</label>
+                <div class="file-input-wrapper">
+                    <label class="custom-file-btn">
+                        {{ form.image }}
+                    </label>
+                </div>
                 {{ form.image.errors }}
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">Create Event</button>
+            <button type="submit" class="btn btn-primary w-100">
+                {% if page_title == "Add Event" %}
+                    Create Event
+                {% else %}
+                    Save Changes
+                {% endif %}
+            </button>
         </form>
 
         <!-- Bottom Cancel/Home Button -->
@@ -125,6 +142,248 @@
     </div>
 </div>
 
+<style>
+/* Title */
+.page-header-title-wrapper {
+    position: relative;
+    width: 100%;
+    height: 80px;
+}
+
+.page-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(calc(-50% - 22%));
+    font-weight: bold;
+    font-size: 63px;
+    color: #017550;
+    white-space: nowrap;
+}
+
+/* Back button */
+.map-back-btn {
+    position: absolute;
+    top: 16%;
+    left: 0;
+    margin-left: 10%;
+    padding: 12px 20px;
+    background: white;          /* white by default */
+    color: #0a7a33;             /* green border/text */
+    border: 2px solid #0a7a33; 
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.map-back-btn:hover {
+    background-color: #0a7a33; /* fill green on hover */
+    color: white;               /* text turns white */
+    transform: translateY(-1px);
+}
+
+/* Form group wrapper */
+.form-group {
+    margin-bottom: 24px;
+}
+
+/* Labels */
+.form-group label {
+    display: block;
+    font-size: 1.1rem;      /* slightly bigger */
+    font-weight: 700;       /* bold */
+    color: #173f6c;         /* stronger green color */
+    margin-bottom: 8px;
+    font-style: normal;     /* remove italic for clarity */
+    font-size: 20px;
+}
+
+/* Inputs & textareas */
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 16px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 50px;
+    font-size: 1em;
+    outline: none;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-group textarea {
+    border-radius: 20px;
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Focus effect */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #5e35b1;
+    box-shadow: 0 0 0 3px rgba(94, 53, 177, 0.1);
+}
+
+.form-group input,
+.form-group select {
+    height: 60px; /* or whatever height you prefer */
+    padding: 0 20px; /* vertical padding handled by height */
+    border-radius: 50px; /* keep round border for normal inputs */
+    box-sizing: border-box;
+}
+
+.time-group select,
+.time-group input {
+    border-radius: 0; /* remove rounded corners for middle elements */
+    height: 60px;
+    padding: 0 15px;
+    border: 2px solid #e0e0e0;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+/* Left-most element: round the left edge (input or select) */
+.time-group > :first-child {
+    border-top-left-radius: 50px;
+    border-bottom-left-radius: 50px;
+}
+
+/* Right-most element: round the right edge (input or select) */
+.time-group > :last-child {
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
+}
+
+/* Focus effect */
+.time-group input:focus,
+.time-group select:focus {
+    border-color: #5e35b1;
+    box-shadow: 0 0 0 3px rgba(94, 53, 177, 0.1);
+}
+
+/* Image input wrapper */
+.file-input-wrapper {
+    display: flex;
+    align-items: center;       /* vertically center children */
+    gap: 12px;
+    height: 60px;              /* same as other inputs */
+    border-radius: 50px;       /* round edges for the box */
+    border: 2px solid #e0e0e0; /* border like other inputs */
+    padding: 0 20px;
+    background: white;
+    box-sizing: border-box;
+}
+
+/* The file input itself takes no extra border, just fills height */
+.file-input-wrapper input[type="file"] {
+    flex: 1;
+    height: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+/* Only the button inside the file input */
+.file-input-wrapper input[type="file"]::-webkit-file-upload-button {
+    margin-top: 7px !important;
+    border: none;
+    border-radius: 20px;       /* soft rounded button */
+    background-color: #5D2E8F; /* purple */
+    color: white;
+    font-weight: bold;
+    padding: 8px 15px;
+    margin: auto 0;            /* vertically center inside wrapper */
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+}
+
+.file-input-wrapper input[type="file"]::-webkit-file-upload-button:hover {
+    background-color: #5D2E8F;
+    font-size: 1.2rem;
+}
+
+/* Firefox */
+.file-input-wrapper input[type="file"]::-moz-file-upload-button {
+    border: none;
+    border-radius: 20px;
+    background-color: #5D2E8F;
+    color: white;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+}
+
+.file-input-wrapper input[type="file"]::-moz-file-upload-button:hover {
+    background-color: #5D2E8F;
+}
+
+/* Primary submit button */
+.btn-primary {
+    margin-top: 40px;
+    background-color: #017550;
+    color: white;
+    border: 2px solid #017550;
+    border-radius: 50px;
+    padding: 16px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #005a3d;
+    border-color: #005a3d;
+    transform: translateY(-2px);
+}
+
+/* Secondary cancel button */
+.btn-secondary {
+    background-color: white;
+    color: #173f6c;
+    border: 2px solid #173f6c;
+    border-radius: 50px;
+    padding: 16px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #173f6c;
+    color: white;
+    transform: translateY(-2px);
+}
+
+#description-editor {
+    border: 2px solid #e0e0e0;
+    border-radius: 0 0 20px 20px;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.ql-toolbar.ql-snow {
+    border-radius: 20px 20px 0 0;
+    border: 2px solid #e0e0e0;
+    border-bottom: none;
+}
+
+.ql-container.ql-snow {
+    border-radius: 0 0 20px 20px;
+    border: 2px solid #e0e0e0;
+    border-top: none;
+}
+</style>
+
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
 {% endblock %}
 
 {% block scripts %}
@@ -166,16 +425,28 @@ function showTopMessage(text, type = "info") {
 </script>
 
 <script>
-function wrapText(openTag, closeTag) {
-    const textarea = document.getElementById("id_description"); // Django default id
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = textarea.value.substring(start, end);
-    textarea.value = textarea.value.substring(0, start) + openTag + selectedText + closeTag + textarea.value.substring(end);
-    textarea.focus();
-    textarea.selectionStart = start + openTag.length;
-    textarea.selectionEnd = end + openTag.length;
+var quill = new Quill('#description-editor', {
+    theme: 'snow',
+    placeholder: 'Enter event description...',
+    modules: {
+        toolbar: [
+            ['bold', 'italic', 'underline'],
+            ['link', 'code-block', { 'list': 'bullet' }]
+        ]
+    }
+});
+
+// Load existing content into Quill on edit
+const existingHTML = document.getElementById('id_description').value;
+if (existingHTML.trim() !== "") {
+    quill.root.innerHTML = existingHTML;
 }
+
+// Sync to Django input on submit
+var form = document.querySelector('form');
+form.onsubmit = function() {
+    document.querySelector('#id_description').value = quill.root.innerHTML;
+};
 </script>
 
 {% for message in messages %}

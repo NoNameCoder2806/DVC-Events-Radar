@@ -1,8 +1,25 @@
 {% extends 'base.html' %}
 {% block title %}Manage Events{% endblock %}
 
-{% block content %}
+{% block page_title %}
+<div class="page-header-title-wrapper">
+    <button type="button" class="event-back-btn" id="backBtn">← Back</button>
 
+    <span class="page-title">Manage Events</span>
+</div>
+
+<script>
+document.getElementById('backBtn').addEventListener('click', function() {
+    window.location.href = "{% url 'home' %}";
+});
+</script>
+{% endblock %}
+
+{% block header_spacer2 %}
+<div style="height: 30px;"></div>
+{% endblock %}
+
+{% block content %}
 <!-- 🔥 FLOATING TOP DROPDOWN MESSAGE -->
 <div id="topNotification"
      style="
@@ -23,21 +40,15 @@
 
 <div class="d-flex justify-content-center mt-5">
     <div class="w-75">
-
-        <!-- Top bar -->
-        <div class="d-flex align-items-center mb-4 position-relative">
-            <div class="position-absolute" style="left: 0;">
-                <a href="{% url 'home' %}" class="btn btn-secondary">&larr; Back</a>
-            </div>
-            <h2 class="mx-auto text-center">Manage Events</h2>
-        </div>
-
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>#</th>
+                    <th>Event Name</th>
+                    <th>Event Type</th>
                     <th>Date</th>
-                    <th>Start - End</th>
+                    <!-- <th>Start - End</th> -->
+                    <th>Campus</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -45,12 +56,15 @@
             <tbody>
                 {% for event in all_events %}
                 <tr>
-                    <td>{{ event.name }}</td>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="event-name text-left">{{ event.name }}</td>
+                    <td>{{ event.event_type }}</tdtd>
                     <td>{{ event.date }}</td>
-                    <td>{{ event.start_time }} - {{ event.end_time }}</td>
+                    <!-- <td>{{ event.start_time }} - {{ event.end_time }}</td> -->
+                    <td>{{ event.campus }}</td>
                     <td>
-                        <a href="{% url 'edit_event' event.id %}" class="btn btn-sm btn-warning">Edit</a>
-                        <button type="button" class="btn btn-sm btn-danger delete-btn"
+                        <a href="{% url 'edit_event' event.id %}" class="btn btn-sm edit-event-btn">Edit</a>
+                        <button type="button" class="btn btn-sm btn-danger delete-event-btn"
                             data-url="{% url 'delete_event' event.id %}"
                             data-name="{{ event.name|escape }}">
                             Delete
@@ -59,7 +73,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="text-center">No events found.</td>
+                    <td colspan="6" class="text-center">No events found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -72,7 +86,6 @@
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title">Delete Event</h5>
                 <button type="button" class="close" data-dismiss="modal">
@@ -82,7 +95,7 @@
 
             <div class="modal-body">
                 <p>You are about to delete this event:</p>
-                <p class="font-weight-bold text-danger" id="eventNameInModal"></p>
+                <p class="font-weight-bold" id="eventNameInModal" style="color: #173F6C;"></p>
             </div>
 
             <div class="modal-footer d-flex gap-2">
@@ -92,31 +105,365 @@
 
                 <form id="deleteForm" method="POST" class="flex-fill">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-danger w-100">Yes, Delete</button>
+                    <button type="submit" class="btn btn-danger w-100">Delete</button>
                 </form>
             </div>
-
         </div>
     </div>
 </div>
 
+<style>
+body {
+    padding-bottom: 100px !important;
+}
+
+/* Title */
+.page-header-title-wrapper {
+    position: relative;
+    width: 100%;
+    height: 80px;
+}
+
+.page-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(calc(-50% - 14%));
+    font-weight: bold;
+    font-size: 63px;
+    color: #017550;
+    white-space: nowrap;
+}
+
+/* Back button */
+.event-back-btn {
+    position: absolute;
+    top: 16%;
+    left: 0;
+    margin-left: 10%;
+    padding: 12px 20px;
+    background: white;          /* white by default */
+    color: #0a7a33;             /* green border/text */
+    border: 2px solid #0a7a33; 
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.event-back-btn:hover {
+    background-color: #0a7a33; /* fill green on hover */
+    color: white;               /* text turns white */
+    transform: translateY(-1px);
+}
+
+/* Remove all built-in table borders */
+.table {
+    border-collapse: separate !important;
+    border-spacing: 0 15px !important;   /* spacing between row boxes */
+}
+
+/* Header as ONE single floating box */
+.table thead {
+    display: table-header-group;
+}
+
+.table thead tr {
+    background: #ffffff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.10);
+    border-radius: 12px;
+}
+
+/* Remove column separators + unify the surface */
+.table thead th {
+    background: transparent !important;
+    border: none !important;
+    padding: 18px;
+    font-weight: 700;
+    color: #173F6C;
+    font-size: 20px;
+}
+
+/* Rounded corners on the entire header box */
+.table thead th:first-child {
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+.table thead th:last-child {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.table th, 
+.table td {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+/* Row as floating card */
+.table tbody tr {
+    background: #ffffff !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.10);
+    border-radius: 12px;
+}
+
+/* Make sure each cell has padding and no borders */
+.table tbody td {
+    font-size: 17px;
+    border: none !important;
+    padding: 18px;
+    vertical-align: middle;
+}
+
+/* Rounded corners on each row */
+.table tbody tr td:first-child {
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+.table tbody tr td:last-child {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+/* Hover colors for alternating rows */
+/* Odd = dark green */
+.table tbody tr:nth-child(odd):hover {
+    background-color: #0A7A33 !important;
+    color: white !important;
+}
+
+/* Even = dark blue */
+.table tbody tr:nth-child(even):hover {
+    background-color: #173F6C !important;
+    color: white !important;
+}
+
+/* Buttons inside hovered rows stay readable */
+.table tbody tr:hover .edit-event-btn,
+.table tbody tr:hover .delete-event-btn {
+    filter: brightness(1.2);
+}
+
+.table-striped {
+    border-top: none !important;
+}
+
+.edit-event-btn {
+    min-width: 75px !important;
+    background-color: #017550 !important;  
+    border-color: #017550 !important;
+    color: white !important;
+    font-weight: 600;
+    font-size: 15px;
+    border-radius: 6px;
+}
+
+.edit-event-btn:hover {
+    background-color: #015d41 !important;  /* slightly darker for hover */
+    border-color: #015d41 !important;
+}
+
+.delete-event-btn {
+    min-width: 75px !important;
+    background-color: #DD1426 !important; /* red */
+    border-color: #DD1426 !important;
+    color: white !important;
+    font-weight: bold;
+    font-size: 15px;
+    border-radius: 6px;
+}
+
+.delete-event-btn:hover {
+    background-color: #B0101F !important; /* darker red */
+    border-color: #B0101F !important;
+}
+
+.table td.event-name {
+    text-align: left !important;
+    max-width: 250px;  
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.modal-header {
+    background-color: #173F6C;  /* blue to match the DVC theme */
+    font-weight: bold;                      /* make header text bold */
+    color: white;                           /* text color */
+}
+
+/* Modal header bold */
+.modal-header .modal-title {
+    font-weight: 700; /* bold */
+}
+
+/* Make modal footer buttons the same size */
+.modal-footer {
+    display: flex;
+    gap: 12px;              /* spacing between buttons */
+}
+
+.modal-footer .btn {
+    flex: 1;                /* make all buttons expand equally */
+    border-radius: 25px;    /* pill-shaped ends */
+    min-height: 45px;       /* optional: uniform height */
+    font-weight: bold;
+    font-size: 18px;
+    outline: none !important;
+    box-shadow: none !important; /* removes the default Bootstrap focus shadow */
+}
+
+/* Optional: also remove for table buttons */
+.edit-event-btn:focus,
+.delete-event-btn:focus,
+.event-back-btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Delete button */
+.modal-footer .btn-danger {
+    background-color: #FFFFFF;  /* white */
+    border: 2px solid #017550;  /* green border */
+    color: #017550;             /* green text */
+}
+
+.modal-footer .btn-danger:hover {
+    background-color: #017550;  /* fill green on hover */
+    color: #FFFFFF;             /* white text */
+}
+
+/* Cancel button */
+.modal-footer .btn-secondary {
+    background-color: #FFFFFF;  /* white */
+    border: 2px solid #173F6C;  /* dark blue border */
+    color: #173F6C;             /* dark blue text */
+}
+
+.modal-footer .btn-secondary:hover {
+    background-color: #173F6C;  /* fill dark blue on hover */
+    color: #FFFFFF;             /* white text */
+}
+/* Remove default modal background & spacing */
+.modal-dialog {
+    margin: auto;
+    max-width: none;
+    width: 30%;
+    display: flex;
+    align-items: center;        /* keep vertical centering */
+    height: 100vh;
+    padding: 0;
+}
+
+.modal-content {
+    border-radius: 16px;      /* soft edges */
+    border: none;             /* no default borders */
+    background-color: #ffffff; /* the only visible rectangle */
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25); /* floating effect */
+    overflow: hidden;
+    margin-top: 10%;             /* move the modal down 10% from center */
+}
+
+/* Optional: remove padding around modal so only the content is visible */
+.modal {
+    padding: 0 !important;
+}
+
+/* Backdrop dim */
+.modal-backdrop.show {
+    opacity: 0.5; /* slightly dark background */
+}
+
+/* Header & Footer styling as before */
+.modal-header {
+    border-bottom: none;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
+
+.modal-footer .btn {
+    border-radius: 25px; /* pill-shaped ends */
+}
+
+.modal-header .close {
+    color: white;           /* make the "×" white */
+    opacity: 1;             /* remove any transparency */
+    font-size: 1.5rem;      /* optional: make it bigger */
+}
+
+.modal-header .close:hover {
+    color: #f8f8f8;         /* optional: slightly lighter on hover */
+    opacity: 1;
+}
+</style>
+
 <!-- JS -->
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+document.querySelectorAll(".delete-event-btn").forEach(btn => {
+    btn.addEventListener("click", function () {
+        const url = this.dataset.url;
+        const name = this.dataset.name;
 
-    // Modal delete button logic
-    document.querySelectorAll(".delete-btn").forEach(btn => {
-        btn.addEventListener("click", function () {
-            const url = this.dataset.url;
-            const name = this.dataset.name;
+        const row = this.closest("tr"); 
+        const rowIndex = Array.from(row.parentNode.children).indexOf(row); // 0-based
 
-            document.getElementById("deleteForm").action = url;
-            document.getElementById("eventNameInModal").innerText = name;
+        // Select modal elements
+        const modalName = document.getElementById("eventNameInModal");
+        const modalHeader = document.querySelector("#deleteModal .modal-header");
+        const cancelBtn = document.querySelector("#deleteModal .btn-secondary");
+        const deleteBtn = document.querySelector("#deleteModal .btn-danger");
 
-            $('#deleteModal').modal('show');
-        });
+        // Set modal event name
+        modalName.innerText = name;
+
+        // Odd/even colors for modal header & event name
+        let mainColor;
+        if (rowIndex % 2 === 0) { // even row
+            mainColor = "#0A7A33";  // green
+        } else { // odd row
+            mainColor = "#173F6C";  // dark blue
+        }
+
+        modalName.style.color = mainColor;
+
+        const red = "#DD1426";
+        modalHeader.style.setProperty("background-color", red, "important");        cancelBtn.style.borderColor = mainColor;
+        
+        // Cancel button hover
+        cancelBtn.style.color = mainColor;
+        cancelBtn.onmouseenter = () => {
+            cancelBtn.style.backgroundColor = mainColor;
+            cancelBtn.style.color = "#fff";
+        };
+        cancelBtn.onmouseleave = () => {
+            cancelBtn.style.backgroundColor = "#fff";
+            cancelBtn.style.color = mainColor;
+        };
+
+        // DELETE BUTTON ALWAYS RED
+        deleteBtn.style.borderColor = "#DD1426";
+        deleteBtn.style.color = "#DD1426";
+        deleteBtn.style.backgroundColor = "#fff";
+
+        deleteBtn.onmouseenter = () => {
+            deleteBtn.style.backgroundColor = "#DD1426";
+            deleteBtn.style.color = "#fff";
+        };
+        deleteBtn.onmouseleave = () => {
+            deleteBtn.style.backgroundColor = "#fff";
+            deleteBtn.style.color = "#DD1426";
+        };
+
+        // Set form action
+        document.getElementById("deleteForm").action = url;
+
+        // Show modal
+        $('#deleteModal').modal('show');
     });
-
 });
 </script>
 
